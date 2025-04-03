@@ -18,7 +18,6 @@ import { NextJsIcon } from "@/components/icons/nextjs";
 export default function Home() {
   return (
     <>
-      <CryptoPriceBanner />
       <HeroHeader />
       
       <Section>

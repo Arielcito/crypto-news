@@ -12,6 +12,7 @@ interface Post {
 }
 
 const mockPosts: Post[] = [
+  // Último Momento
   {
     id: "1",
     title: "Bitcoin supera los $70,000 por primera vez en su historia",
@@ -23,28 +24,86 @@ const mockPosts: Post[] = [
   },
   {
     id: "2",
-    title: "Ethereum 2.0: Las últimas actualizaciones del protocolo",
-    excerpt: "La red de Ethereum continúa evolucionando con nuevas mejoras en su protocolo...",
-    category: "Tecnología",
-    date: "2024-03-19",
-    readTime: "5 min",
+    title: "Ethereum alcanza nuevo récord de TVL en DeFi",
+    excerpt: "El valor total bloqueado en protocolos DeFi de Ethereum supera los $100 mil millones...",
+    category: "Último Momento",
+    date: "2024-03-20",
+    readTime: "4 min",
     image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
   },
+  // Noticias de Mercado
   {
     id: "3",
-    title: "Solana: El ecosistema que está revolucionando DeFi",
-    excerpt: "Solana se posiciona como una de las plataformas más prometedoras en el espacio DeFi...",
-    category: "DeFi",
-    date: "2024-03-18",
-    readTime: "4 min",
+    title: "Análisis: El mercado de criptomonedas en 2024",
+    excerpt: "Un análisis detallado de las tendencias actuales y futuras del mercado de criptomonedas...",
+    category: "Noticias de Mercado",
+    date: "2024-03-19",
+    readTime: "6 min",
     image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
   },
   {
     id: "4",
-    title: "NFTs: La nueva tendencia en el arte digital",
-    excerpt: "El mercado de NFTs continúa creciendo, atrayendo a artistas y coleccionistas...",
-    category: "NFTs",
+    title: "Volumen de trading de Bitcoin supera el de Apple",
+    excerpt: "El volumen de trading de Bitcoin en las últimas 24 horas supera al de las acciones de Apple...",
+    category: "Noticias de Mercado",
+    date: "2024-03-19",
+    readTime: "4 min",
+    image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  },
+  // Tecnología
+  {
+    id: "5",
+    title: "Ethereum 2.0: Las últimas actualizaciones del protocolo",
+    excerpt: "La red de Ethereum continúa evolucionando con nuevas mejoras en su protocolo...",
+    category: "Tecnología",
+    date: "2024-03-18",
+    readTime: "5 min",
+    image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  },
+  {
+    id: "6",
+    title: "Solana: La nueva era de las transacciones rápidas",
+    excerpt: "Cómo Solana está revolucionando la velocidad de las transacciones blockchain...",
+    category: "Tecnología",
+    date: "2024-03-18",
+    readTime: "4 min",
+    image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  },
+  // Temas Destacados
+  {
+    id: "7",
+    title: "DeFi: El futuro de las finanzas descentralizadas",
+    excerpt: "Un análisis profundo del impacto de DeFi en el sistema financiero tradicional...",
+    category: "Temas Destacados",
     date: "2024-03-17",
+    readTime: "7 min",
+    image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  },
+  {
+    id: "8",
+    title: "NFTs: La revolución del arte digital",
+    excerpt: "Cómo los NFTs están transformando el mundo del arte y la propiedad digital...",
+    category: "Temas Destacados",
+    date: "2024-03-17",
+    readTime: "5 min",
+    image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  },
+  // Últimas Noticias
+  {
+    id: "9",
+    title: "Nuevo ETF de Bitcoin en Europa",
+    excerpt: "Europa lanza su primer ETF de Bitcoin, marcando un hito en la adopción institucional...",
+    category: "Últimas Noticias",
+    date: "2024-03-16",
+    readTime: "4 min",
+    image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  },
+  {
+    id: "10",
+    title: "Regulaciones de criptomonedas en América Latina",
+    excerpt: "Un análisis de las nuevas regulaciones de criptomonedas en países latinoamericanos...",
+    category: "Últimas Noticias",
+    date: "2024-03-16",
     readTime: "6 min",
     image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
   }

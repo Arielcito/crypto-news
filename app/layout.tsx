@@ -10,6 +10,8 @@ import { mainMenu, contentMenu } from "@/menu.config";
 import { Section, Container } from "@/components/craft";
 import { Analytics } from "@vercel/analytics/react";
 import { siteConfig } from "@/site.config";
+import { CryptoPriceBanner } from "@/components/crypto-price-banner";
+import { HeroHeader } from "@/components/hero-header";
 
 import Balancer from "react-wrap-balancer";
 import Logo from "@/public/logo.svg";
@@ -41,18 +43,36 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
-      <body className={cn("min-h-screen font-sans antialiased", font.variable)}>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", font.variable)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <Nav />
-          {children}
-          <Footer />
+          <div className="relative flex min-h-screen flex-col">
+            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+              <Container>
+                <div className="flex h-14 items-center">
+                  <MobileNav />
+                  <div className="flex flex-1 items-center justify-between">
+                    <Link href="/" className="flex items-center space-x-2">
+                      <Image src={Logo} alt="Logo" width={32} height={32} />
+                      <span className="font-bold">Crypto News</span>
+                    </Link>
+                    <div className="flex items-center space-x-2">
+                      <ThemeToggle />
+                    </div>
+                  </div>
+                </div>
+              </Container>
+            </header>
+            <CryptoPriceBanner />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+          <Analytics />
         </ThemeProvider>
-        <Analytics />
       </body>
     </html>
   );
@@ -156,7 +176,7 @@ const Footer = () => {
         <Container className="border-t not-prose flex flex-col md:flex-row md:gap-2 gap-6 justify-between md:items-center">
           <ThemeToggle />
           <p className="text-muted-foreground">
-            &copy; <a href="https://9d8.dev">9d8</a>. All rights reserved.
+            &copy; <a href="https://criptonews.com">criptonews</a>. All rights reserved.
             2025-present.
           </p>
         </Container>
