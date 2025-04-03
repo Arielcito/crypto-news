@@ -59,6 +59,14 @@ export default function RootLayout({
 }
 
 const Nav = ({ className, children, id }: NavProps) => {
+  const categoryNames: Record<string, string> = {
+    mercados: "Mercados",
+    noticias: "Noticias",
+    etfs: "ETFs",
+    analisis: "Análisis",
+    educacion: "Educación",
+  };
+
   return (
     <nav
       className={cn("sticky z-50 top-0 bg-background", "border-b", className)}
@@ -88,14 +96,11 @@ const Nav = ({ className, children, id }: NavProps) => {
             {Object.entries(mainMenu).map(([key, href]) => (
               <Button key={href} asChild variant="ghost" size="sm">
                 <Link href={href}>
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                  {categoryNames[key]}
                 </Link>
               </Button>
             ))}
           </div>
-          <Button asChild className="hidden sm:flex">
-            <Link href="https://github.com/9d8dev/next-wp">Get Started</Link>
-          </Button>
           <MobileNav />
         </div>
       </div>

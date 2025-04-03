@@ -1,12 +1,16 @@
 // Define the menu items
 export const mainMenu = {
-  home: "/",
-  about: "https://github.com/9d8dev/next-wp",
-  blog: "/posts",
+  mercados: "/mercados",
+  noticias: "/noticias",
+  etfs: "/etfs",
+  analisis: "/analisis",
+  educacion: "/educacion",
 };
 
 export const contentMenu = {
-  categories: "/posts/categories",
-  tags: "/posts/tags",
+  posts: "/posts",
+  pages: "/pages",
   authors: "/posts/authors",
+  tags: "/posts/tags",
+  categories: "/posts/categories",
 };
