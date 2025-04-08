@@ -26,9 +26,9 @@ const font = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: "WordPress & Next.js Starter by 9d8",
+  title: "BITCOINARG.news - Noticias de Argentina y LATAM",
   description:
-    "A starter template for Next.js with WordPress as a headless CMS.",
+    "Noticias de Argentina y LATAM. Cobertura de eventos, regulaciones y adopción cripto en Argentina y Latinoamérica.",
   metadataBase: new URL(siteConfig.site_domain),
   alternates: {
     canonical: "/",
@@ -58,7 +58,7 @@ export default function RootLayout({
                   <div className="flex flex-1 items-center justify-between">
                     <Link href="/" className="flex items-center space-x-2">
                       <Image src={Logo} alt="Logo" width={32} height={32} />
-                      <span className="font-bold">Crypto News</span>
+                      <span className="font-bold">BITCOINARG.news</span>
                     </Link>
                     <div className="flex items-center space-x-2">
                       <ThemeToggle />
@@ -176,7 +176,7 @@ const Footer = () => {
         <Container className="border-t not-prose flex flex-col md:flex-row md:gap-2 gap-6 justify-between md:items-center">
           <ThemeToggle />
           <p className="text-muted-foreground">
-            &copy; <a href="https://criptonews.com">criptonews</a>. All rights reserved.
+            &copy; <a href="https://bitcoinarg.news">bitcoinarg.news</a>. All rights reserved.
             2025-present.
           </p>
         </Container>
