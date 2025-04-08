@@ -3,9 +3,16 @@ import { RecommendedPosts } from "@/components/recommended-posts";
 import { Clock, Calendar } from "lucide-react";
 import { notFound } from "next/navigation";
 import { mockPosts } from "@/lib/data/posts";
+import Image from "next/image";
 
-export default async function PostPage({ params }: { params: { id: string } }) {
-  const post = mockPosts.find(p => p.id === params.id);
+interface PageProps {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function PostPage({ params, searchParams }: PageProps) {
+  const [resolvedParams, resolvedSearchParams] = await Promise.all([params, searchParams]);
+  const post = mockPosts.find(p => p.id === resolvedParams.id);
 
   if (!post) {
     notFound();
@@ -19,10 +26,12 @@ export default async function PostPage({ params }: { params: { id: string } }) {
           <div className="lg:col-span-2">
             <article className="prose prose-lg max-w-none dark:prose-invert">
               <div className="aspect-video relative overflow-hidden rounded-lg mb-8 ring-1 ring-border/50">
-                <img
-                  src={post.image}
+                <Image
+                  src={post.image || ''}
                   alt={post.title}
-                  className="object-cover w-full h-full"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               </div>
 

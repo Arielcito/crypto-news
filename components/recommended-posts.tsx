@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Clock } from "lucide-react";
 import { Post } from "@/types/post";
+import Image from "next/image";
 
 interface RecommendedPostsProps {
   currentPostId: string;
@@ -26,10 +27,12 @@ export function RecommendedPosts({ currentPostId, posts }: RecommendedPostsProps
           >
             <article className="flex gap-4 p-2 rounded-lg hover:bg-muted/50 transition-colors">
               <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg ring-1 ring-border/50">
-                <img
-                  src={post.image}
+                <Image
+                  src={post.image || ''}
                   alt={post.title}
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  sizes="96px"
                 />
               </div>
               <div className="flex-1 min-w-0">

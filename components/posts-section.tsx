@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Clock, TrendingUp, Newspaper } from "lucide-react";
+import Image from "next/image";
 
 interface Post {
   id: string;
@@ -114,10 +115,12 @@ function PostCard({ post }: { post: Post }) {
     <Link href={`/news/${post.id}`} className="group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
         <div className="aspect-video relative overflow-hidden">
-          <img
-            src={post.image}
+          <Image
+            src={post.image || ''}
             alt={post.title}
-            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </div>
         <div className="p-4">

@@ -23,7 +23,6 @@ export default function Home() {
       <Section>
         <Container>
           <main className="space-y-12">
-            <NavCards />
             <PostsSection />
             <Newsletter />
           </main>
