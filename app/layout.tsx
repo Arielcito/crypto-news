@@ -1,7 +1,7 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Inter as FontSans } from "next/font/google";
+import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Button } from "@/components/ui/button";
 import { MobileNav } from "@/components/nav/mobile-nav";
@@ -14,36 +14,74 @@ import { CryptoPriceBanner } from "@/components/crypto-price-banner";
 import { HeroHeader } from "@/components/hero-header";
 
 import Balancer from "react-wrap-balancer";
-import Logo from "@/public/logo.svg";
+import Logo from "@/public/logo.png";
 import Image from "next/image";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
-const font = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "BITCOINARG.news - Noticias de Argentina y LATAM",
-  description:
-    "Noticias de Argentina y LATAM. Cobertura de eventos, regulaciones y adopción cripto en Argentina y Latinoamérica.",
-  metadataBase: new URL(siteConfig.site_domain),
-  alternates: {
-    canonical: "/",
+  title: "BITCOINARG.news | Noticias de Bitcoin y Criptomonedas en Argentina",
+  description: "Las últimas noticias sobre Bitcoin, criptomonedas y blockchain en Argentina y Latinoamérica. Información actualizada sobre adopción, regulación y tecnología.",
+  keywords: "bitcoin, criptomonedas, argentina, latinoamérica, blockchain, adopción, regulación, tecnología, finanzas, economía",
+  authors: [{ name: "BITCOINARG.news" }],
+  creator: "BITCOINARG.news",
+  publisher: "BITCOINARG.news",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    title: "BITCOINARG.news | Noticias de Bitcoin y Criptomonedas en Argentina",
+    description: "Las últimas noticias sobre Bitcoin, criptomonedas y blockchain en Argentina y Latinoamérica.",
+    url: "https://bitcoinarg.news",
+    siteName: "BITCOINARG.news",
+    images: [
+      {
+        url: "https://bitcoinarg.news/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "BITCOINARG.news",
+      },
+    ],
+    locale: "es_AR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BITCOINARG.news | Noticias de Bitcoin y Criptomonedas en Argentina",
+    description: "Las últimas noticias sobre Bitcoin, criptomonedas y blockchain en Argentina y Latinoamérica.",
+    images: ["https://bitcoinarg.news/twitter-image.jpg"],
+    creator: "@bitcoinargnews",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "google-site-verification-code",
   },
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <head />
-      <body className={cn("min-h-screen bg-background font-sans antialiased", font.variable)}>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.className)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

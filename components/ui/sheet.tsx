@@ -55,7 +55,9 @@ interface SheetContentProps
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
-  SheetContentProps
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> & {
+    side?: "left" | "right" | "top" | "bottom";
+  }
 >(({ side = "right", className, children, ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />

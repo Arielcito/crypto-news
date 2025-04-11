@@ -1,18 +1,23 @@
-import { Container } from "@/components/craft";
+import Link from "next/link";
+import { SocialMediaButtons } from "./social-media-buttons";
 
 export function HeroHeader() {
   return (
-    <header className="border-b">
-      <Container>
-        <div className="py-6">
-          <h1 className="text-4xl font-bold text-center">
-            Tu Fuente de Noticias Crypto
-          </h1>
-          <p className="text-center text-muted-foreground mt-2">
-            Mantente informado con las últimas noticias, análisis de mercado y tendencias en criptomonedas.
-          </p>
+    <header className="bg-tertiary py-6">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className="mb-4 md:mb-0">
+            <Link href="/" className="text-2xl font-bold text-primary">
+              BITCOINARG.news
+            </Link>
+            <p className="text-secondary-foreground mt-1">
+              Noticias de Bitcoin y criptomonedas en Argentina y Latinoamérica
+            </p>
+          </div>
+          
+          <SocialMediaButtons />
         </div>
-      </Container>
+      </div>
     </header>
   );
 } 

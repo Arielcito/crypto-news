@@ -219,13 +219,13 @@ export const Main = ({ children, className, id }: BaseProps) => (
 );
 
 export const Section = ({ children, className, id }: BaseProps) => (
-  <section className={cn(styles.layout.section, className)} id={id}>
+  <section className={cn("py-8 md:py-12", className)} id={id}>
     {children}
   </section>
 );
 
 export const Container = ({ children, className, id }: BaseProps) => (
-  <div className={cn(styles.layout.container, className)} id={id}>
+  <div className={cn("container mx-auto px-4 sm:px-6 lg:px-8", className)} id={id}>
     {children}
   </div>
 );
