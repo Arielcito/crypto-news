@@ -89,22 +89,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="relative flex min-h-screen flex-col">
-            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              <Container>
-                <div className="flex h-14 items-center">
-                  <MobileNav />
-                  <div className="flex flex-1 items-center justify-between">
-                    <Link href="/" className="flex items-center space-x-2">
-                      <Image src={Logo} alt="Logo" width={32} height={32} />
-                      <span className="font-bold">BITCOINARG.news</span>
-                    </Link>
-                    <div className="flex items-center space-x-2">
-                      <ThemeToggle />
-                    </div>
-                  </div>
-                </div>
-              </Container>
-            </header>
+            <HeroHeader />
             <CryptoPriceBanner />
             <main className="flex-1">{children}</main>
             <Footer />
@@ -142,7 +127,6 @@ const Nav = ({ className, children, id }: NavProps) => {
             src={Logo}
             alt="Logo"
             loading="eager"
-            className="dark:invert"
             width={42}
             height={26.44}
           ></Image>
@@ -177,7 +161,6 @@ const Footer = () => {
               <Image
                 src={Logo}
                 alt="Logo"
-                className="dark:invert"
                 width={42}
                 height={26.44}
               ></Image>

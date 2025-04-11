@@ -177,41 +177,6 @@ export function PostsSection() {
           ))}
         </div>
       </section>
-
-      <section>
-        <h2 className="text-3xl font-bold text-primary mb-6">Últimas Noticias</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockPosts.map((post) => (
-            <Card key={post.id} className="border border-tertiary hover:border-secondary transition-colors">
-              <CardHeader>
-                <div className="text-sm text-secondary font-medium">{post.category}</div>
-                <CardTitle className="text-xl text-primary">{post.title}</CardTitle>
-                <CardDescription>{post.date}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="aspect-video bg-tertiary rounded-md mb-4"></div>
-                <p className="text-foreground">{post.excerpt}</p>
-              </CardContent>
-              <CardFooter>
-                <Link 
-                  href={`/news/${post.id}`} 
-                  className="text-secondary hover:text-secondary/80 transition-colors font-medium"
-                >
-                  Leer más →
-                </Link>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-        <div className="mt-8 text-center">
-          <Link 
-            href="/noticias" 
-            className="inline-block bg-primary text-primary-foreground px-6 py-2 rounded-md hover:bg-primary/90 transition-colors"
-          >
-            Ver todas las noticias
-          </Link>
-        </div>
-      </section>
     </div>
   );
 } 

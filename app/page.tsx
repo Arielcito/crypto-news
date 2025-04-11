@@ -1,7 +1,7 @@
 // Craft Imports
 import { Section, Container } from "@/components/craft";
 import { CryptoPriceBanner } from "@/components/crypto-price-banner";
-import { Newsletter } from "@/components/newsletter";
+import { TelegramChannel } from "@/components/newsletter";
 import { HeroHeader } from "@/components/hero-header";
 import { NavCards } from "@/components/nav-cards";
 import { PostsSection } from "@/components/posts-section";
@@ -18,13 +18,11 @@ import { NextJsIcon } from "@/components/icons/nextjs";
 export default function Home() {
   return (
     <>
-      <HeroHeader />
-      
       <Section>
         <Container>
           <main className="space-y-12">
             <PostsSection />
-            <Newsletter />
+            <TelegramChannel />
           </main>
         </Container>
       </Section>

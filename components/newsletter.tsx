@@ -1,35 +1,32 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { FaTelegram } from "react-icons/fa";
 
-export function Newsletter() {
+export function TelegramChannel() {
   return (
-    <Card className="bg-tertiary border-tertiary">
+    <Card className="bg-tertiary border-tertiary flex flex-col items-center text-center">
       <CardHeader>
-        <CardTitle className="text-primary">Suscríbete a nuestro newsletter</CardTitle>
+        <CardTitle className="text-primary">Únete a nuestro canal de Telegram</CardTitle>
         <CardDescription>
-          Recibe las últimas noticias sobre Bitcoin y criptomonedas directamente en tu correo.
+          Mantente al día con las últimas noticias sobre Bitcoin y criptomonedas en tiempo real.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="flex flex-col sm:flex-row gap-2">
-          <Input 
-            type="email" 
-            placeholder="Tu correo electrónico" 
-            className="flex-1"
-            required
-          />
-          <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90">
-            Suscribirse
-          </Button>
-        </form>
+        <Button 
+          asChild 
+          className="w-fit bg-[#0088cc] hover:bg-[#0088cc]/90 text-white px-6"
+        >
+          <a href="https://t.me/bitcoinarg" target="_blank" rel="noopener noreferrer">
+            <FaTelegram className="mr-2 h-4 w-4" />
+            Unirse al canal
+          </a>
+        </Button>
       </CardContent>
       <CardFooter>
         <p className="text-sm text-muted-foreground">
-          Al suscribirte, aceptas recibir comunicaciones de marketing de BITCOINARG.news.
-          Puedes darte de baja en cualquier momento.
+          Más de 10,000 miembros ya están recibiendo nuestras actualizaciones diarias.
         </p>
       </CardFooter>
     </Card>
