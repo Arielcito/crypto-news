@@ -1,3 +1,4 @@
+/** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
   images: {
@@ -12,4 +13,4 @@ const config = {
   output: 'standalone',
 };
 
-export default config; 
+module.exports = config; 

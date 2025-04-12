@@ -1,3 +1,5 @@
+'use client';
+
 // Craft Imports
 import { Section, Container } from "@/components/craft";
 import { CryptoPriceBanner } from "@/components/crypto-price-banner";
