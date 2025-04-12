@@ -34,18 +34,30 @@ const LOCAL_STORAGE_KEY = 'selected_domain';
 
 export function getCurrentDomain(): Domain {
   if (typeof window === 'undefined') {
+    console.log('getCurrentDomain: Running on server, returning localhost');
     return 'localhost';
   }
   
-  console.log('getCurrentDomain', window.location.hostname);
+  console.log('getCurrentDomain: Hostname:', window.location.hostname);
   
   // Remove www. prefix if present
   const hostname = window.location.hostname.replace(/^www\./, '');
+  console.log('getCurrentDomain: Cleaned hostname:', hostname);
   
-  if (hostname === 'bitcoinarg.news') return 'bitcoinarg.news';
-  if (hostname === 'tendenciascrypto.com') return 'tendenciascrypto.com';
-  if (hostname === 'ultimahoracrypto.com') return 'ultimahoracrypto.com';
+  if (hostname === 'bitcoinarg.news') {
+    console.log('getCurrentDomain: Matched bitcoinarg.news');
+    return 'bitcoinarg.news';
+  }
+  if (hostname === 'tendenciascrypto.com') {
+    console.log('getCurrentDomain: Matched tendenciascrypto.com');
+    return 'tendenciascrypto.com';
+  }
+  if (hostname === 'ultimahoracrypto.com') {
+    console.log('getCurrentDomain: Matched ultimahoracrypto.com');
+    return 'ultimahoracrypto.com';
+  }
   
+  console.log('getCurrentDomain: No match found, returning localhost');
   return 'localhost';
 }
 
@@ -56,30 +68,8 @@ export const setSelectedDomain = (domain: Domain) => {
 };
 
 export function getCurrentPalette(domain: Domain = getCurrentDomain()) {
-  switch (domain) {
-    case 'bitcoinarg.news':
-      return {
-        primary: 'hsl(24, 100%, 50%)',
-        secondary: 'hsl(0, 0%, 100%)',
-        tertiary: 'hsl(0, 0%, 0%)'
-      };
-    case 'tendenciascrypto.com':
-      return {
-        primary: 'hsl(210, 100%, 50%)',
-        secondary: 'hsl(0, 0%, 100%)',
-        tertiary: 'hsl(0, 0%, 0%)'
-      };
-    case 'ultimahoracrypto.com':
-      return {
-        primary: 'hsl(120, 100%, 50%)',
-        secondary: 'hsl(0, 0%, 100%)',
-        tertiary: 'hsl(0, 0%, 0%)'
-      };
-    default:
-      return {
-        primary: 'hsl(24, 100%, 50%)',
-        secondary: 'hsl(0, 0%, 100%)',
-        tertiary: 'hsl(0, 0%, 0%)'
-      };
-  }
+  console.log('getCurrentPalette: Domain:', domain);
+  const palette = domainPalettes[domain];
+  console.log('getCurrentPalette: Selected palette:', palette);
+  return palette;
 } 
