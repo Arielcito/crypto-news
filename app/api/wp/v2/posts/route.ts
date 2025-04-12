@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { checkBasicAuth } from '@/lib/auth';
 import { Post } from '@/types/wordpress';
 
@@ -45,12 +45,12 @@ export async function GET(request: NextRequest) {
   headers.set('X-WP-Total', filteredPosts.length.toString());
   headers.set('X-WP-TotalPages', Math.ceil(filteredPosts.length / per_page).toString());
 
-  return NextResponse.json(paginatedPosts, { headers });
+  return Response.json(paginatedPosts, { headers });
 }
 
 export async function POST(request: NextRequest) {
   if (!checkBasicAuth(request)) {
-    return new NextResponse('Unauthorized', { status: 401 });
+    return new Response('Unauthorized', { status: 401 });
   }
 
   try {
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     
     // Validar campos requeridos
     if (!body.title || !body.content) {
-      return new NextResponse('Title and content are required', { status: 400 });
+      return new Response('Title and content are required', { status: 400 });
     }
 
     const newPost: Post = {
@@ -96,15 +96,15 @@ export async function POST(request: NextRequest) {
 
     posts.push(newPost);
 
-    return NextResponse.json(newPost, { status: 201 });
+    return Response.json(newPost, { status: 201 });
   } catch (error) {
-    return new NextResponse('Invalid request body', { status: 400 });
+    return new Response('Invalid request body', { status: 400 });
   }
 }
 
 export async function PUT(request: NextRequest) {
   if (!checkBasicAuth(request)) {
-    return new NextResponse('Unauthorized', { status: 401 });
+    return new Response('Unauthorized', { status: 401 });
   }
 
   try {
@@ -113,7 +113,7 @@ export async function PUT(request: NextRequest) {
 
     const postIndex = posts.findIndex(post => post.id === id);
     if (postIndex === -1) {
-      return new NextResponse('Post not found', { status: 404 });
+      return new Response('Post not found', { status: 404 });
     }
 
     const updatedPost = {
@@ -125,25 +125,25 @@ export async function PUT(request: NextRequest) {
 
     posts[postIndex] = updatedPost;
 
-    return NextResponse.json(updatedPost);
+    return Response.json(updatedPost);
   } catch (error) {
-    return new NextResponse('Invalid request body', { status: 400 });
+    return new Response('Invalid request body', { status: 400 });
   }
 }
 
 export async function DELETE(request: NextRequest) {
   if (!checkBasicAuth(request)) {
-    return new NextResponse('Unauthorized', { status: 401 });
+    return new Response('Unauthorized', { status: 401 });
   }
 
   const id = parseInt(request.nextUrl.pathname.split('/').pop() || '0');
   const postIndex = posts.findIndex(post => post.id === id);
 
   if (postIndex === -1) {
-    return new NextResponse('Post not found', { status: 404 });
+    return new Response('Post not found', { status: 404 });
   }
 
   posts.splice(postIndex, 1);
 
-  return new NextResponse(null, { status: 204 });
+  return new Response(null, { status: 204 });
 } 

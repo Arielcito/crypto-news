@@ -28,11 +28,9 @@ const nextConfig = {
   experimental: {
     // This helps prevent regex stack overflows
     instrumentationHook: false,
-    // Limit resource use during static generation
-    cpus: Math.max(1, Math.min(4, require('os').cpus().length / 2)),
   },
-  // Optimize for dynamic routes with ISR
-  output: 'hybrid',
+  // Optimize for dynamic routes
+  output: 'standalone',
 };
 
 module.exports = nextConfig; 
