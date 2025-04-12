@@ -21,7 +21,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       <CryptoPriceBanner />
       <main className="flex-1">{children}</main>
       <Footer />
-      <DomainSelector />
+      
+      {process.env.NODE_ENV === 'development' && <DomainSelector />}
     </div>
   );
 }

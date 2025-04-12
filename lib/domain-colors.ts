@@ -36,7 +36,7 @@ export function getCurrentDomain(): Domain {
   if (typeof window === 'undefined') {
     return 'localhost';
   }
-
+  console.log('getCurrentDomain', window.location.hostname);
   const hostname = window.location.hostname;
   if (hostname === 'bitcoinarg.news') return 'bitcoinarg.news';
   if (hostname === 'tendenciascrypto.com') return 'tendenciascrypto.com';
