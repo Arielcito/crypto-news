@@ -65,16 +65,12 @@ export async function POST(request: NextRequest) {
       id: posts.length + 1,
       date: new Date().toISOString(),
       date_gmt: new Date().toISOString(),
-      guid: {
-        rendered: `https://${process.env.NEXT_PUBLIC_SITE_URL}/?p=${posts.length + 1}`
-      },
       modified: new Date().toISOString(),
       modified_gmt: new Date().toISOString(),
       password: '',
       slug: body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
       status: body.status || 'publish',
       type: 'post',
-      link: `https://${process.env.NEXT_PUBLIC_SITE_URL}/?p=${posts.length + 1}`,
       title: {
         rendered: body.title
       },
