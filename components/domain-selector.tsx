@@ -1,39 +1,42 @@
 'use client';
 
 import { useDomain } from '@/lib/use-domain';
-import { setSelectedDomain, Domain } from '@/lib/domain-colors';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { Domain } from '@/lib/domain-colors';
 
 export function DomainSelector() {
-  const { domain } = useDomain();
+  const { domain, setDomain } = useDomain();
+  const router = useRouter();
 
-  if (typeof window === 'undefined' || window.location.hostname !== 'localhost') {
-    return null;
-  }
-
-  const domains = [
-    { id: 'bitcoinarg.news', label: 'BitcoinArg' },
-    { id: 'tendenciascrypto.com', label: 'TendenciasCrypto' },
-    { id: 'ultimahoracrypto.com', label: 'UltimaHoraCrypto' },
-  ];
+  const handleDomainChange = (newDomain: string) => {
+    setDomain(newDomain as Domain);
+    router.refresh();
+  };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex gap-2 bg-background p-2 rounded-lg shadow-lg border">
-      {domains.map(({ id, label }) => (
-        <Button
-          key={id}
-          variant={domain === id ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setSelectedDomain(id as Domain)}
-          className={cn(
-            'transition-colors',
-            domain === id && 'bg-primary text-primary-foreground'
-          )}
-        >
-          {label}
-        </Button>
-      ))}
+    <div className="fixed bottom-4 right-4 flex gap-2">
+      <Button
+        variant={domain === 'bitcoinarg.news' ? 'default' : 'outline'}
+        size="sm"
+        onClick={() => handleDomainChange('bitcoinarg.news')}
+      >
+        BitcoinArg
+      </Button>
+      <Button
+        variant={domain === 'tendenciascrypto.com' ? 'default' : 'outline'}
+        size="sm"
+        onClick={() => handleDomainChange('tendenciascrypto.com')}
+      >
+        Tendencias
+      </Button>
+      <Button
+        variant={domain === 'ultimahoracrypto.com' ? 'default' : 'outline'}
+        size="sm"
+        onClick={() => handleDomainChange('ultimahoracrypto.com')}
+      >
+        Última Hora
+      </Button>
     </div>
   );
 } 

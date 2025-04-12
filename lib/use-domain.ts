@@ -137,40 +137,28 @@ const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
 };
 
 export function useDomain() {
-  const [config, setConfig] = useState<DomainConfig>(() => {
-    const domain = getCurrentDomain();
-    const colors = getCurrentPalette();
-    const baseConfig = domainConfigs[domain];
-    
-    return {
-      domain,
-      colors,
-      ...baseConfig
-    };
-  });
+  const [domain, setDomain] = useState<Domain>(getCurrentDomain());
+  const colors = getCurrentPalette(domain);
+  const config = domainConfigs[domain];
 
   useEffect(() => {
-    const updateConfig = () => {
-      const domain = getCurrentDomain();
-      const colors = getCurrentPalette();
-      const baseConfig = domainConfigs[domain];
-      
-      setConfig({
-        domain,
-        colors,
-        ...baseConfig
-      });
+    // Actualizar el dominio cuando cambie la URL
+    const handlePopState = () => {
+      setDomain(getCurrentDomain());
     };
 
-    updateConfig();
-    window.addEventListener('popstate', updateConfig);
-    window.addEventListener('domain-changed', updateConfig);
-    
-    return () => {
-      window.removeEventListener('popstate', updateConfig);
-      window.removeEventListener('domain-changed', updateConfig);
-    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  return config;
+  return {
+    domain,
+    setDomain,
+    ...config,
+    colors,
+    site: {
+      ...config.site,
+      domain
+    }
+  };
 } 

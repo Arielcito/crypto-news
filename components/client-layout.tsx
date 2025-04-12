@@ -15,8 +15,6 @@ import { cn } from '@/lib/utils';
 import { MessageSquare, Twitter, Instagram, Youtube, Music } from 'lucide-react';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
-  const { site } = useDomain();
-
   return (
     <div className="relative flex min-h-screen flex-col">
       <HeroHeader />
@@ -27,50 +25,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-
-const Nav = ({ className, children, id }: NavProps) => {
-  const { site } = useDomain();
-
-  return (
-    <nav
-      className={cn("sticky z-50 top-0 bg-background", "border-b", className)}
-      id={id}
-    >
-      <div
-        id="nav-container"
-        className="max-w-5xl mx-auto py-4 px-6 sm:px-8 flex justify-between items-center"
-      >
-        <Link
-          className="hover:opacity-75 transition-all flex gap-4 items-center"
-          href="/"
-        >
-          <Image
-            src={site.logo}
-            alt="Logo"
-            loading="eager"
-            width={42}
-            height={26.44}
-          ></Image>
-          <h2 className="text-sm">{site.name}</h2>
-        </Link>
-        {children}
-        <div className="flex items-center gap-2">
-          <div className="mx-2 hidden md:flex">
-            {site.categories.map(({ key, label, href }) => (
-              <Button key={href} asChild variant="ghost" size="sm">
-                <Link href={href}>
-                  {label}
-                </Link>
-              </Button>
-            ))}
-          </div>
-          <ThemeToggle />
-          <MobileNav />
-        </div>
-      </div>
-    </nav>
-  );
-};
 
 const Footer = () => {
   const { site } = useDomain();
@@ -87,7 +41,7 @@ const Footer = () => {
                 alt={site.name}
                 width={42}
                 height={26.44}
-              ></Image>
+              />
             </Link>
             <p>
               <Balancer>{site.description}</Balancer>
@@ -126,44 +80,8 @@ const Footer = () => {
                   <Instagram size={20} />
                 </Link>
               )}
-              {site.socialLinks.tiktok && (
-                <Link
-                  className="hover:text-primary transition-colors"
-                  href={site.socialLinks.tiktok}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Music size={20} />
-                </Link>
-              )}
-              {site.socialLinks.youtube && (
-                <Link
-                  className="hover:text-primary transition-colors"
-                  href={site.socialLinks.youtube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Youtube size={20} />
-                </Link>
-              )}
             </div>
           </div>
-        </Container>
-        <Container className="border-t not-prose flex flex-col md:flex-row md:gap-2 gap-6 justify-between md:items-center">
-          <ThemeToggle />
-          <p className="text-muted-foreground">
-            &copy; <a href="https://bitcoinarg.news">{site.name}</a>. All rights reserved.
-            2025-present.
-          </p>
-        </Container>
-        <Container className="mt-12 p-6 bg-muted/50 rounded-lg text-center">
-          <h3 className="text-lg font-medium mb-2">¿Querés llegar a la comunidad cripto más grande de Argentina?</h3>
-          <Link
-            className="text-primary hover:underline underline-offset-4"
-            href="mailto:publicidad@bitcoinarg.news"
-          >
-            publicidad@bitcoinarg.news
-          </Link>
         </Container>
       </Section>
     </footer>

@@ -32,17 +32,17 @@ export const domainPalettes: Record<Domain, ColorPalette> = {
 // Store selected domain in localStorage
 const LOCAL_STORAGE_KEY = 'selected_domain';
 
-export const getCurrentDomain = (): Domain => {
-  if (typeof window === 'undefined') return 'bitcoinarg.news';
-  
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost') {
-    const storedDomain = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return (storedDomain as Domain) || 'bitcoinarg.news';
+export function getCurrentDomain(): Domain {
+  if (typeof window === 'undefined') {
+    return 'localhost';
   }
-  
-  return hostname as Domain;
-};
+
+  const hostname = window.location.hostname;
+  if (hostname === 'bitcoinarg.news') return 'bitcoinarg.news';
+  if (hostname === 'tendenciascrypto.com') return 'tendenciascrypto.com';
+  if (hostname === 'ultimahoracrypto.com') return 'ultimahoracrypto.com';
+  return 'localhost';
+}
 
 export const setSelectedDomain = (domain: Domain) => {
   if (typeof window === 'undefined') return;
@@ -50,7 +50,31 @@ export const setSelectedDomain = (domain: Domain) => {
   window.dispatchEvent(new Event('domain-changed'));
 };
 
-export const getCurrentPalette = (): ColorPalette => {
-  const domain = getCurrentDomain();
-  return domainPalettes[domain];
-}; 
+export function getCurrentPalette(domain: Domain = getCurrentDomain()) {
+  switch (domain) {
+    case 'bitcoinarg.news':
+      return {
+        primary: 'hsl(24, 100%, 50%)',
+        secondary: 'hsl(0, 0%, 100%)',
+        tertiary: 'hsl(0, 0%, 0%)'
+      };
+    case 'tendenciascrypto.com':
+      return {
+        primary: 'hsl(210, 100%, 50%)',
+        secondary: 'hsl(0, 0%, 100%)',
+        tertiary: 'hsl(0, 0%, 0%)'
+      };
+    case 'ultimahoracrypto.com':
+      return {
+        primary: 'hsl(120, 100%, 50%)',
+        secondary: 'hsl(0, 0%, 100%)',
+        tertiary: 'hsl(0, 0%, 0%)'
+      };
+    default:
+      return {
+        primary: 'hsl(24, 100%, 50%)',
+        secondary: 'hsl(0, 0%, 100%)',
+        tertiary: 'hsl(0, 0%, 0%)'
+      };
+  }
+} 
