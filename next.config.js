@@ -1,6 +1,6 @@
 import { NextConfig } from 'next';
 
-const config: NextConfig = {
+const config = {
   reactStrictMode: true,
   images: {
     remotePatterns: [
