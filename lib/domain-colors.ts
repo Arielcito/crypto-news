@@ -1,4 +1,4 @@
-export type Domain = 'bitcoinarg.news' | 'tendenciascrypto.com' | 'ultimahoracrypto.com' | 'localhost';
+export type Domain = 'bitcoinarg.news' | 'tendenciascrypto.com' | 'tendenciascripto.com' | 'ultimahoracrypto.com' | 'localhost';
 
 export interface ColorPalette {
   primary: string;
@@ -13,6 +13,11 @@ export const domainPalettes: Record<Domain, ColorPalette> = {
     tertiary: '#ECEFF1', // Gris Claro
   },
   'tendenciascrypto.com': {
+    primary: '#2979FF', // Azul Eléctrico
+    secondary: '#673AB7', // Púrpura
+    tertiary: '#37474F', // Gris Oscuro
+  },
+  'tendenciascripto.com': {
     primary: '#2979FF', // Azul Eléctrico
     secondary: '#673AB7', // Púrpura
     tertiary: '#37474F', // Gris Oscuro
@@ -48,7 +53,7 @@ export function getCurrentDomain(): Domain {
     console.log('getCurrentDomain: Matched bitcoinarg.news');
     return 'bitcoinarg.news';
   }
-  if (hostname === 'tendenciascrypto.com') {
+  if (hostname === 'tendenciascrypto.com' || hostname === 'tendenciascripto.com') {
     console.log('getCurrentDomain: Matched tendenciascrypto.com');
     return 'tendenciascrypto.com';
   }

@@ -49,6 +49,28 @@ export const domainConfigs = {
       ]
     }
   },
+  'tendenciascripto.com': {
+    isBitcoinArg: false,
+    isTendenciasCrypto: true,
+    isUltimaHoraCrypto: false,
+    site: {
+      domain: 'tendenciascrypto.com',
+      name: 'TENDENCIASCRIPTO',
+      description: 'Análisis profundo y tendencias del mercado de criptomonedas en Latinoamérica.',
+      title: 'TENDENCIASCRIPTO.com | Análisis y Tendencias del Mercado Cripto',
+      ogImage: '/tendenciascrypto/og-image.jpg',
+      twitterHandle: '@tendenciascrypto',
+      logo: '/tendenciascrypto/logo.png',
+      socialLinks: {
+        telegram: 'https://t.me/tendenciascrypto'
+      },
+      categories: [
+        { key: 'tendencias', label: 'Tendencias', href: '/tendencias' },
+        { key: 'analisis', label: 'Análisis', href: '/analisis' },
+        { key: 'mercado', label: 'Mercado', href: '/mercado' }
+      ]
+    }
+  },
   'ultimahoracrypto.com': {
     isBitcoinArg: false,
     isTendenciasCrypto: false,
