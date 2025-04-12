@@ -64,7 +64,7 @@ export function getCurrentDomain(): Domain {
   }
   if (hostname === 'ultimahoracrypto.com' || hostname === 'ultimahoracripto.com') {
     console.log('getCurrentDomain: Matched ultimahoracrypto.com');
-    return 'ultimahoracrypto.com';
+    return hostname as Domain;
   }
   
   console.log('getCurrentDomain: No match found, returning localhost');
