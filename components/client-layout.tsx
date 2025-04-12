@@ -1,47 +1,29 @@
-import "./globals.css";
+'use client';
 
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { ThemeProvider } from "@/lib/theme-provider";
-import { Button } from "@/components/ui/button";
-import { MobileNav } from "@/components/nav/mobile-nav";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { mainMenu, contentMenu } from "@/menu.config";
-import { Section, Container } from "@/components/craft";
-import { Analytics } from "@vercel/analytics/react";
-import { siteConfig } from "@/site.config";
-import { CryptoPriceBanner } from "@/components/crypto-price-banner";
-import { HeroHeader } from "@/components/hero-header";
-import { DomainSelector } from "@/components/domain-selector";
-import { ClientLayout } from "@/components/client-layout";
-
+import { useDomain } from '@/lib/use-domain';
+import { Button } from '@/components/ui/button';
+import { MobileNav } from '@/components/nav/mobile-nav';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Section, Container } from '@/components/craft';
+import { CryptoPriceBanner } from '@/components/crypto-price-banner';
+import { HeroHeader } from '@/components/hero-header';
+import { DomainSelector } from '@/components/domain-selector';
 import Balancer from "react-wrap-balancer";
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from '@/lib/utils';
 
-import { cn } from "@/lib/utils";
-import { useDomain } from "@/lib/use-domain";
+export function ClientLayout({ children }: { children: React.ReactNode }) {
+  const { site } = useDomain();
 
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "Bitcoin Argentina",
-  description: "Noticias y análisis sobre Bitcoin y criptomonedas en Argentina",
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider>
-          <ClientLayout>{children}</ClientLayout>
-        </ThemeProvider>
-      </body>
-    </html>
+    <div className="relative flex min-h-screen flex-col">
+      <HeroHeader />
+      <CryptoPriceBanner />
+      <main className="flex-1">{children}</main>
+      <Footer />
+      <DomainSelector />
+    </div>
   );
 }
 
@@ -160,4 +142,4 @@ const Footer = () => {
       </Section>
     </footer>
   );
-};
+}; 
