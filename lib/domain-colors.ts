@@ -39,47 +39,49 @@ export const domainPalettes: Record<Domain, ColorPalette> = {
   },
 };
 
-// Store selected domain in localStorage
-const LOCAL_STORAGE_KEY = 'selected_domain';
+const COOKIE_KEY = 'selected_domain';
 
 export function getCurrentDomain(): Domain {
   if (typeof window === 'undefined') {
-    console.log('getCurrentDomain: Running on server, returning localhost');
     return 'localhost';
   }
-  
-  console.log('getCurrentDomain: Hostname:', window.location.hostname);
-  
-  // Remove www. prefix if present
+
+  // Check cookie first
+  const cookieDomain = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(`${COOKIE_KEY}=`))
+    ?.split('=')[1] as Domain;
+
+  if (cookieDomain) {
+    return cookieDomain;
+  }
+
   const hostname = window.location.hostname.replace(/^www\./, '');
-  console.log('getCurrentDomain: Cleaned hostname:', hostname);
   
   if (hostname === 'bitcoinarg.news') {
-    console.log('getCurrentDomain: Matched bitcoinarg.news');
     return 'bitcoinarg.news';
   }
   if (hostname === 'tendenciascrypto.com' || hostname === 'tendenciascripto.com') {
-    console.log('getCurrentDomain: Matched tendenciascrypto.com');
     return 'tendenciascrypto.com';
   }
   if (hostname === 'ultimahoracrypto.com' || hostname === 'ultimahoracripto.com') {
-    console.log('getCurrentDomain: Matched ultimahoracrypto.com');
     return hostname as Domain;
   }
   
-  console.log('getCurrentDomain: No match found, returning localhost');
   return 'localhost';
 }
 
 export const setSelectedDomain = (domain: Domain) => {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(LOCAL_STORAGE_KEY, domain);
+  
+  // Set cookie with 1 year expiration
+  const date = new Date();
+  date.setFullYear(date.getFullYear() + 1);
+  document.cookie = `${COOKIE_KEY}=${domain}; expires=${date.toUTCString()}; path=/`;
+  
   window.dispatchEvent(new Event('domain-changed'));
 };
 
 export function getCurrentPalette(domain: Domain = getCurrentDomain()) {
-  console.log('getCurrentPalette: Domain:', domain);
-  const palette = domainPalettes[domain];
-  console.log('getCurrentPalette: Selected palette:', palette);
-  return palette;
+  return domainPalettes[domain];
 } 
