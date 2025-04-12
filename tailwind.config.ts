@@ -23,38 +23,38 @@ const config = {
         sans: ["var(--font-sans)", ...fontFamily.sans],
       },
       colors: {
-        border: "var(--tertiary)",
-        input: "var(--tertiary)",
-        ring: "var(--primary)",
-        background: "var(--tertiary)",
-        foreground: "var(--secondary)",
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "var(--primary)",
-          foreground: "var(--tertiary)",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "var(--secondary)",
-          foreground: "var(--tertiary)",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "var(--tertiary)",
-          foreground: "var(--secondary)",
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "var(--primary)",
-          foreground: "var(--tertiary)",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
-          DEFAULT: "var(--tertiary)",
-          foreground: "var(--secondary)",
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "var(--tertiary)",
-          foreground: "var(--secondary)",
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
       },
       borderRadius: {
@@ -76,21 +76,17 @@ const config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
-      typography: {
-        DEFAULT: {
-          css: {
-            h1: { margin: 0 },
-            h2: { margin: 0 },
-            h3: { margin: 0 },
-            h4: { margin: 0 },
-            h5: { margin: 0 },
-            h6: { margin: 0 },
-          },
-        },
-      },
     },
   },
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@tailwindcss/typography")({
+      className: 'prose',
+      modifiers: {
+        headings: false
+      }
+    }),
+  ],
 } satisfies Config;
 
 export default config;

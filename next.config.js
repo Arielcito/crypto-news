@@ -26,11 +26,28 @@ const nextConfig = {
   // Add options to reduce static generation complexity
   staticPageGenerationTimeout: 180,
   experimental: {
-    // This helps prevent regex stack overflows
+    // Disable instrumentation hook to prevent regex stack issues
     instrumentationHook: false,
+    // Simplify build pattern matching
+    webpackBuildWorker: false,
   },
-  // Optimize for dynamic routes
+  // Use server components for dynamic routes
   output: 'standalone',
+  // Limit the regexp patterns during build
+  transpilePackages: [],
+  // Prevent excessive module resolution and matching
+  webpack: (config) => {
+    // Optimized cache settings
+    config.cache = {
+      ...config.cache,
+      maxGenerations: 1,
+    };
+    
+    // Limit module resolution depth
+    config.resolve.symlinks = false;
+    
+    return config;
+  },
 };
 
 module.exports = nextConfig; 

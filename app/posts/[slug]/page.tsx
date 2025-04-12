@@ -18,6 +18,14 @@ import type { Metadata } from "next";
 // Force dynamic rendering instead of static generation
 export const dynamic = 'force-dynamic';
 
+// Disable static generation for this route
+export const dynamicParams = true;
+
+// Prevent excessive static path generation
+export const generateStaticParams = () => {
+  return [];
+}
+
 export async function generateMetadata({
   params,
 }: {
