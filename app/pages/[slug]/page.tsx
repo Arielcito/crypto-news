@@ -1,6 +1,6 @@
 import { getPageBySlug, getAllPages } from "@/lib/wordpress";
 import { Section, Container, Prose } from "@/components/craft";
-import { siteConfig } from "@/site.config";
+import { getDomainConfig } from "@/lib/domain-config";
 
 import type { Metadata } from "next";
 
@@ -27,7 +27,8 @@ export async function generateMetadata({
     return {};
   }
 
-  const ogUrl = new URL(`${siteConfig.site_domain}/api/og`);
+  const { site } = getDomainConfig();
+  const ogUrl = new URL(`https://${site.domain}/api/og`);
   ogUrl.searchParams.append("title", page.title.rendered);
   // Strip HTML tags for description and limit length
   const description = page.excerpt?.rendered
@@ -45,7 +46,7 @@ export async function generateMetadata({
       title: page.title.rendered,
       description: description,
       type: "article",
-      url: `${siteConfig.site_domain}/pages/${page.slug}`,
+      url: `${site.domain}/pages/${page.slug}`,
       images: [
         {
           url: ogUrl.toString(),

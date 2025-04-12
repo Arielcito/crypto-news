@@ -83,7 +83,7 @@ const Footer = () => {
               <h3 className="sr-only">{site.name}</h3>
               <Image
                 src={site.logo}
-                alt="Logo"
+                alt={site.name}
                 width={42}
                 height={26.44}
               ></Image>
@@ -106,30 +106,56 @@ const Footer = () => {
           </div>
           <div className="flex flex-col gap-2 text-sm">
             <h5 className="font-medium text-base">Social</h5>
-            <Link
-              className="hover:underline underline-offset-4"
-              href={site.socialLinks.twitter}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Twitter
-            </Link>
-            <Link
-              className="hover:underline underline-offset-4"
-              href={site.socialLinks.telegram}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Telegram
-            </Link>
-            <Link
-              className="hover:underline underline-offset-4"
-              href={site.socialLinks.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Discord
-            </Link>
+            {site.socialLinks.telegram && (
+              <Link
+                className="hover:underline underline-offset-4"
+                href={site.socialLinks.telegram}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Telegram
+              </Link>
+            )}
+            {site.socialLinks.twitter && (
+              <Link
+                className="hover:underline underline-offset-4"
+                href={site.socialLinks.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Twitter
+              </Link>
+            )}
+            {site.socialLinks.instagram && (
+              <Link
+                className="hover:underline underline-offset-4"
+                href={site.socialLinks.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Instagram
+              </Link>
+            )}
+            {site.socialLinks.tiktok && (
+              <Link
+                className="hover:underline underline-offset-4"
+                href={site.socialLinks.tiktok}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                TikTok
+              </Link>
+            )}
+            {site.socialLinks.youtube && (
+              <Link
+                className="hover:underline underline-offset-4"
+                href={site.socialLinks.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                YouTube
+              </Link>
+            )}
           </div>
         </Container>
         <Container className="border-t not-prose flex flex-col md:flex-row md:gap-2 gap-6 justify-between md:items-center">
@@ -138,6 +164,15 @@ const Footer = () => {
             &copy; <a href="https://bitcoinarg.news">{site.name}</a>. All rights reserved.
             2025-present.
           </p>
+        </Container>
+        <Container className="mt-12 p-6 bg-muted/50 rounded-lg text-center">
+          <h3 className="text-lg font-medium mb-2">¿Querés llegar a la comunidad cripto más grande de Argentina?</h3>
+          <Link
+            className="text-primary hover:underline underline-offset-4"
+            href="mailto:publicidad@bitcoinarg.news"
+          >
+            publicidad@bitcoinarg.news
+          </Link>
         </Container>
       </Section>
     </footer>

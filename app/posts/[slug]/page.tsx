@@ -8,8 +8,8 @@ import {
 
 import { Section, Container, Article, Prose } from "@/components/craft";
 import { badgeVariants } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { siteConfig } from "@/site.config";
+import { cn } from "@/lib/utils"; 
+import { getDomainConfig } from "@/lib/domain-config";
 
 import Link from "next/link";
 import Balancer from "react-wrap-balancer";
@@ -36,7 +36,8 @@ export async function generateMetadata({
     return {};
   }
 
-  const ogUrl = new URL(`${siteConfig.site_domain}/api/og`);
+  const { site } = getDomainConfig();
+  const ogUrl = new URL(`https://${site.domain}/api/og`);
   ogUrl.searchParams.append("title", post.title.rendered);
   // Strip HTML tags for description
   const description = post.excerpt.rendered.replace(/<[^>]*>/g, "").trim();
@@ -49,7 +50,7 @@ export async function generateMetadata({
       title: post.title.rendered,
       description: description,
       type: "article",
-      url: `${siteConfig.site_domain}/posts/${post.slug}`,
+      url: `${site.domain}/posts/${post.slug}`,
       images: [
         {
           url: ogUrl.toString(),

@@ -14,6 +14,7 @@ interface DomainConfig {
     tertiary: string;
   };
   site: {
+    domain: string; 
     name: string;
     description: string;
     title: string;
@@ -21,9 +22,12 @@ interface DomainConfig {
     twitterHandle: string;
     logo: string;
     socialLinks: {
-      twitter: string;
       telegram: string;
-      discord: string;
+      twitter?: string;
+      discord?: string;
+      instagram?: string;
+      tiktok?: string;
+      youtube?: string;
     };
     categories: {
       key: string;
@@ -39,6 +43,7 @@ const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
     isTendenciasCrypto: false,
     isUltimaHoraCrypto: false,
     site: {
+      domain: 'bitcoinarg.news',
       name: 'BITCOINARG.news',
       description: 'Las últimas noticias sobre Bitcoin, criptomonedas y blockchain en Argentina y Latinoamérica.',
       title: 'BITCOINARG.news | Noticias de Bitcoin y Criptomonedas en Argentina',
@@ -46,9 +51,11 @@ const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
       twitterHandle: '@bitcoinargnews',
       logo: '/bitcoinarg/logo.png',
       socialLinks: {
-        twitter: 'https://twitter.com/bitcoinargnews',
         telegram: 'https://t.me/bitcoinargnews',
-        discord: 'https://discord.gg/bitcoinargnews'
+        twitter: 'https://twitter.com/bitcoinargnews',
+        instagram: 'https://instagram.com/bitcoinargnews',
+        tiktok: 'https://tiktok.com/@bitcoinargnews',
+        youtube: 'https://youtube.com/@bitcoinargnews'
       },
       categories: [
         { key: 'noticias', label: 'Noticias', href: '/noticias' },
@@ -62,6 +69,7 @@ const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
     isTendenciasCrypto: true,
     isUltimaHoraCrypto: false,
     site: {
+      domain: 'tendenciascrypto.com',
       name: 'TENDENCIASCRIPTO.com',
       description: 'Análisis profundo y tendencias del mercado de criptomonedas en Latinoamérica.',
       title: 'TENDENCIASCRIPTO.com | Análisis y Tendencias del Mercado Cripto',
@@ -69,9 +77,7 @@ const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
       twitterHandle: '@tendenciascrypto',
       logo: '/tendenciascrypto/logo.png',
       socialLinks: {
-        twitter: 'https://twitter.com/tendenciascrypto',
-        telegram: 'https://t.me/tendenciascrypto',
-        discord: 'https://discord.gg/tendenciascrypto'
+        telegram: 'https://t.me/tendenciascrypto'
       },
       categories: [
         { key: 'tendencias', label: 'Tendencias', href: '/tendencias' },
@@ -85,6 +91,7 @@ const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
     isTendenciasCrypto: false,
     isUltimaHoraCrypto: true,
     site: {
+      domain: 'ultimahoracrypto.com',
       name: 'ULTIMAHORACRIPTO.com',
       description: 'Noticias de última hora sobre criptomonedas y blockchain en Latinoamérica.',
       title: 'ULTIMAHORACRIPTO.com | Noticias Cripto en Tiempo Real',
@@ -92,9 +99,7 @@ const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
       twitterHandle: '@ultimahoracrypto',
       logo: '/ultimahoracrypto/logo.png',
       socialLinks: {
-        twitter: 'https://twitter.com/ultimahoracrypto',
-        telegram: 'https://t.me/ultimahoracrypto',
-        discord: 'https://discord.gg/ultimahoracrypto'
+        telegram: 'https://t.me/ultimahoracrypto'
       },
       categories: [
         { key: 'ultimahora', label: 'Última Hora', href: '/ultimahora' },
@@ -108,6 +113,7 @@ const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
     isTendenciasCrypto: false,
     isUltimaHoraCrypto: false,
     site: {
+      domain: 'localhost',      
       name: 'BITCOINARG.news',
       description: 'Las últimas noticias sobre Bitcoin, criptomonedas y blockchain en Argentina y Latinoamérica.',
       title: 'BITCOINARG.news | Noticias de Bitcoin y Criptomonedas en Argentina',
@@ -115,9 +121,11 @@ const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
       twitterHandle: '@bitcoinargnews',
       logo: '/bitcoinarg/logo.png',
       socialLinks: {
-        twitter: 'https://twitter.com/bitcoinargnews',
         telegram: 'https://t.me/bitcoinargnews',
-        discord: 'https://discord.gg/bitcoinargnews'
+        twitter: 'https://twitter.com/bitcoinargnews',
+        instagram: 'https://instagram.com/bitcoinargnews',
+        tiktok: 'https://tiktok.com/@bitcoinargnews',
+        youtube: 'https://youtube.com/@bitcoinargnews'
       },
       categories: [
         { key: 'noticias', label: 'Noticias', href: '/noticias' },

@@ -22,10 +22,11 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 import { mainMenu, contentMenu } from "@/menu.config";
-import { siteConfig } from "@/site.config";
+import { useDomain } from "@/lib/use-domain";
 
 export function MobileNav() {
   const [open, setOpen] = React.useState(false);
+  const { site } = useDomain();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -47,7 +48,7 @@ export function MobileNav() {
               onOpenChange={setOpen}
             >
               <ArrowRightSquare className="mr-2 h-4 w-4" />
-              <span>{siteConfig.site_name}</span>
+              <span>{site.name}</span>
             </MobileLink>
           </SheetTitle>
         </SheetHeader>

@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { SocialMediaButtons } from "./social-media-buttons";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { MobileNav } from "@/components/nav/mobile-nav";
 import { mainMenu } from "@/menu.config";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/site.config";
 import { useDomain } from "@/lib/use-domain";
 import Image from "next/image";
+
 const categoryNames: Record<string, string> = {
   mercados: "Mercados",
   noticias: "Noticias",
@@ -23,8 +22,8 @@ export function HeroHeader() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <Image src={site.logo} alt={siteConfig.site_name} width={32} height={32} />
-              <span className="text-xl font-bold text-primary">{siteConfig.site_name}</span>
+              <Image src={site.logo} alt={site.name} width={32} height={32} />
+              <span className="text-xl font-bold text-primary">{site.name}</span>
             </Link>
             <div className="hidden md:flex gap-2">
               {Object.entries(mainMenu).map(([key, href]) => (
@@ -36,8 +35,42 @@ export function HeroHeader() {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="hidden md:block">
-              <SocialMediaButtons />
+            <div className="hidden md:flex gap-2">
+              {site.socialLinks.telegram && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={site.socialLinks.telegram} target="_blank" rel="noopener noreferrer">
+                    Telegram
+                  </Link>
+                </Button>
+              )}
+              {site.socialLinks.twitter && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={site.socialLinks.twitter} target="_blank" rel="noopener noreferrer">
+                    Twitter
+                  </Link>
+                </Button>
+              )}
+              {site.socialLinks.instagram && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={site.socialLinks.instagram} target="_blank" rel="noopener noreferrer">
+                    Instagram
+                  </Link>
+                </Button>
+              )}
+              {site.socialLinks.tiktok && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={site.socialLinks.tiktok} target="_blank" rel="noopener noreferrer">
+                    TikTok
+                  </Link>
+                </Button>
+              )}
+              {site.socialLinks.youtube && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={site.socialLinks.youtube} target="_blank" rel="noopener noreferrer">
+                    YouTube
+                  </Link>
+                </Button>
+              )}
             </div>
             <ThemeToggle />
             <MobileNav />
