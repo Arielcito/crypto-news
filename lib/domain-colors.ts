@@ -76,6 +76,7 @@ export function getCurrentPalette(domain: Domain = getCurrentDomain()) {
         tertiary: 'hsl(0, 0%, 0%)'
       };
     case 'ultimahoracrypto.com':
+    case 'ultimahoracripto.com':
       return {
         primary: 'hsl(120, 100%, 50%)',
         secondary: 'hsl(0, 0%, 100%)',
