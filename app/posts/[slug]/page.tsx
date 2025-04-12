@@ -17,11 +17,17 @@ import Balancer from "react-wrap-balancer";
 import type { Metadata } from "next";
 
 export async function generateStaticParams() {
-  const posts = await getAllPosts();
-
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
+  try {
+    // Limit the number of posts to pre-render to avoid stack overflow
+    const posts = await getAllPosts({ per_page: 50 });
+    
+    return posts.map((post) => ({
+      slug: post.slug,
+    }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return [];
+  }
 }
 
 export async function generateMetadata({

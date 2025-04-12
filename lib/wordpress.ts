@@ -83,10 +83,11 @@ export async function getAllPosts(filterParams?: {
   tag?: string;
   category?: string;
   search?: string;
+  per_page?: number;
 }): Promise<Post[]> {
   const query: Record<string, any> = {
     _embed: true,
-    per_page: 100,
+    per_page: filterParams?.per_page || 100,
   };
 
   if (filterParams?.search) {

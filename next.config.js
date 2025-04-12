@@ -22,6 +22,14 @@ const nextConfig = {
         permanent: true,
       },
     ];
+  },
+  // Add options to reduce static generation complexity
+  staticPageGenerationTimeout: 180,
+  experimental: {
+    // This helps prevent regex stack overflows
+    instrumentationHook: false,
+    // Limit resource use during static generation
+    cpus: Math.max(1, Math.min(4, require('os').cpus().length / 2)),
   }
 };
 
