@@ -56,6 +56,25 @@ export const siteConfigs: Record<Domain, SiteConfig> = {
       { key: 'ia', label: 'IA', href: '/ia' },
     ],
   },
+  'tendenciascripto.com': {
+    name: 'TENDENCIASCRIPTO.com',
+    description: 'Análisis profundo y tendencias del mercado de criptomonedas en Latinoamérica.',
+    title: 'TENDENCIASCRIPTO.com | Análisis y Tendencias del Mercado Cripto',
+    ogImage: '/og-tendenciascrypto.jpg',
+    twitterHandle: '@tendenciascrypto',
+    socialLinks: {
+      twitter: 'https://twitter.com/tendenciascrypto',
+      telegram: 'https://t.me/tendenciascrypto',
+      discord: 'https://discord.gg/tendenciascrypto',
+    },
+    categories: [
+      { key: 'blockchain', label: 'Blockchain', href: '/blockchain' },
+      { key: 'defi', label: 'DeFi', href: '/defi' },
+      { key: 'web3', label: 'Web3', href: '/web3' },
+      { key: 'nfts', label: 'NFTs', href: '/nfts' },
+      { key: 'ia', label: 'IA', href: '/ia' },
+    ],
+  },
   'ultimahoracrypto.com': {
     name: 'ULTIMAHORACRIPTO.com',
     description: 'Noticias de última hora sobre criptomonedas y blockchain en Latinoamérica.',
