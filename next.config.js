@@ -37,9 +37,10 @@ const nextConfig = {
   transpilePackages: [],
   // Prevent excessive module resolution and matching
   webpack: (config) => {
-    // Optimized cache settings
+    // Optimized cache settings with required type property
     config.cache = {
       ...config.cache,
+      type: "memory",
       maxGenerations: 1,
     };
     
