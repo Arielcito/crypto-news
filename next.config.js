@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://crypto-news-ctky4y2te-arielcitos-projects.vercel.app'),
   images: {
     remotePatterns: [
       {
@@ -22,8 +23,7 @@ const nextConfig = {
         permanent: true,
       },
     ];
-  },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://crypto-news-7iqshbwpy-arielcitos-projects.vercel.app'),
+  }
 };
 
 module.exports = nextConfig; 

@@ -37,7 +37,7 @@ interface DomainConfig {
   };
 }
 
-const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
+export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
   'bitcoinarg.news': {
     isBitcoinArg: true,
     isTendenciasCrypto: false,
