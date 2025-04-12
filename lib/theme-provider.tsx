@@ -60,6 +60,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('theme', theme);
   }, [theme, mounted]);
 
+  // Update CSS variables when domain or colors change
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.style.setProperty('--primary', colors.primary);
+    root.style.setProperty('--secondary', colors.secondary);
+    root.style.setProperty('--tertiary', colors.tertiary);
+  }, [colors]);
+
   return (
     <ThemeContext.Provider value={{ domain, colors, site, theme, setTheme, mounted }}>
       <style jsx global>{`
