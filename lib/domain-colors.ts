@@ -12,12 +12,12 @@ export const domainPalettes: Record<Domain, ColorPalette> = {
     secondary: '#03A9F4', // Celeste
     tertiary: '#ECEFF1', // Gris Claro
   },
-  'tendenciascrypto.com': {
+  'tendenciascripto.com': {
     primary: '#2979FF', // Azul Eléctrico
     secondary: '#673AB7', // Púrpura
     tertiary: '#37474F', // Gris Oscuro
   },
-  'ultimahoracrypto.com': {
+  'ultimahorascripto.com': {
     primary: '#D32F2F', // Rojo
     secondary: '#FAFAFA', // Negro
     tertiary: '#FAFAFA', // Blanco

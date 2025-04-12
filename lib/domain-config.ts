@@ -27,12 +27,12 @@ export const domainConfigs = {
       ]
     }
   },
-  'tendenciascrypto.com': {
+  'tendenciascripto.com': {
     isBitcoinArg: false,
     isTendenciasCrypto: true,
     isUltimaHoraCrypto: false,
     site: {
-      domain: 'tendenciascrypto.com',
+      domain: 'tendenciascripto.com',
       name: 'TENDENCIASCRIPTO',
       description: 'Análisis profundo y tendencias del mercado de criptomonedas en Latinoamérica.',
       title: 'TENDENCIASCRIPTO.com | Análisis y Tendencias del Mercado Cripto',
@@ -49,12 +49,12 @@ export const domainConfigs = {
       ]
     }
   },
-  'ultimahoracrypto.com': {
+  'ultimahorascripto.com': {
     isBitcoinArg: false,
     isTendenciasCrypto: false,
     isUltimaHoraCrypto: true,
     site: {
-      domain: 'ultimahoracrypto.com',
+      domain: 'ultimahorascripto.com',
       name: 'ULTIMAHORACRIPTO',
       description: 'Noticias de última hora sobre criptomonedas y blockchain en Latinoamérica.',
       title: 'ULTIMAHORACRIPTO.com | Noticias Cripto en Tiempo Real',
