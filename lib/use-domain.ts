@@ -70,7 +70,7 @@ const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
     isUltimaHoraCrypto: false,
     site: {
       domain: 'tendenciascrypto.com',
-      name: 'TENDENCIASCRIPTO.com',
+      name: 'TENDENCIASCRIPTO',
       description: 'Análisis profundo y tendencias del mercado de criptomonedas en Latinoamérica.',
       title: 'TENDENCIASCRIPTO.com | Análisis y Tendencias del Mercado Cripto',
       ogImage: '/tendenciascrypto/og-image.jpg',
@@ -92,7 +92,7 @@ const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
     isUltimaHoraCrypto: true,
     site: {
       domain: 'ultimahoracrypto.com',
-      name: 'ULTIMAHORACRIPTO.com',
+      name: 'ULTIMAHORACRIPTO',
       description: 'Noticias de última hora sobre criptomonedas y blockchain en Latinoamérica.',
       title: 'ULTIMAHORACRIPTO.com | Noticias Cripto en Tiempo Real',
       ogImage: '/ultimahoracrypto/og-image.jpg',
@@ -114,7 +114,7 @@ const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors'>> = {
     isUltimaHoraCrypto: false,
     site: {
       domain: 'localhost',      
-      name: 'BITCOINARG.news',
+      name: 'BITCOINARG',
       description: 'Las últimas noticias sobre Bitcoin, criptomonedas y blockchain en Argentina y Latinoamérica.',
       title: 'BITCOINARG.news | Noticias de Bitcoin y Criptomonedas en Argentina',
       ogImage: '/bitcoinarg/og-image.jpg',

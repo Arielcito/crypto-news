@@ -64,6 +64,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           --secondary: ${colors.secondary};
           --tertiary: ${colors.tertiary};
         }
+        body {
+          background-color: ${theme === 'light' ? '#ffffff' : '#000000'};
+        }
       `}</style>
       {children}
     </ThemeContext.Provider>

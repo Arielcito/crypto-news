@@ -12,6 +12,7 @@ import Balancer from "react-wrap-balancer";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from '@/lib/utils';
+import { MessageSquare, Twitter, Instagram, Youtube, Music } from 'lucide-react';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const { site } = useDomain();
@@ -92,70 +93,60 @@ const Footer = () => {
               <Balancer>{site.description}</Balancer>
             </p>
           </div>
-          <div className="flex flex-col gap-2 text-sm">
-            <h5 className="font-medium text-base">Website</h5>
-            {site.categories.map(({ key, label, href }) => (
-              <Link
-                className="hover:underline underline-offset-4"
-                key={href}
-                href={href}
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-          <div className="flex flex-col gap-2 text-sm">
+          <div className="flex flex-col gap-4 text-sm">
             <h5 className="font-medium text-base">Social</h5>
-            {site.socialLinks.telegram && (
-              <Link
-                className="hover:underline underline-offset-4"
-                href={site.socialLinks.telegram}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Telegram
-              </Link>
-            )}
-            {site.socialLinks.twitter && (
-              <Link
-                className="hover:underline underline-offset-4"
-                href={site.socialLinks.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Twitter
-              </Link>
-            )}
-            {site.socialLinks.instagram && (
-              <Link
-                className="hover:underline underline-offset-4"
-                href={site.socialLinks.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Instagram
-              </Link>
-            )}
-            {site.socialLinks.tiktok && (
-              <Link
-                className="hover:underline underline-offset-4"
-                href={site.socialLinks.tiktok}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                TikTok
-              </Link>
-            )}
-            {site.socialLinks.youtube && (
-              <Link
-                className="hover:underline underline-offset-4"
-                href={site.socialLinks.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                YouTube
-              </Link>
-            )}
+            <div className="flex gap-4">
+              {site.socialLinks.telegram && (
+                <Link
+                  className="hover:text-primary transition-colors"
+                  href={site.socialLinks.telegram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageSquare size={20} />
+                </Link>
+              )}
+              {site.socialLinks.twitter && (
+                <Link
+                  className="hover:text-primary transition-colors"
+                  href={site.socialLinks.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Twitter size={20} />
+                </Link>
+              )}
+              {site.socialLinks.instagram && (
+                <Link
+                  className="hover:text-primary transition-colors"
+                  href={site.socialLinks.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Instagram size={20} />
+                </Link>
+              )}
+              {site.socialLinks.tiktok && (
+                <Link
+                  className="hover:text-primary transition-colors"
+                  href={site.socialLinks.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Music size={20} />
+                </Link>
+              )}
+              {site.socialLinks.youtube && (
+                <Link
+                  className="hover:text-primary transition-colors"
+                  href={site.socialLinks.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Youtube size={20} />
+                </Link>
+              )}
+            </div>
           </div>
         </Container>
         <Container className="border-t not-prose flex flex-col md:flex-row md:gap-2 gap-6 justify-between md:items-center">

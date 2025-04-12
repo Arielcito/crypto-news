@@ -19,7 +19,7 @@ export const domainPalettes: Record<Domain, ColorPalette> = {
   },
   'ultimahoracrypto.com': {
     primary: '#D32F2F', // Rojo
-    secondary: '#212121', // Negro
+    secondary: '#FAFAFA', // Negro
     tertiary: '#FAFAFA', // Blanco
   },
   'localhost': {
