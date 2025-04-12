@@ -93,6 +93,24 @@ export const siteConfigs: Record<Domain, SiteConfig> = {
       { key: 'redes', label: 'Redes', href: '/redes' },
     ],
   },
+  'ultimahoracripto.com': {
+    name: 'ULTIMAHORACRIPTO.com',
+    description: 'Noticias de última hora sobre criptomonedas y blockchain en Latinoamérica.',
+    title: 'ULTIMAHORACRIPTO.com | Noticias Cripto en Tiempo Real',
+    ogImage: '/og-ultimahoracrypto.jpg',
+    twitterHandle: '@ultimahoracrypto',
+    socialLinks: {
+      twitter: 'https://twitter.com/ultimahoracrypto',
+      telegram: 'https://t.me/ultimahoracrypto',
+      discord: 'https://discord.gg/ultimahoracrypto',
+    },
+    categories: [
+      { key: 'actualizaciones', label: 'Actualizaciones', href: '/actualizaciones' },
+      { key: 'macroeconomia', label: 'Macroeconomía', href: '/macroeconomia' },
+      { key: 'politica', label: 'Política', href: '/politica' },
+      { key: 'redes', label: 'Redes', href: '/redes' },
+    ],
+  },
   'localhost': {
     name: 'BITCOINARG.news',
     description: 'Noticias de Argentina y LATAM. Cobertura de eventos, regulaciones y adopción cripto en Argentina y Latinoamérica.',

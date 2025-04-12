@@ -93,6 +93,28 @@ export const domainConfigs = {
       ]
     }
   },
+  'ultimahoracripto.com': {
+    isBitcoinArg: false,
+    isTendenciasCrypto: false,
+    isUltimaHoraCrypto: true,
+    site: {
+      domain: 'ultimahoracripto.com',
+      name: 'ULTIMAHORACRIPTO',
+      description: 'Noticias de última hora sobre criptomonedas y blockchain en Latinoamérica.',
+      title: 'ULTIMAHORACRIPTO.com | Noticias Cripto en Tiempo Real',
+      ogImage: '/ultimahoracrypto/og-image.jpg',
+      twitterHandle: '@ultimahoracrypto',
+      logo: '/ultimahoracrypto/logo.png',
+      socialLinks: {
+        telegram: 'https://t.me/ultimahoracrypto'
+      },
+      categories: [
+        { key: 'ultimahora', label: 'Última Hora', href: '/ultimahora' },
+        { key: 'noticias', label: 'Noticias', href: '/noticias' },
+        { key: 'alertas', label: 'Alertas', href: '/alertas' }
+      ]
+    }
+  },
   'localhost': {
     isBitcoinArg: true,
     isTendenciasCrypto: false,
