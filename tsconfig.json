@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "wp.config.ts"
-  ],
+, "next.config.js"  ],
   "exclude": [
     "node_modules"
   ]
