@@ -3,7 +3,6 @@ import {
   getFeaturedMediaById,
   getAuthorById,
   getCategoryById,
-  getAllPosts,
 } from "@/lib/wordpress";
 
 import { Section, Container, Article, Prose } from "@/components/craft";
@@ -16,19 +15,8 @@ import Balancer from "react-wrap-balancer";
 
 import type { Metadata } from "next";
 
-export async function generateStaticParams() {
-  try {
-    // Limit the number of posts to pre-render to avoid stack overflow
-    const posts = await getAllPosts({ per_page: 50 });
-    
-    return posts.map((post) => ({
-      slug: post.slug,
-    }));
-  } catch (error) {
-    console.error('Error generating static params:', error);
-    return [];
-  }
-}
+// Force dynamic rendering instead of static generation
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,
