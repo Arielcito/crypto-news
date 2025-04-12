@@ -1,5 +1,3 @@
-import { NextConfig } from 'next';
-
 const config = {
   reactStrictMode: true,
   images: {
