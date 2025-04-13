@@ -15,7 +15,7 @@ export function RecommendedPosts({ currentPostId, posts }: RecommendedPostsProps
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+      <h3 className="text-lg text-primary font-semibold bg-clip-text text-transparent">
         Posts Relacionados
       </h3>
       <div className="space-y-4">

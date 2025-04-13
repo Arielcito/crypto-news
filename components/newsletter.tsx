@@ -6,11 +6,11 @@ import { FaTelegram } from "react-icons/fa";
 
 export function TelegramChannel() {
   return (
-    <Card className="bg-tertiary border-tertiary flex flex-col items-center text-center">
+    <Card className="bg-background dark:bg-tertiary border-border dark:border-tertiary flex flex-col items-center text-center">
       <CardHeader>
         <CardTitle className="text-primary">Únete a nuestro canal de Telegram</CardTitle>
-        <CardDescription>
-          Mantente al día con las últimas noticias sobre Bitcoin y criptomonedas en tiempo real.
+        <CardDescription className="text-muted-foreground">
+          Sé el primero en enterarte de las noticias más relevantes del mundo cripto, en tiempo real.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -25,9 +25,10 @@ export function TelegramChannel() {
         </Button>
       </CardContent>
       <CardFooter>
-        <p className="text-sm text-muted-foreground">
+        {/* Hidden member count for future use */}
+        {/* <p className="text-sm text-muted-foreground">
           Más de 10,000 miembros ya están recibiendo nuestras actualizaciones diarias.
-        </p>
+        </p> */}
       </CardFooter>
     </Card>
   );

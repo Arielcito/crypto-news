@@ -13,10 +13,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from '@/lib/utils';
 import { MessageSquare, Twitter, Instagram, Youtube, Music } from 'lucide-react';
+import { MiniHeader } from '@/components/mini-header';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative flex min-h-screen flex-col">
+      <MiniHeader />
       <HeroHeader />
       <CryptoPriceBanner />
       <main className="flex-1">{children}</main>
@@ -45,15 +47,34 @@ const Footer = () => {
               />
             </Link>
             <p>
-              <Balancer>{site.description}</Balancer>
+              <Balancer>+8 años informando sobre criptomonedas en Argentina y Latinoamérica.</Balancer>
             </p>
+            <div className="flex flex-col gap-2">
+              <p className="text-sm font-medium">¿Querés aparecer en nuestra web?</p>
+              <a 
+                href="mailto:123@gmail.com" 
+                className="text-sm text-primary hover:underline"
+              >
+                123@gmail.com
+              </a>
+            </div>
           </div>
           <div className="flex flex-col gap-4 text-sm">
             <h5 className="font-medium text-base">Social</h5>
             <div className="flex gap-4">
+              {site.socialLinks.instagram && (
+                <Link
+                  className="text-foreground hover:text-primary transition-colors"
+                  href={site.socialLinks.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Instagram size={20} />
+                </Link>
+              )}
               {site.socialLinks.telegram && (
                 <Link
-                  className="hover:text-primary transition-colors"
+                  className="text-foreground hover:text-primary transition-colors"
                   href={site.socialLinks.telegram}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -63,7 +84,7 @@ const Footer = () => {
               )}
               {site.socialLinks.twitter && (
                 <Link
-                  className="hover:text-primary transition-colors"
+                  className="text-foreground hover:text-primary transition-colors"
                   href={site.socialLinks.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -71,18 +92,35 @@ const Footer = () => {
                   <Twitter size={20} />
                 </Link>
               )}
-              {site.socialLinks.instagram && (
+              {site.socialLinks.tiktok && (
                 <Link
-                  className="hover:text-primary transition-colors"
-                  href={site.socialLinks.instagram}
+                  className="text-foreground hover:text-primary transition-colors"
+                  href={site.socialLinks.tiktok}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Instagram size={20} />
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86 4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                  </svg>
+                </Link>
+              )}
+              {site.socialLinks.youtube && (
+                <Link
+                  className="text-foreground hover:text-primary transition-colors"
+                  href={site.socialLinks.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Youtube size={20} />
                 </Link>
               )}
             </div>
           </div>
+        </Container>
+        <Container className="mt-8 pt-8 border-t">
+          <p className="text-sm text-muted-foreground">
+            © {new Date().getFullYear()} {site.name}. Todos los derechos reservados.
+          </p>
         </Container>
       </Section>
     </footer>

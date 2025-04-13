@@ -146,26 +146,97 @@ function PostCard({ post }: { post: Post }) {
   );
 }
 
+function FeaturedPostCard({ post }: { post: Post }) {
+  return (
+    <Link href={`/news/${post.id}`} className="group">
+      <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow h-full">
+        <div className="aspect-[16/10] relative overflow-hidden">
+          <Image
+            src={post.image || ''}
+            alt={post.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+        </div>
+        <div className="p-6">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full">
+              {post.category}
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-4 h-4" />
+              {post.readTime}
+            </span>
+          </div>
+          <h2 className="text-2xl font-bold mb-3 group-hover:text-primary transition-colors">
+            {post.title}
+          </h2>
+          <p className="text-muted-foreground line-clamp-3">
+            {post.excerpt}
+          </p>
+        </div>
+      </article>
+    </Link>
+  );
+}
+
+function SmallPostCard({ post }: { post: Post }) {
+  return (
+    <Link href={`/news/${post.id}`} className="group">
+      <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+        <div className="grid grid-cols-3 gap-4">
+          <div className="aspect-square relative overflow-hidden">
+            <Image
+              src={post.image || ''}
+              alt={post.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 33vw, 20vw"
+            />
+          </div>
+          <div className="col-span-2 p-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+              <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
+                {post.category}
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {post.readTime}
+              </span>
+            </div>
+            <h3 className="font-semibold line-clamp-2 group-hover:text-primary transition-colors">
+              {post.title}
+            </h3>
+          </div>
+        </div>
+      </article>
+    </Link>
+  );
+}
+
 export function PostsSection() {
-  const ultimoMomento = mockPosts.filter(post => post.category === "Último Momento");
-  const otherPosts = mockPosts.filter(post => post.category !== "Último Momento");
+  const featuredPost = mockPosts[0];
+  const recentPosts = mockPosts.slice(1, 5);
+  const otherPosts = mockPosts.slice(5);
 
   return (
-    <div className="space-y-8">
-      {/* Último Momento */}
+    <div className="space-y-12">
+      {/* Featured and Recent Posts */}
       <section>
-        <div className="flex items-center gap-2 mb-6">
-          <Newspaper className="w-5 h-5 text-primary" />
-          <h2 className="text-2xl font-bold">Último Momento</h2>
-        </div>
         <div className="grid md:grid-cols-2 gap-6">
-          {ultimoMomento.map(post => (
-            <PostCard key={post.id} post={post} />
-          ))}
+          <div>
+            <FeaturedPostCard post={featuredPost} />
+          </div>
+          <div className="space-y-6">
+            {recentPosts.map(post => (
+              <SmallPostCard key={post.id} post={post} />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Otros Posts */}
+      {/* Other Posts */}
       <section>
         <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="w-5 h-5 text-primary" />
