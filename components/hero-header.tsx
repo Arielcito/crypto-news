@@ -6,11 +6,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Instagram, MessageSquare, Twitter, Youtube } from 'lucide-react';
+import { Instagram, Youtube } from 'lucide-react';
+import { FaTelegram, FaTiktok, FaYoutube } from 'react-icons/fa';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 export function HeroHeader() {
-  const { site } = useDomain();
+  const { site, isBitcoinArg } = useDomain();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -39,7 +40,12 @@ export function HeroHeader() {
                 height={120} 
                 className="transition-transform duration-300"
               />
-              <h1 className="text-4xl font-bold">{site.name}</h1>
+              <div className="flex flex-col items-center">
+                <h1 className="text-4xl font-bold">{site.name}</h1>
+                {isBitcoinArg && (
+                  <p className="text-sm text-muted-foreground mt-1">8 años informando sobre criptomonedas en Argentina y Latinoamérica</p>
+                )}
+              </div>
             </div>
           </Link>
           
@@ -79,7 +85,7 @@ export function HeroHeader() {
               {site.socialLinks.telegram && (
                 <Button asChild variant="ghost" size="icon">
                   <Link href={site.socialLinks.telegram} target="_blank" rel="noopener noreferrer">
-                    <MessageSquare className="h-4 w-4" />
+                    <FaTelegram className="h-4 w-4" />
                   </Link>
                 </Button>
               )}
@@ -98,19 +104,10 @@ export function HeroHeader() {
 
             {/* Social links right */}
             <div className="flex items-center gap-2">
-              {site.socialLinks.twitter && (
-                <Button asChild variant="ghost" size="icon">
-                  <Link href={site.socialLinks.twitter} target="_blank" rel="noopener noreferrer">
-                    <Twitter className="h-4 w-4" />
-                  </Link>
-                </Button>
-              )}
               {site.socialLinks.tiktok && (
                 <Button asChild variant="ghost" size="icon">
                   <Link href={site.socialLinks.tiktok} target="_blank" rel="noopener noreferrer">
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86 4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                    </svg>
+                    <FaTiktok className="h-4 w-4" />
                   </Link>
                 </Button>
               )}

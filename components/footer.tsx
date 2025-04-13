@@ -7,35 +7,30 @@ import Image from "next/image";
 import Link from "next/link";
 import { MessageSquare, Twitter, Instagram, Youtube } from 'lucide-react';
 import { TelegramChannel } from './newsletter';
+import { FaTelegram, FaTiktok, FaYoutube } from 'react-icons/fa'
 
 export function Footer() {
   const { site } = useDomain();
 
   return (
-    <footer>
+    <footer className="min-h-[50vh]">
       <Section>
-        <Container className="grid md:grid-cols-[1.5fr_0.5fr_0.5fr_1fr] gap-12">
+        <Container className="grid md:grid-cols-[1.5fr_0.5fr_0.5fr_1fr] gap-12 h-full">
           <div className="flex flex-col gap-6 not-prose">
-            <Link href="/">
-              <h3 className="sr-only">{site.name}</h3>
+            <Link href="/" className="flex items-center gap-4">
               <Image
                 src={site.logo}
                 alt={site.name}
                 width={42}
                 height={26.44}
               />
+              <h3 className="text-xl font-medium">{site.name}</h3>
             </Link>
             <p>
               <Balancer>+8 años informando sobre criptomonedas en Argentina y Latinoamérica.</Balancer>
             </p>
-            <div className="flex flex-col gap-2">
-              <p className="text-sm font-medium">¿Querés aparecer en nuestra web?</p>
-              <a 
-                href="mailto:123@gmail.com" 
-                className="text-sm text-primary hover:underline"
-              >
-                123@gmail.com
-              </a>
+            <div className="md:col-span-2">
+              <TelegramChannel />
             </div>
           </div>
           <div className="flex flex-col gap-4 text-sm">
@@ -58,17 +53,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <MessageSquare size={20} />
-                </Link>
-              )}
-              {site.socialLinks.twitter && (
-                <Link
-                  className="text-foreground hover:text-primary transition-colors"
-                  href={site.socialLinks.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Twitter size={20} />
+                  <FaTelegram size={20} />
                 </Link>
               )}
               {site.socialLinks.tiktok && (
@@ -78,9 +63,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86 4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                  </svg>
+                  <FaTiktok size={20} />
                 </Link>
               )}
               {site.socialLinks.youtube && (
@@ -90,13 +73,19 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Youtube size={20} />
+                  <FaYoutube size={20} />
                 </Link>
               )}
             </div>
           </div>
-          <div className="md:col-span-2">
-            <TelegramChannel />
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-medium">¿Querés aparecer en nuestra web?</p>
+            <a 
+              href="mailto:123@gmail.com" 
+              className="text-sm text-primary hover:underline"
+            >
+              123@gmail.com
+            </a>
           </div>
         </Container>
         <Container className="mt-8 pt-8 border-t">
