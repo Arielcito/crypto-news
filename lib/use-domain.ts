@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Domain, getCurrentDomain, getCurrentPalette } from './domain-colors';
+import { Domain, getCurrentDomain, getCurrentPalette, setSelectedDomain } from './domain-colors';
 
 interface DomainConfig {
   domain: Domain;
@@ -118,13 +118,13 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
     isUltimaHoraCrypto: true,
     site: {
       domain: 'ultimahoracrypto.com',
-      name: 'ULTIMAHORACRIPTO',
+      name: 'Ultima Hora Cripto',
       description: 'Noticias de última hora sobre criptomonedas y blockchain en Latinoamérica.',
       title: 'ULTIMAHORACRIPTO.com | Noticias Cripto en Tiempo Real',
       ogImage: '/ultimahoracrypto/og-image.jpg',
       twitterHandle: '@ultimahoracrypto',
       logo: '/ultimahoracrypto/logo.png',
-      logoDark: '/ultimahoracrypto/logo.png',
+      logoDark: '/ultimahoracrypto/logo-dark.png',
       socialLinks: {
         telegram: 'https://t.me/ultimahoracrypto'
       },
@@ -188,23 +188,52 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
 };
 
 export function useDomain() {
-  const [domain, setDomain] = useState<Domain>(getCurrentDomain());
+  const [domain, setDomain] = useState<Domain>(() => {
+    // Check cookie first
+    const cookieDomain = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('selected_domain='))
+      ?.split('=')[1] as Domain;
+
+    if (cookieDomain) {
+      return cookieDomain;
+    }
+
+    // In development, always start with localhost
+    if (process.env.NODE_ENV === 'development') {
+      return 'localhost';
+    }
+
+    return getCurrentDomain();
+  });
+
   const colors = getCurrentPalette(domain);
   const config = domainConfigs[domain];
 
   useEffect(() => {
-    // Actualizar el dominio cuando cambie la URL
-    const handlePopState = () => {
-      setDomain(getCurrentDomain());
+    // Listen for domain changes from other components
+    const handleDomainChange = () => {
+      const newDomain = getCurrentDomain();
+      if (newDomain !== domain) {
+        setDomain(newDomain);
+      }
     };
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+    window.addEventListener('domain-changed', handleDomainChange);
+    return () => window.removeEventListener('domain-changed', handleDomainChange);
+  }, [domain]);
+
+  const handleSetDomain = (newDomain: Domain) => {
+    if (newDomain === domain) return;
+    
+    setDomain(newDomain);
+    setSelectedDomain(newDomain);
+    window.dispatchEvent(new Event('domain-changed'));
+  };
 
   return {
     domain,
-    setDomain,
+    setDomain: handleSetDomain,
     ...config,
     colors,
     site: {

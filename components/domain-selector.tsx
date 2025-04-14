@@ -10,6 +10,8 @@ export function DomainSelector() {
   const router = useRouter();
 
   const handleDomainChange = (newDomain: string) => {
+    if (newDomain === domain) return;
+    
     setDomain(newDomain as Domain);
     router.refresh();
   };

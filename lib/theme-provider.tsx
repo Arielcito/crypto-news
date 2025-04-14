@@ -24,9 +24,6 @@ const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { domain, colors, site } = useDomain();
-  console.log('ThemeProvider: Initialized with domain:', domain);
-  console.log('ThemeProvider: Colors:', colors);
-  console.log('ThemeProvider: Site:', site);
   
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -69,7 +66,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [colors]);
 
   return (
-    <ThemeContext.Provider value={{ domain, colors, site, theme, setTheme, mounted }}>
+    <ThemeContext.Provider value={{
+      domain,
+      colors,
+      site,
+      theme,
+      setTheme,
+      mounted
+    }}>
       <style jsx global>{`
         :root {
           --primary: ${colors.primary};
