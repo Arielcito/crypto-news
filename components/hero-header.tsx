@@ -1,6 +1,7 @@
 'use client';
 
 import { useDomain } from '@/lib/use-domain';
+import { useTheme } from '@/lib/theme-provider';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,6 +13,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 
 export function HeroHeader() {
   const { site, isBitcoinArg } = useDomain();
+  const { theme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export function HeroHeader() {
           <Link href="/" className="flex flex-col items-center justify-center h-32 py-4">
             <div className="flex items-center gap-4">
               <Image 
-                src={site.logo} 
+                src={theme === 'dark' ? site.logoDark : site.logo} 
                 alt={site.name} 
                 width={120} 
                 height={120} 
@@ -43,7 +45,7 @@ export function HeroHeader() {
               <div className="flex flex-col items-center">
                 <h1 className="text-4xl font-bold">{site.name}</h1>
                 {isBitcoinArg && (
-                  <p className="text-sm text-muted-foreground mt-1">8 años informando sobre criptomonedas en Argentina y Latinoamérica</p>
+                  <p className="text-sm text-muted-foreground mt-1">+ 8 años informando sobre criptomonedas en Argentina y Latinoamérica</p>
                 )}
               </div>
             </div>
@@ -94,7 +96,7 @@ export function HeroHeader() {
             {/* Logo and site name centered */}
             <Link href="/" className="flex items-center gap-3 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <Image 
-                src={site.logo} 
+                src={theme === 'dark' ? site.logoDark : site.logo} 
                 alt={site.name} 
                 width={32} 
                 height={32}

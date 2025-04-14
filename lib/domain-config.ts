@@ -13,6 +13,7 @@ export const domainConfigs = {
       ogImage: '/bitcoinarg/og-image.jpg',
       twitterHandle: '@bitcoinargnews',
       logo: '/bitcoinarg/logo.png',
+      logoDark: '/bitcoinarg/logo.png',
       socialLinks: {
         telegram: 'https://t.me/bitcoinargnews',
         twitter: 'https://twitter.com/bitcoinargnews',
@@ -39,6 +40,7 @@ export const domainConfigs = {
       ogImage: '/tendenciascrypto/og-image.jpg',
       twitterHandle: '@tendenciascrypto',
       logo: '/tendenciascrypto/logo.png',
+      logoDark: '/tendenciascrypto/logo.png',
       socialLinks: {
         telegram: 'https://t.me/tendenciascrypto'
       },
@@ -61,6 +63,7 @@ export const domainConfigs = {
       ogImage: '/tendenciascrypto/og-image.jpg',
       twitterHandle: '@tendenciascrypto',
       logo: '/tendenciascrypto/logo.png',
+      logoDark: '/tendenciascrypto/logo.png',
       socialLinks: {
         telegram: 'https://t.me/tendenciascrypto'
       },
@@ -77,12 +80,13 @@ export const domainConfigs = {
     isUltimaHoraCrypto: true,
     site: {
       domain: 'ultimahoracrypto.com',
-      name: 'ULTIMAHORACRIPTO',
+      name: 'Ultima Hora Cripto',
       description: 'Noticias de última hora sobre criptomonedas y blockchain en Latinoamérica.',
       title: 'ULTIMAHORACRIPTO.com | Noticias Cripto en Tiempo Real',
       ogImage: '/ultimahoracrypto/og-image.jpg',
       twitterHandle: '@ultimahoracrypto',
       logo: '/ultimahoracrypto/logo.png',
+      logoDark: '/ultimahoracrypto/logo-dark.png',
       socialLinks: {
         telegram: 'https://t.me/ultimahoracrypto'
       },
@@ -105,6 +109,7 @@ export const domainConfigs = {
       ogImage: '/ultimahoracrypto/og-image.jpg',
       twitterHandle: '@ultimahoracrypto',
       logo: '/ultimahoracrypto/logo.png',
+      logoDark: '/ultimahoracrypto/logo.png',
       socialLinks: {
         telegram: 'https://t.me/ultimahoracrypto'
       },
@@ -127,6 +132,7 @@ export const domainConfigs = {
       ogImage: '/bitcoinarg/og-image.jpg',
       twitterHandle: '@bitcoinargnews',
       logo: '/bitcoinarg/logo.png',
+      logoDark: '/bitcoinarg/logo.png',
       socialLinks: {
         telegram: 'https://t.me/bitcoinargnews',
         twitter: 'https://twitter.com/bitcoinargnews',

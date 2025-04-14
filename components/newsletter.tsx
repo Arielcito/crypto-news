@@ -6,7 +6,7 @@ import { FaTelegram } from "react-icons/fa";
 
 export function TelegramChannel() {
   return (
-    <Card className="bg-background dark:bg-[#1a1a1a] border-border dark:border-[#1a1a1a] flex flex-col items-center text-center">
+    <Card className="bg-background dark:bg-[#1a1a1a] border-border flex flex-col items-center text-center border-2 border-primary">
       <CardHeader>
         <CardTitle className="text-primary">Únete a nuestro canal de Telegram</CardTitle>
         <CardDescription className="text-muted-foreground">

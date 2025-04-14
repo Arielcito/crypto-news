@@ -21,6 +21,7 @@ interface DomainConfig {
     ogImage: string;
     twitterHandle: string;
     logo: string;
+    logoDark: string;
     socialLinks: {
       telegram: string;
       twitter?: string;
@@ -50,6 +51,7 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       ogImage: '/bitcoinarg/og-image.jpg',
       twitterHandle: '@bitcoinargnews',
       logo: '/bitcoinarg/logo.png',
+      logoDark: '/bitcoinarg/logo.png',
       socialLinks: {
         telegram: 'https://t.me/bitcoinargnews',
         twitter: 'https://twitter.com/bitcoinargnews',
@@ -76,6 +78,7 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       ogImage: '/tendenciascrypto/og-image.jpg',
       twitterHandle: '@tendenciascrypto',
       logo: '/tendenciascrypto/logo.png',
+      logoDark: '/tendenciascrypto/logo.png',
       socialLinks: {
         telegram: 'https://t.me/tendenciascrypto'
       },
@@ -98,6 +101,7 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       ogImage: '/tendenciascrypto/og-image.jpg',
       twitterHandle: '@tendenciascrypto',
       logo: '/tendenciascrypto/logo.png',
+      logoDark: '/tendenciascrypto/logo.png',
       socialLinks: {
         telegram: 'https://t.me/tendenciascrypto'
       },
@@ -120,6 +124,7 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       ogImage: '/ultimahoracrypto/og-image.jpg',
       twitterHandle: '@ultimahoracrypto',
       logo: '/ultimahoracrypto/logo.png',
+      logoDark: '/ultimahoracrypto/logo.png',
       socialLinks: {
         telegram: 'https://t.me/ultimahoracrypto'
       },
@@ -142,6 +147,7 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       ogImage: '/ultimahoracrypto/og-image.jpg',
       twitterHandle: '@ultimahoracrypto',
       logo: '/ultimahoracrypto/logo.png',
+      logoDark: '/ultimahoracrypto/logo-dark.png',
       socialLinks: {
         telegram: 'https://t.me/ultimahoracrypto'
       },
@@ -164,6 +170,7 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       ogImage: '/bitcoinarg/og-image.jpg',
       twitterHandle: '@bitcoinargnews',
       logo: '/bitcoinarg/logo.png',
+      logoDark: '/bitcoinarg/logo.png',
       socialLinks: {
         telegram: 'https://t.me/bitcoinargnews',
         twitter: 'https://twitter.com/bitcoinargnews',
