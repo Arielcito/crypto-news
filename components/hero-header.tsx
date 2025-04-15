@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Instagram, Youtube } from 'lucide-react';
-import { FaTelegram, FaTiktok, FaYoutube } from 'react-icons/fa';
+import { FaTelegram, FaTiktok } from 'react-icons/fa';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 export function HeroHeader() {
@@ -75,7 +75,24 @@ export function HeroHeader() {
       )}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            {/* Social links left */}
+            {/* Theme toggle left */}
+            <div className="flex items-center">
+              <ThemeToggle />
+            </div>
+
+            {/* Logo and site name centered */}
+            <Link href="/" className="flex items-center gap-2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+              <Image 
+                src={theme === 'dark' ? site.logoDark : site.logo} 
+                alt={site.name} 
+                width={24} 
+                height={24} 
+                className="transition-transform duration-300"
+              />
+              <span className="text-sm font-medium">{site.name}</span>
+            </Link>
+
+            {/* Social links right */}
             <div className="flex items-center gap-2">
               {site.socialLinks.instagram && (
                 <Button asChild variant="ghost" size="icon">
@@ -91,21 +108,6 @@ export function HeroHeader() {
                   </Link>
                 </Button>
               )}
-            </div>
-
-            {/* Logo and site name centered */}
-            <Link href="/" className="flex items-center gap-3 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <Image 
-                src={theme === 'dark' ? site.logoDark : site.logo} 
-                alt={site.name} 
-                width={32} 
-                height={32}
-              />
-              <span className="text-lg font-bold">{site.name}</span>
-            </Link>
-
-            {/* Social links right */}
-            <div className="flex items-center gap-2">
               {site.socialLinks.tiktok && (
                 <Button asChild variant="ghost" size="icon">
                   <Link href={site.socialLinks.tiktok} target="_blank" rel="noopener noreferrer">
@@ -120,7 +122,6 @@ export function HeroHeader() {
                   </Link>
                 </Button>
               )}
-              <ThemeToggle />
             </div>
           </div>
         </div>

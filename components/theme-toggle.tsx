@@ -1,44 +1,29 @@
 'use client';
 
 import { useTheme } from '@/lib/theme-provider';
-import { Button } from '@/components/ui/button';
-import { Moon, Sun } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
+import { Moon, Sun } from 'lucide-react';
 
 export function ThemeToggle() {
   const { theme, setTheme, mounted } = useTheme();
 
   if (!mounted) {
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className="w-9 h-9"
-        disabled
-      >
-        <div className="h-5 w-5" />
-      </Button>
-    );
+    return null;
   }
 
   const isDark = theme === 'dark';
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className={cn(
-        'transition-colors',
-        isDark && 'text-primary'
-      )}
-    >
-      {isDark ? (
-        <Sun className="h-5 w-5" />
-      ) : (
-        <Moon className="h-5 w-5" />
-      )}
-      <span className="sr-only">Toggle theme</span>
-    </Button>
+    <div className="flex items-center gap-1.5">
+      <Sun className="h-3.5 w-3.5 text-muted-foreground" />
+      <Switch
+        checked={isDark}
+        onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+        className="data-[state=checked]:bg-primary"
+        aria-label="Toggle theme"
+      />
+      <Moon className="h-3.5 w-3.5 text-muted-foreground" />
+    </div>
   );
 } 
