@@ -126,7 +126,7 @@ function PostCard({ post }: { post: Post }) {
         </div>
         <div className="p-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">
+            <span className="bg-primary/10 text-primary  py-1 rounded-full text-xs">
               {post.category}
             </span>
             <span className="flex items-center gap-1">
@@ -197,7 +197,7 @@ function SmallPostCard({ post }: { post: Post }) {
           </div>
           <div className="col-span-2 p-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-              <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
+              <span className="bg-primary/10 text-primary  py-0.5 rounded-full text-xs">
                 {post.category}
               </span>
               <span className="flex items-center gap-1">

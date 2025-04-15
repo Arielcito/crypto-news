@@ -10,7 +10,7 @@ import { MessageSquare, Twitter, Instagram, Youtube } from 'lucide-react';
 import { FaTelegram, FaTiktok, FaYoutube } from 'react-icons/fa'
 
 export function Footer() {
-  const { site } = useDomain();
+  const { site, isBitcoinArg } = useDomain();
   const { theme } = useTheme();
 
   return (
@@ -27,9 +27,11 @@ export function Footer() {
               />
               <h3 className="text-xl font-medium">{site.name}</h3>
             </Link>
-            <p>
-              <Balancer>+8 años informando sobre criptomonedas en Argentina y Latinoamérica.</Balancer>
-            </p>
+            {isBitcoinArg && (
+              <p>
+                <Balancer>+8 años informando sobre criptomonedas en Argentina y Latinoamérica.</Balancer>
+              </p>
+            )}
           </div>
           <div className="flex flex-col gap-4 text-sm">
             <h5 className="font-medium text-base">Social</h5>

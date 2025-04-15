@@ -189,7 +189,10 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
 
 export function useDomain() {
   const [domain, setDomain] = useState<Domain>(() => {
-    // Check cookie first
+    if (typeof window === 'undefined') {
+      return process.env.NODE_ENV === 'development' ? 'localhost' : getCurrentDomain();
+    }
+
     const cookieDomain = document.cookie
       .split('; ')
       .find(row => row.startsWith('selected_domain='))
@@ -199,12 +202,7 @@ export function useDomain() {
       return cookieDomain;
     }
 
-    // In development, always start with localhost
-    if (process.env.NODE_ENV === 'development') {
-      return 'localhost';
-    }
-
-    return getCurrentDomain();
+    return process.env.NODE_ENV === 'development' ? 'localhost' : getCurrentDomain();
   });
 
   const colors = getCurrentPalette(domain);
