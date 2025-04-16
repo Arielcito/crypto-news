@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id            Int      @id @default(autoincrement())
+  date          DateTime @default(now())
+  dateGmt       DateTime @default(now()) @map("date_gmt")
+  modified      DateTime @default(now())
+  modifiedGmt   DateTime @default(now()) @map("modified_gmt")
+  slug          String   @unique
+  status        String   @default("publish")
+  title         String
+  content       String   @db.Text
+  excerpt       String?  @db.Text
+  author        Int
+  featuredMedia Int?     @map("featured_media")
+  domain        String
+  categories    Category[]
+  tags          Tag[]
+
+  @@map("posts")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  domain      String
+  posts       Post[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  domain      String
+  posts       Post[]
+
+  @@map("tags")
+}
+
+model DomainCategories {
+  id          Int      @id @default(autoincrement())
+  domain      String
+  name        String
+  slug        String
+  isActive    Boolean  @default(true) @map("is_active")
+
+  @@unique([domain, slug])
+  @@map("domain_categories")
+}
