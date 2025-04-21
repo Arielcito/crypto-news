@@ -27,21 +27,22 @@ model Post {
   author        Int
   featuredMedia Int?     @map("featured_media")
   domain        String
-  categories    Category[]
+  categories    DomainCategories[]
   tags          Tag[]
 
   @@map("posts")
 }
 
-model Category {
+model DomainCategories {
   id          Int      @id @default(autoincrement())
-  name        String
-  slug        String   @unique
-  description String?  @db.Text
   domain      String
+  name        String
+  slug        String
+  isActive    Boolean  @default(true) @map("is_active")
   posts       Post[]
 
-  @@map("categories")
+  @@unique([domain, slug])
+  @@map("domain_categories")
 }
 
 model Tag {
@@ -53,15 +54,4 @@ model Tag {
   posts       Post[]
 
   @@map("tags")
-}
-
-model DomainCategories {
-  id          Int      @id @default(autoincrement())
-  domain      String
-  name        String
-  slug        String
-  isActive    Boolean  @default(true) @map("is_active")
-
-  @@unique([domain, slug])
-  @@map("domain_categories")
 }

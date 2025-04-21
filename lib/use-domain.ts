@@ -60,9 +60,14 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         youtube: 'https://youtube.com/@bitcoinargnews'
       },
       categories: [
-        { key: 'noticias', label: 'Noticias', href: '/noticias' },
-        { key: 'analisis', label: 'Análisis', href: '/analisis' },
-        { key: 'educacion', label: 'Educación', href: '/educacion' }
+        { key: 'bitcoin-finanzas', label: 'Bitcoin y Finanzas Personales', href: '/bitcoin-finanzas' },
+        { key: 'economia-crisis', label: 'Economía y Crisis', href: '/economia-crisis' },
+        { key: 'regulacion-politicas', label: 'Regulación y Políticas Cripto', href: '/regulacion-politicas' },
+        { key: 'mercado-volatilidad', label: 'Mercado y Volatilidad', href: '/mercado-volatilidad' },
+        { key: 'tecnologia-mineria', label: 'Tecnología y Minería', href: '/tecnologia-mineria' },
+        { key: 'pagos-servicios', label: 'Pagos y Servicios en Cripto', href: '/pagos-servicios' },
+        { key: 'geopolitica-actualidad', label: 'Geopolítica y Actualidad', href: '/geopolitica-actualidad' },
+        { key: 'adopcion-comunidad', label: 'Adopción y Comunidad', href: '/adopcion-comunidad' }
       ]
     }
   },
@@ -83,9 +88,14 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         telegram: 'https://t.me/tendenciascrypto'
       },
       categories: [
-        { key: 'tendencias', label: 'Tendencias', href: '/tendencias' },
-        { key: 'analisis', label: 'Análisis', href: '/analisis' },
-        { key: 'mercado', label: 'Mercado', href: '/mercado' }
+        { key: 'innovacion-tecnologia', label: 'Innovación y Tecnología', href: '/innovacion-tecnologia' },
+        { key: 'trading-inversiones', label: 'Trading e Inversiones', href: '/trading-inversiones' },
+        { key: 'criptomonedas-blockchain', label: 'Criptomonedas y Blockchain', href: '/criptomonedas-blockchain' },
+        { key: 'regulacion-politica', label: 'Regulación y Política Cripto', href: '/regulacion-politica' },
+        { key: 'adopcion-comunidad', label: 'Adopción y Comunidad', href: '/adopcion-comunidad' },
+        { key: 'descentralizacion-proyectos', label: 'Descentralización y Proyectos', href: '/descentralizacion-proyectos' },
+        { key: 'crisis-riesgos', label: 'Crisis y Riesgos', href: '/crisis-riesgos' },
+        { key: 'tendencias-globales', label: 'Tendencias Globales', href: '/tendencias-globales' }
       ]
     }
   },
@@ -129,9 +139,13 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         telegram: 'https://t.me/ultimahoracrypto'
       },
       categories: [
-        { key: 'ultimahora', label: 'Última Hora', href: '/ultimahora' },
-        { key: 'noticias', label: 'Noticias', href: '/noticias' },
-        { key: 'alertas', label: 'Alertas', href: '/alertas' }
+        { key: 'mercados', label: 'Mercados', href: '/mercados' },
+        { key: 'regulacion', label: 'Regulación', href: '/regulacion' },
+        { key: 'tecnologia-blockchain', label: 'Tecnología Blockchain', href: '/tecnologia-blockchain' },
+        { key: 'inversion-estrategia', label: 'Inversión y Estrategia', href: '/inversion-estrategia' },
+        { key: 'economia-global', label: 'Economía Global', href: '/economia-global' },
+        { key: 'mineria-seguridad', label: 'Minería y Seguridad', href: '/mineria-seguridad' },
+        { key: 'tendencias-crisis', label: 'Tendencias y Crisis', href: '/tendencias-crisis' }
       ]
     }
   },
@@ -179,9 +193,14 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         youtube: 'https://youtube.com/@bitcoinargnews'
       },
       categories: [
-        { key: 'noticias', label: 'Noticias', href: '/noticias' },
-        { key: 'analisis', label: 'Análisis', href: '/analisis' },
-        { key: 'educacion', label: 'Educación', href: '/educacion' }
+        { key: 'bitcoin-finanzas', label: 'Bitcoin y Finanzas Personales', href: '/bitcoin-finanzas' },
+        { key: 'economia-crisis', label: 'Economía y Crisis', href: '/economia-crisis' },
+        { key: 'regulacion-politicas', label: 'Regulación y Políticas Cripto', href: '/regulacion-politicas' },
+        { key: 'mercado-volatilidad', label: 'Mercado y Volatilidad', href: '/mercado-volatilidad' },
+        { key: 'tecnologia-mineria', label: 'Tecnología y Minería', href: '/tecnologia-mineria' },
+        { key: 'pagos-servicios', label: 'Pagos y Servicios en Cripto', href: '/pagos-servicios' },
+        { key: 'geopolitica-actualidad', label: 'Geopolítica y Actualidad', href: '/geopolitica-actualidad' },
+        { key: 'adopcion-comunidad', label: 'Adopción y Comunidad', href: '/adopcion-comunidad' }
       ]
     }
   }
