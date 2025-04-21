@@ -1,7 +1,30 @@
 import { checkBasicAuth } from '@/lib/auth';
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Prisma, Post, DomainCategories, Tag } from '@prisma/client';
+
+type PostWithRelations = Post & {
+  categories: DomainCategories[];
+  tags: Tag[];
+};
+
+type PostResponse = {
+  id: number;
+  date: Date;
+  dateGmt: Date;
+  modified: Date;
+  modifiedGmt: Date;
+  slug: string;
+  status: string;
+  title: string;
+  content: string;
+  excerpt: string | null;
+  author: number;
+  featuredMedia: number | null;
+  domain: string;
+  categories: DomainCategories[];
+  tags: Tag[];
+};
 
 const createResponse = (data: any = null, error: string | null = null, message: string | null = null, status: number = 200) => {
   return Response.json({ data, error, message }, { status });
@@ -15,8 +38,8 @@ export async function GET(request: NextRequest) {
     const per_page = parseInt(searchParams.get('per_page') || '10');
     const page = parseInt(searchParams.get('page') || '1');
     const search = searchParams.get('search') || '';
-    const categories = searchParams.get('categories')?.split(',') || [];
-    const tags = searchParams.get('tags')?.split(',') || [];
+    const categoriesParam = searchParams.get('categories')?.split(',') || [];
+    const tagsParam = searchParams.get('tags')?.split(',') || [];
 
     const where: Prisma.PostWhereInput = {
       AND: [
@@ -26,17 +49,17 @@ export async function GET(request: NextRequest) {
             { content: { contains: search, mode: Prisma.QueryMode.insensitive } }
           ]
         } : {},
-        categories.length > 0 ? {
+        categoriesParam.length > 0 ? {
           categories: {
             some: {
-              id: { in: categories.map(Number) }
+              id: { in: categoriesParam.map(Number) }
             }
           }
         } : {},
-        tags.length > 0 ? {
+        tagsParam.length > 0 ? {
           tags: {
             some: {
-              id: { in: tags.map(Number) }
+              id: { in: tagsParam.map(Number) }
             }
           }
         } : {}
@@ -60,7 +83,7 @@ export async function GET(request: NextRequest) {
     headers.set('X-WP-Total', total.toString());
     headers.set('X-WP-TotalPages', Math.ceil(total / per_page).toString());
 
-    return createResponse({ posts, total, totalPages: Math.ceil(total / per_page) }, null, 'Posts retrieved successfully');
+    return createResponse({ posts, total, totalPages: Math.ceil(total / per_page) }, null, 'Posts retrieved successfully', 200);
   } catch (error: any) {
     console.error('[GET] /api/wp/v2/posts - Error:', error);
     return createResponse(null, 'Internal server error', error?.message, 500);
@@ -88,13 +111,16 @@ export async function POST(request: NextRequest) {
       return createResponse(null, 'Bad request', 'Title and content are required', 400);
     }
 
-    // Validar que las categorías existan
+    // Ensure domain is provided or default
+    const domain = body.domain || 'default';
+
+    // Validate that categories exist for the given domain
     if (body.categories?.length) {
       const existingCategories = await prisma.domainCategories.findMany({
         where: { 
           AND: [
             { id: { in: body.categories } },
-            { domain: body.domain || 'default' }
+            { domain: domain }
           ]
         }
       });
@@ -102,11 +128,11 @@ export async function POST(request: NextRequest) {
       if (existingCategories.length !== body.categories.length) {
         const foundIds = existingCategories.map(c => c.id);
         const missingIds = body.categories.filter((id: number) => !foundIds.includes(id));
-        return createResponse(null, 'Bad request', `Categories not found: ${missingIds.join(', ')}`, 400);
+        return createResponse(null, 'Bad request', `Categories not found for domain ${domain}: ${missingIds.join(', ')}`, 400);
       }
     }
 
-    // Validar que los tags existan
+    // Validate that tags exist (assuming tags are not domain-specific for now)
     if (body.tags?.length) {
       const existingTags = await prisma.tag.findMany({
         where: { id: { in: body.tags } }
@@ -126,43 +152,48 @@ export async function POST(request: NextRequest) {
       slug: body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
       status: body.status || 'publish',
       author: body.author || 1,
-      featuredMedia: body.featured_media || 0,
-      domain: body.domain || 'default',
+      featuredMedia: body.featured_media || null,
+      domain: domain,
       categories: body.categories?.length || 0,
       tags: body.tags?.length || 0
     });
 
-    const newPost = await prisma.post.create({
-      data: {
+    const newPostData: Prisma.PostCreateInput = {
         title: body.title,
         content: body.content,
         excerpt: body.excerpt || body.content.substring(0, 200) + '...',
         slug: body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
         status: body.status || 'publish',
         author: body.author || 1,
-        featuredMedia: body.featured_media || 0,
-        domain: body.domain || 'default',
+        featuredMedia: body.featured_media || null,
+        domain: domain,
         categories: {
           connect: body.categories?.map((id: number) => ({ id })) || []
         },
         tags: {
           connect: body.tags?.map((id: number) => ({ id })) || []
         }
-      },
+    };
+
+    const newPost = await prisma.post.create({
+      data: newPostData,
       include: {
         categories: true,
         tags: true
       }
     });
 
+    // Cast to include relations for logging/response
+    const newPostWithRelations = newPost as PostWithRelations;
+
     console.log('[POST] /api/wp/v2/posts - Post created successfully:', {
-      id: newPost.id,
-      title: newPost.title,
-      categories: newPost.categories.length,
-      tags: newPost.tags.length
+      id: newPostWithRelations.id,
+      title: newPostWithRelations.title,
+      categories: newPostWithRelations.categories.length,
+      tags: newPostWithRelations.tags.length
     });
 
-    return createResponse(newPost, null, 'Post created successfully', 201);
+    return createResponse(newPostWithRelations, null, 'Post created successfully', 201);
   } catch (error: any) {
     console.error('[POST] /api/wp/v2/posts - Error creating post:', error);
     console.error('[POST] /api/wp/v2/posts - Error details:', {
@@ -170,70 +201,12 @@ export async function POST(request: NextRequest) {
       message: error?.message,
       stack: error?.stack
     });
+
+    // Handle potential Prisma unique constraint violation for slug
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        return createResponse(null, 'Conflict', 'A post with this slug already exists.', 409);
+    }
+
     return createResponse(null, 'Bad request', error?.message || 'Invalid request body', 400);
   }
 }
-
-export async function PUT(request: NextRequest) {
-  console.log('[PUT] /api/wp/v2/posts/[id] - Request received');
-  
-  if (!checkBasicAuth(request)) {
-    console.log('[PUT] /api/wp/v2/posts/[id] - Unauthorized');
-    return createResponse(null, 'Unauthorized', 'Authentication required', 401);
-  }
-
-  try {
-    const body = await request.json();
-    const id = parseInt(request.nextUrl.pathname.split('/').pop() || '0');
-    console.log(`[PUT] /api/wp/v2/posts/${id} - Updating post`);
-
-    const updatedPost = await prisma.post.update({
-      where: { id },
-      data: {
-        ...body,
-        modified: new Date(),
-        modifiedGmt: new Date(),
-        categories: body.categories ? {
-          set: body.categories.map((id: number) => ({ id }))
-        } : undefined,
-        tags: body.tags ? {
-          set: body.tags.map((id: number) => ({ id }))
-        } : undefined
-      },
-      include: {
-        categories: true,
-        tags: true
-      }
-    });
-
-    console.log(`[PUT] /api/wp/v2/posts/${id} - Post updated successfully`);
-    return createResponse(updatedPost, null, 'Post updated successfully');
-  } catch (error: any) {
-    console.error(`[PUT] /api/wp/v2/posts/[id] - Error:`, error);
-    return createResponse(null, 'Not found', error?.message || 'Post not found', 404);
-  }
-}
-
-export async function DELETE(request: NextRequest) {
-  console.log('[DELETE] /api/wp/v2/posts/[id] - Request received');
-  
-  if (!checkBasicAuth(request)) {
-    console.log('[DELETE] /api/wp/v2/posts/[id] - Unauthorized');
-    return createResponse(null, 'Unauthorized', 'Authentication required', 401);
-  }
-
-  try {
-    const id = parseInt(request.nextUrl.pathname.split('/').pop() || '0');
-    console.log(`[DELETE] /api/wp/v2/posts/${id} - Deleting post`);
-
-    await prisma.post.delete({
-      where: { id }
-    });
-
-    console.log(`[DELETE] /api/wp/v2/posts/${id} - Post deleted successfully`);
-    return createResponse(null, null, 'Post deleted successfully', 204);
-  } catch (error: any) {
-    console.error(`[DELETE] /api/wp/v2/posts/[id] - Error:`, error);
-    return createResponse(null, 'Not found', error?.message || 'Post not found', 404);
-  }
-} 
