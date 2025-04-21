@@ -25,7 +25,7 @@ model Post {
   content       String   @db.Text
   excerpt       String?  @db.Text
   author        Int
-  featuredMedia Int?     @map("featured_media")
+  featuredMedia String?  @map("featured_media")
   domain        String
   categories    DomainCategories[]
   tags          Tag[]
