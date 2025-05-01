@@ -30,7 +30,7 @@ export function MiniHeader() {
           </div>
 
           {/* Center - Logo and site name */}
-          <Link href="/" className="flex items-center gap-1 sm:gap-2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <Link href="/" className="hidden md:flex items-center gap-1 sm:gap-2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <Image 
               src={theme === 'dark' ? site.logoDark : site.logo} 
               alt={site.name} 

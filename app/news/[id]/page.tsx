@@ -68,12 +68,12 @@ export default async function PostPage({ params, searchParams }: PageProps) {
                 />
               </div>
 
-              <div className="grid grid-cols-4 gap-8">
-                <div className="col-span-3">
-                  <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <div className="lg:col-span-3">
+                  <div dangerouslySetInnerHTML={{ __html: post.content || '' }} />
                 </div>
-                <div className="col-span-1">
-                  <TableOfContents content={post.content} />
+                <div className="hidden lg:block lg:col-span-1">
+                  <TableOfContents content={post.content || ''} />
                 </div>
               </div>
             </article>

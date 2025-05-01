@@ -2,16 +2,10 @@ import Link from "next/link";
 import { Clock, TrendingUp, Newspaper } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface Post {
-  id: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  date: string;
-  readTime: string;
-  image?: string;
-}
+import { Post } from "@/types/post";
+import { LatestNewsSection } from "./LatestNewsSection";
+import { TopStoriesSection } from "./TopStoriesSection";
+import { DeepDivesSection } from "./DeepDivesSection";
 
 const mockPosts: Post[] = [
   // Último Momento
@@ -108,6 +102,61 @@ const mockPosts: Post[] = [
     date: "2024-03-16",
     readTime: "6 min",
     image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  },
+  // Deep Dive Posts
+  {
+    id: "11",
+    title: "Análisis técnico: El futuro de las DAOs",
+    excerpt: "Un estudio profundo sobre el impacto y evolución de las Organizaciones Autónomas Descentralizadas...",
+    category: "Deep Dive",
+    date: "2024-03-15",
+    readTime: "8 min",
+    image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  },
+  {
+    id: "12",
+    title: "Layer 2: La solución a la escalabilidad de Ethereum",
+    excerpt: "Un análisis detallado de las diferentes soluciones Layer 2 y su impacto en la red Ethereum...",
+    category: "Deep Dive",
+    date: "2024-03-15",
+    readTime: "7 min",
+    image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  },
+  {
+    id: "13",
+    title: "El impacto de la Web3 en la privacidad digital",
+    excerpt: "Cómo la Web3 está redefiniendo la privacidad y seguridad en internet...",
+    category: "Deep Dive",
+    date: "2024-03-14",
+    readTime: "6 min",
+    image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  },
+  {
+    id: "14",
+    title: "Smart Contracts: La revolución de los contratos inteligentes",
+    excerpt: "Un análisis profundo de los smart contracts y su impacto en diferentes industrias...",
+    category: "Deep Dive",
+    date: "2024-03-14",
+    readTime: "5 min",
+    image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  },
+  {
+    id: "15",
+    title: "El futuro de las stablecoins",
+    excerpt: "Análisis del mercado de stablecoins y su papel en el ecosistema cripto...",
+    category: "Deep Dive",
+    date: "2024-03-13",
+    readTime: "6 min",
+    image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  },
+  {
+    id: "16",
+    title: "Criptomonedas y el medio ambiente",
+    excerpt: "Un estudio sobre el impacto ambiental de las criptomonedas y las soluciones sostenibles...",
+    category: "Deep Dive",
+    date: "2024-03-13",
+    readTime: "7 min",
+    image: "https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
   }
 ];
 
@@ -124,20 +173,20 @@ function PostCard({ post }: { post: Post }) {
             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
           />
         </div>
-        <div className="p-3 md:p-4">
-          <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground mb-2">
-            <span className="bg-primary/10 text-primary py-0.5 md:py-1 rounded-full text-xs">
+        <div className="p-2">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+            <span className="bg-primary/10 text-primary py-0.5 rounded-full text-[10px]">
               {post.category}
             </span>
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
+              <Clock className="w-2.5 h-2.5" />
               {post.readTime}
             </span>
           </div>
-          <h3 className="font-semibold text-sm md:text-base mb-2 group-hover:text-primary transition-colors">
+          <h3 className="font-semibold text-xs mb-1 group-hover:text-primary transition-colors">
             {post.title}
           </h3>
-          <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
+          <p className="text-[10px] text-muted-foreground line-clamp-2">
             {post.excerpt}
           </p>
         </div>
@@ -159,20 +208,20 @@ function FeaturedPostCard({ post }: { post: Post }) {
             sizes="(max-width: 640px) 100vw, 50vw"
           />
         </div>
-        <div className="p-4 md:p-6">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 md:mb-3">
-            <span className="bg-primary/10 text-primary px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm">
+        <div className="p-2">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+            <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded-full text-[10px]">
               {post.category}
             </span>
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3 md:w-4 md:h-4" />
+              <Clock className="w-2.5 h-2.5" />
               {post.readTime}
             </span>
           </div>
-          <h2 className="text-lg md:text-2xl font-bold mb-2 md:mb-3 group-hover:text-primary transition-colors">
+          <h2 className="text-sm font-bold mb-1 group-hover:text-primary transition-colors">
             {post.title}
           </h2>
-          <p className="text-sm md:text-base text-muted-foreground line-clamp-2 md:line-clamp-3">
+          <p className="text-xs text-muted-foreground line-clamp-2">
             {post.excerpt}
           </p>
         </div>
@@ -185,7 +234,7 @@ function SmallPostCard({ post }: { post: Post }) {
   return (
     <Link href={`/news/${post.id}`} className="group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-        <div className="grid grid-cols-3 gap-3 md:gap-4">
+        <div className="grid grid-cols-3 gap-2">
           <div className="aspect-square relative overflow-hidden">
             <Image
               src={post.image || ''}
@@ -195,17 +244,17 @@ function SmallPostCard({ post }: { post: Post }) {
               sizes="(max-width: 640px) 33vw, 20vw"
             />
           </div>
-          <div className="col-span-2 p-2 md:p-4">
-            <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground mb-1 md:mb-2">
-              <span className="bg-primary/10 text-primary py-0.5 rounded-full text-xs">
+          <div className="col-span-2 p-1.5">
+            <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-0.5">
+              <span className="bg-primary/10 text-primary py-0.5 rounded-full text-[10px]">
                 {post.category}
               </span>
               <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
+                <Clock className="w-2.5 h-2.5" />
                 {post.readTime}
               </span>
             </div>
-            <h3 className="font-semibold text-sm md:text-base line-clamp-2 group-hover:text-primary transition-colors">
+            <h3 className="font-semibold text-xs line-clamp-2 group-hover:text-primary transition-colors">
               {post.title}
             </h3>
           </div>
@@ -216,38 +265,28 @@ function SmallPostCard({ post }: { post: Post }) {
 }
 
 export function PostsSection() {
-  const featuredPost = mockPosts[0];
-  const recentPosts = mockPosts.slice(1, 5);
-  const otherPosts = mockPosts.slice(5);
+  // Dividir los posts en tres grupos para cada sección
+  const latestPosts = mockPosts.slice(0, 4);
+  const topStoryPosts = mockPosts.slice(4, 8);
+  const deepDivePosts = mockPosts.slice(8, 12);
 
   return (
-    <div className="space-y-8 md:space-y-12">
-      {/* Featured and Recent Posts */}
-      <section>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <div>
-            <FeaturedPostCard post={featuredPost} />
-          </div>
-          <div className="space-y-4 md:space-y-6">
-            {recentPosts.map(post => (
-              <SmallPostCard key={post.id} post={post} />
-            ))}
-          </div>
-        </div>
-      </section>
+    <div className="container mx-auto px-4 space-y-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <LatestNewsSection posts={latestPosts} />
+        <TopStoriesSection posts={topStoryPosts} />
+        <DeepDivesSection posts={deepDivePosts} />
+      </div>
 
-      {/* Other Posts */}
-      <section>
-        <div className="flex items-center gap-2 mb-4 md:mb-6">
-          <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-          <h2 className="text-xl md:text-2xl font-bold">Lo Más Reciente</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {otherPosts.map(post => (
+      {/* Sección de todos los posts */}
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold">Todas las Noticias</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {mockPosts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
         </div>
-      </section>
+      </div>
     </div>
   );
 } 

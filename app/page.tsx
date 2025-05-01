@@ -40,7 +40,7 @@ export default function Home() {
       <Section>
         <Container>
           <main className="space-y-12">
-            <PostsSection key={domain} />
+            <PostsSection />
             <TelegramChannel key={domain} />
           </main>
         </Container>

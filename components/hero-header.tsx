@@ -44,7 +44,7 @@ export function HeroHeader() {
                 className="transition-transform duration-300 w-16 h-16 sm:w-20 sm:h-20"
               />
               <div className="flex flex-col items-center">
-                <h1 className="text-2xl sm:text-4xl font-bold">{site.name}</h1>
+                <h1 className="text-2xl sm:text-4xl font-bold text-center">{site.name}</h1>
                 {isBitcoinArg && (
                   <p className="text-xs sm:text-sm text-muted-foreground mt-1 text-center max-w-[200px] sm:max-w-none">
                     + 8 años informando sobre criptomonedas en Argentina y Latinoamérica
@@ -55,13 +55,13 @@ export function HeroHeader() {
           </Link>
           
           {/* Menú de categorías - Solo visible en desktop */}
-          <div className="hidden md:flex justify-center border-t border-b py-2 sm:py-3">
-            <div className="flex gap-2 sm:gap-6">
+          <div className="hidden md:flex flex-col items-center border-t border-b py-2 sm:py-3">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-6 max-w-3xl">
               {site.categories.map((category) => (
                 <Link 
                   key={category.href} 
                   href={category.href}
-                  className="text-xs sm:text-sm font-medium hover:text-primary transition-colors whitespace-nowrap"
+                  className="text-xs sm:text-sm font-bold hover:text-primary transition-colors whitespace-nowrap text-center"
                 >
                   {category.label}
                 </Link>
@@ -84,7 +84,7 @@ export function HeroHeader() {
             </div>
 
             {/* Center - Logo and site name */}
-            <Link href="/" className="flex items-center gap-1 sm:gap-2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <Link href="/" className=" items-center gap-1 sm:gap-2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden sm:flex">
               <Image 
                 src={theme === 'dark' ? site.logoDark : site.logo} 
                 alt={site.name} 
@@ -92,7 +92,7 @@ export function HeroHeader() {
                 height={20} 
                 className="transition-transform duration-300"
               />
-              <span className="text-xs sm:text-sm font-medium hidden sm:inline">{site.name}</span>
+              <span className="text-xs sm:text-sm font-bold hidden sm:inline text-center">{site.name}</span>
             </Link>
 
             {/* Right side - Theme toggle and social links (desktop only) */}

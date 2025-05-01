@@ -6,5 +6,5 @@ export interface Post {
   date: string;
   readTime: string;
   image?: string;
-  content: string;
+  content?: string;
 } 

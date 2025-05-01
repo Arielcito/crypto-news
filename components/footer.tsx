@@ -14,7 +14,7 @@ export function Footer() {
   const { theme } = useTheme();
 
   return (
-    <footer className="min-h-[50vh]">
+    <footer>
       <Section>
         <Container className="grid md:grid-cols-[1.5fr_0.5fr_1fr] gap-12 h-full">
           <div className="flex flex-col gap-6 not-prose">
@@ -27,11 +27,11 @@ export function Footer() {
               />
               <h3 className="text-xl font-medium">{site.name}</h3>
             </Link>
-            {isBitcoinArg && (
+
               <p>
                 <Balancer>+8 años informando sobre criptomonedas en Argentina y Latinoamérica.</Balancer>
               </p>
-            )}
+            
           </div>
           <div className="flex flex-col gap-4 text-sm">
             <h5 className="font-medium text-base">Social</h5>
