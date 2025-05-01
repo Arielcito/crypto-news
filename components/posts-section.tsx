@@ -6,6 +6,8 @@ import { Post } from "@/types/post";
 import { LatestNewsSection } from "./LatestNewsSection";
 import { TopStoriesSection } from "./TopStoriesSection";
 import { DeepDivesSection } from "./DeepDivesSection";
+import { useQuery } from '@tanstack/react-query';
+import { fetchPosts } from '@/lib/api/posts';
 
 const mockPosts: Post[] = [
   // Último Momento
@@ -265,10 +267,23 @@ function SmallPostCard({ post }: { post: Post }) {
 }
 
 export function PostsSection() {
+  const { data: apiPosts = [], isLoading } = useQuery({
+    queryKey: ['posts'],
+    queryFn: fetchPosts,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Combine mock and API posts
+  const allPosts = [...mockPosts, ...apiPosts];
+
   // Dividir los posts en tres grupos para cada sección
-  const latestPosts = mockPosts.slice(0, 4);
-  const topStoryPosts = mockPosts.slice(4, 8);
-  const deepDivePosts = mockPosts.slice(8, 12);
+  const latestPosts = allPosts.slice(0, 4);
+  const topStoryPosts = allPosts.slice(4, 8);
+  const deepDivePosts = allPosts.slice(8, 12);
+
+  if (isLoading) {
+    return <div className="container mx-auto px-4">Cargando posts...</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 space-y-12">
@@ -282,7 +297,7 @@ export function PostsSection() {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold">Todas las Noticias</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockPosts.map((post) => (
+          {allPosts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
         </div>
