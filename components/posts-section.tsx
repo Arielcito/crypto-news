@@ -121,12 +121,12 @@ function PostCard({ post }: { post: Post }) {
             alt={post.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
           />
         </div>
-        <div className="p-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <span className="bg-primary/10 text-primary  py-1 rounded-full text-xs">
+        <div className="p-3 md:p-4">
+          <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground mb-2">
+            <span className="bg-primary/10 text-primary py-0.5 md:py-1 rounded-full text-xs">
               {post.category}
             </span>
             <span className="flex items-center gap-1">
@@ -134,10 +134,10 @@ function PostCard({ post }: { post: Post }) {
               {post.readTime}
             </span>
           </div>
-          <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">
+          <h3 className="font-semibold text-sm md:text-base mb-2 group-hover:text-primary transition-colors">
             {post.title}
           </h3>
-          <p className="text-sm text-muted-foreground line-clamp-2">
+          <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
             {post.excerpt}
           </p>
         </div>
@@ -156,23 +156,23 @@ function FeaturedPostCard({ post }: { post: Post }) {
             alt={post.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="(max-width: 640px) 100vw, 50vw"
           />
         </div>
-        <div className="p-6">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full">
+        <div className="p-4 md:p-6">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2 md:mb-3">
+            <span className="bg-primary/10 text-primary px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm">
               {post.category}
             </span>
             <span className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
+              <Clock className="w-3 h-3 md:w-4 md:h-4" />
               {post.readTime}
             </span>
           </div>
-          <h2 className="text-2xl font-bold mb-3 group-hover:text-primary transition-colors">
+          <h2 className="text-lg md:text-2xl font-bold mb-2 md:mb-3 group-hover:text-primary transition-colors">
             {post.title}
           </h2>
-          <p className="text-muted-foreground line-clamp-3">
+          <p className="text-sm md:text-base text-muted-foreground line-clamp-2 md:line-clamp-3">
             {post.excerpt}
           </p>
         </div>
@@ -185,19 +185,19 @@ function SmallPostCard({ post }: { post: Post }) {
   return (
     <Link href={`/news/${post.id}`} className="group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-3 md:gap-4">
           <div className="aspect-square relative overflow-hidden">
             <Image
               src={post.image || ''}
               alt={post.title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
-              sizes="(max-width: 768px) 33vw, 20vw"
+              sizes="(max-width: 640px) 33vw, 20vw"
             />
           </div>
-          <div className="col-span-2 p-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-              <span className="bg-primary/10 text-primary  py-0.5 rounded-full text-xs">
+          <div className="col-span-2 p-2 md:p-4">
+            <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground mb-1 md:mb-2">
+              <span className="bg-primary/10 text-primary py-0.5 rounded-full text-xs">
                 {post.category}
               </span>
               <span className="flex items-center gap-1">
@@ -205,7 +205,7 @@ function SmallPostCard({ post }: { post: Post }) {
                 {post.readTime}
               </span>
             </div>
-            <h3 className="font-semibold line-clamp-2 group-hover:text-primary transition-colors">
+            <h3 className="font-semibold text-sm md:text-base line-clamp-2 group-hover:text-primary transition-colors">
               {post.title}
             </h3>
           </div>
@@ -221,14 +221,14 @@ export function PostsSection() {
   const otherPosts = mockPosts.slice(5);
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8 md:space-y-12">
       {/* Featured and Recent Posts */}
       <section>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <div>
             <FeaturedPostCard post={featuredPost} />
           </div>
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {recentPosts.map(post => (
               <SmallPostCard key={post.id} post={post} />
             ))}
@@ -238,11 +238,11 @@ export function PostsSection() {
 
       {/* Other Posts */}
       <section>
-        <div className="flex items-center gap-2 mb-6">
-          <TrendingUp className="w-5 h-5 text-primary" />
-          <h2 className="text-2xl font-bold">Lo Más Reciente</h2>
+        <div className="flex items-center gap-2 mb-4 md:mb-6">
+          <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+          <h2 className="text-xl md:text-2xl font-bold">Lo Más Reciente</h2>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {otherPosts.map(post => (
             <PostCard key={post.id} post={post} />
           ))}

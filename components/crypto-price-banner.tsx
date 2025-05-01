@@ -55,8 +55,8 @@ export function CryptoPriceBanner() {
   if (!prices.length) return null;
 
   return (
-    <div className="bg-accent/50 border-b">
-      <div className="container mx-auto">
+    <div className="bg-accent/50 border-b w-full">
+      <div className="w-full">
         <div className="relative overflow-hidden">
           <motion.div
             className="flex gap-6 py-2 px-4"
