@@ -8,24 +8,6 @@ type PostWithRelations = Post & {
   tags: Tag[];
 };
 
-type PostResponse = {
-  id: number;
-  date: Date;
-  dateGmt: Date;
-  modified: Date;
-  modifiedGmt: Date;
-  slug: string;
-  status: string;
-  title: string;
-  content: string;
-  excerpt: string | null;
-  author: number;
-  featuredMedia: number | null;
-  domain: string;
-  categories: DomainCategories[];
-  tags: Tag[];
-};
-
 const createResponse = (data: any = null, error: string | null = null, message: string | null = null, status: number = 200) => {
   return Response.json({ data, error, message }, { status });
 };

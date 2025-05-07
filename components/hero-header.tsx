@@ -45,27 +45,38 @@ export function HeroHeader() {
               />
               <div className="flex flex-col items-center">
                 <h1 className="text-2xl sm:text-4xl font-bold text-center">{site.name}</h1>
-                {isBitcoinArg && (
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-1 text-center max-w-[200px] sm:max-w-none">
-                    + 8 años informando sobre criptomonedas en Argentina y Latinoamérica
-                  </p>
-                )}
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1 text-center max-w-[200px] sm:max-w-none">
+                  {site.description}
+                </p>
               </div>
             </div>
           </Link>
           
           {/* Menú de categorías - Solo visible en desktop */}
           <div className="hidden md:flex flex-col items-center border-t border-b py-2 sm:py-3">
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-6 max-w-3xl">
-              {site.categories.map((category) => (
-                <Link 
-                  key={category.href} 
-                  href={category.href}
-                  className="text-xs sm:text-sm font-bold hover:text-primary transition-colors whitespace-nowrap text-center"
-                >
-                  {category.label}
-                </Link>
-              ))}
+            <div className="flex flex-col gap-2 sm:gap-6 max-w-3xl">
+              <div className="flex justify-center gap-2 sm:gap-6">
+                {site.categories.slice(0, Math.ceil(site.categories.length / 2)).map((category) => (
+                  <Link 
+                    key={category.href} 
+                    href={category.href}
+                    className="text-xs sm:text-sm font-bold hover:text-primary transition-colors whitespace-nowrap text-center"
+                  >
+                    {category.label}
+                  </Link>
+                ))}
+              </div>
+              <div className="flex justify-center gap-2 sm:gap-6">
+                {site.categories.slice(Math.ceil(site.categories.length / 2)).map((category) => (
+                  <Link 
+                    key={category.href} 
+                    href={category.href}
+                    className="text-xs sm:text-sm font-bold hover:text-primary transition-colors whitespace-nowrap text-center"
+                  >
+                    {category.label}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </div>

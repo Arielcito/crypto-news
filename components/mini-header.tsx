@@ -34,8 +34,8 @@ export function MiniHeader() {
             <Image 
               src={theme === 'dark' ? site.logoDark : site.logo} 
               alt={site.name} 
-              width={20} 
-              height={20} 
+              width={60} 
+              height={60} 
               className="transition-transform duration-300"
             />
             <span className="text-xs sm:text-sm font-medium hidden sm:inline">{site.name}</span>
