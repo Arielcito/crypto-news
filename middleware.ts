@@ -12,8 +12,7 @@ const allowedDomains = [
   'www.ultimahoracrypto.com',
   'ultimahoracrypto.com',
   'www.ultimahoracripto.com',
-  'ultimahoracripto.com',
-  'localhost:3000'
+  'ultimahoracripto.com'
 ]
 
 export function middleware(request: NextRequest) {
