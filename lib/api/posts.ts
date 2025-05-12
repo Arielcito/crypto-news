@@ -12,10 +12,19 @@ interface SinglePostResponse {
   message: string | null;
 }
 
+const cleanDomain = (domain: string): string => {
+  // Remove protocol (http:// or https://)
+  let cleaned = domain.replace(/^https?:\/\//, '');
+  // Remove www. if present
+  cleaned = cleaned.replace(/^www\./, '');
+  return cleaned;
+};
+
 export const fetchPosts = async (): Promise<Post[]> => {
   try {
     const currentDomain = typeof window !== 'undefined' ? window.location.origin : '';
-    const response = await axiosInstance.get<ApiResponse>(`/api/wp/v2/posts?domain=${currentDomain === 'http://localhost:3000' ? 'bitcoinarg.news' : currentDomain}`);
+    const cleanedDomain = cleanDomain(currentDomain === 'http://localhost:3000' ? 'bitcoinarg.news' : currentDomain);
+    const response = await axiosInstance.get<ApiResponse>(`/api/wp/v2/posts?domain=${cleanedDomain}`);
     const apiPosts = response.data.data?.posts || [];
 
     return apiPosts;
