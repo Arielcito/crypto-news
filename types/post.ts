@@ -1,10 +1,14 @@
-export interface Post {
-  id: string;
+interface Post {
+  id: number;
   title: string;
   excerpt: string;
-  category: string;
   date: string;
-  readTime: string;
-  image?: string;
-  content?: string;
-} 
+  content: string;
+  categories: Array<{ id: number; name: string }>;
+  featuredMedia: string;
+  slug: string;
+  domain: string;
+  views?: number;
+}
+
+export default Post;

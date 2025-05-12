@@ -16,22 +16,41 @@ export function HeroHeader() {
   const { site, isBitcoinArg } = useDomain();
   const { theme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
+      const currentScrollY = window.scrollY;
+      
+      // Solo actualizamos el estado si hay un cambio significativo
+      if (Math.abs(currentScrollY - lastScrollY) > 5) {
+        setIsScrolled(currentScrollY > 100);
+        setLastScrollY(currentScrollY);
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    // Usamos requestAnimationFrame para suavizar la animación
+    let ticking = false;
+    const scrollListener = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', scrollListener, { passive: true });
+    return () => window.removeEventListener('scroll', scrollListener);
+  }, [lastScrollY]);
 
   return (
     <>
       {/* Logo grande y menú de categorías */}
       <div className={cn(
-        "w-full bg-background transition-all duration-300",
-        isScrolled ? "h-0 opacity-0" : "opacity-100"
+        "w-full bg-background transition-all duration-300 ease-in-out",
+        isScrolled ? "h-0 opacity-0 pointer-events-none" : "opacity-100"
       )}>
         <div className="container mx-auto px-2 sm:px-4">
           <Link href="/" className="flex flex-col items-center justify-center h-24 sm:h-32 py-2 sm:py-4">
@@ -54,29 +73,16 @@ export function HeroHeader() {
           
           {/* Menú de categorías - Solo visible en desktop */}
           <div className="hidden md:flex flex-col items-center border-t border-b py-2 sm:py-3">
-            <div className="flex flex-col gap-2 sm:gap-6 max-w-3xl">
-              <div className="flex justify-center gap-2 sm:gap-6">
-                {site.categories.slice(0, Math.ceil(site.categories.length / 2)).map((category) => (
-                  <Link 
-                    key={category.href} 
-                    href={category.href}
-                    className="text-xs sm:text-sm font-bold hover:text-primary transition-colors whitespace-nowrap text-center"
-                  >
-                    {category.label}
-                  </Link>
-                ))}
-              </div>
-              <div className="flex justify-center gap-2 sm:gap-6">
-                {site.categories.slice(Math.ceil(site.categories.length / 2)).map((category) => (
-                  <Link 
-                    key={category.href} 
-                    href={category.href}
-                    className="text-xs sm:text-sm font-bold hover:text-primary transition-colors whitespace-nowrap text-center"
-                  >
-                    {category.label}
-                  </Link>
-                ))}
-              </div>
+            <div className="flex justify-center gap-2 sm:gap-6 max-w-3xl">
+              {site.categories.map((category) => (
+                <Link 
+                  key={category.href} 
+                  href={category.href}
+                  className="text-xs sm:text-sm font-bold hover:text-primary transition-colors whitespace-nowrap text-center"
+                >
+                  {category.label}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -84,8 +90,8 @@ export function HeroHeader() {
 
       {/* Header compacto al hacer scroll */}
       <header className={cn(
-        "fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 border-b",
-        isScrolled ? "translate-y-0 shadow-sm" : "-translate-y-full"
+        "fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 ease-in-out border-b",
+        isScrolled ? "translate-y-0 shadow-sm" : "-translate-y-full pointer-events-none"
       )}>
         <div className="container mx-auto px-2 sm:px-4">
           <div className="flex items-center justify-between h-14 sm:h-16">

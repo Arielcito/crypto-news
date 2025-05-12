@@ -181,9 +181,6 @@ export const domainConfigs = {
 
 export function getDomainConfig() {
   const domain = process.env.NEXT_PUBLIC_DOMAIN as Domain || 'localhost';
-  console.log('getDomainConfig: Environment domain:', process.env.NEXT_PUBLIC_DOMAIN);
-  console.log('getDomainConfig: Selected domain:', domain);
   const config = domainConfigs[domain];
-  console.log('getDomainConfig: Selected config:', config);
   return config;
 } 

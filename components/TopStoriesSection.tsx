@@ -1,18 +1,19 @@
 import Link from "next/link";
 import { Clock } from "lucide-react";
 import Image from "next/image";
-import { Post } from "@/types/post";
+import Post from "@/types/post";
 
 interface TopStoriesSectionProps {
   posts: Post[];
 }
 
 function FeaturedStoryCard({ post }: { post: Post }) {
+  console.log(post);
   return (
-    <Link href={`/news/${post.id}`} className="block group">
+    <Link href={`/news/${post.slug}`} className="block group">
       <article className="relative h-[300px] rounded-lg overflow-hidden">
         <Image
-          src={post.image || ""}
+          src={post.featuredMedia || ""}
           alt={post.title}
           fill
           className="object-cover brightness-75 group-hover:scale-105 transition-transform duration-300"
@@ -21,10 +22,6 @@ function FeaturedStoryCard({ post }: { post: Post }) {
           <div className="flex items-center gap-2 text-sm mb-2">
             <span className="bg-blue-500 px-2 py-1 rounded-full">
               DESTACADO
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              {post.readTime}
             </span>
           </div>
           <h3 className="text-2xl font-bold mb-2 group-hover:text-blue-400 transition-colors">
@@ -40,12 +37,13 @@ function FeaturedStoryCard({ post }: { post: Post }) {
 }
 
 function SmallStoryCard({ post }: { post: Post }) {
+  console.log(post);
   return (
-    <Link href={`/news/${post.id}`} className="block group">
+    <Link href={`/news/${post.slug}`} className="block group">
       <article className="flex gap-4 items-center">
         <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
           <Image
-            src={post.image || ""}
+            src={post.featuredMedia || ""}
             alt={post.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -53,14 +51,10 @@ function SmallStoryCard({ post }: { post: Post }) {
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {post.readTime}
-            </span>
+            <h3 className="font-bold text-sm group-hover:text-primary transition-colors line-clamp-2">
+              {post.title}
+            </h3>
           </div>
-          <h3 className="font-bold text-sm group-hover:text-primary transition-colors line-clamp-2">
-            {post.title}
-          </h3>
         </div>
       </article>
     </Link>
@@ -68,7 +62,15 @@ function SmallStoryCard({ post }: { post: Post }) {
 }
 
 export function TopStoriesSection({ posts }: TopStoriesSectionProps) {
+  if (!posts || posts.length === 0) {
+    return null;
+  }
+
   const [featuredPost, ...smallPosts] = posts;
+  
+  if (!featuredPost) {
+    return null;
+  }
 
   return (
     <div className="flex-1">
@@ -77,7 +79,7 @@ export function TopStoriesSection({ posts }: TopStoriesSectionProps) {
         <FeaturedStoryCard post={featuredPost} />
         <div className="space-y-4">
           {smallPosts.map((post) => (
-            <SmallStoryCard key={post.id} post={post} />
+            <SmallStoryCard key={post.slug} post={post} />
           ))}
         </div>
       </div>

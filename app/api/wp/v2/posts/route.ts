@@ -14,17 +14,18 @@ const createResponse = (data: any = null, error: string | null = null, message: 
 
 export async function GET(request: NextRequest) {
   console.log('[GET] /api/wp/v2/posts - Request received');
-  
-  try {
+    try {
     const searchParams = request.nextUrl.searchParams;
     const per_page = parseInt(searchParams.get('per_page') || '10');
     const page = parseInt(searchParams.get('page') || '1');
     const search = searchParams.get('search') || '';
     const categoriesParam = searchParams.get('categories')?.split(',') || [];
     const tagsParam = searchParams.get('tags')?.split(',') || [];
+    const domain = searchParams.get('domain') || 'default';
 
     const where: Prisma.PostWhereInput = {
       AND: [
+        { domain: domain },
         search ? {
           OR: [
             { title: { contains: search, mode: Prisma.QueryMode.insensitive } },

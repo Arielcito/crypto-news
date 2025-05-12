@@ -29,6 +29,7 @@ interface DomainConfig {
       instagram?: string;
       tiktok?: string;
       youtube?: string;
+      email?: string;
     };
     categories: {
       key: string;
@@ -54,20 +55,20 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       logoDark: '/bitcoinarg/logo.png',
       socialLinks: {
         telegram: 'https://t.me/bitcoinargnews',
-        twitter: 'https://twitter.com/bitcoinargnews',
-        instagram: 'https://instagram.com/bitcoinargnews',
-        tiktok: 'https://tiktok.com/@bitcoinargnews',
-        youtube: 'https://youtube.com/@bitcoinargnews'
+        instagram: 'https://instagram.com/bitcoin_argentina',
+        tiktok: 'https://tiktok.com/@bitcoin_argentina',
+        youtube: 'https://www.youtube.com/@bitcoinargentinaoficial',
+        email: 'bitcoinargentina.oficial@gmail.com'
       },
       categories: [
-        { key: 'bitcoin-finanzas', label: 'Bitcoin y Finanzas Personales', href: '/bitcoin-finanzas' },
-        { key: 'economia-crisis', label: 'Economía y Crisis', href: '/economia-crisis' },
-        { key: 'regulacion-politicas', label: 'Regulación y Políticas Cripto', href: '/regulacion-politicas' },
-        { key: 'mercado-volatilidad', label: 'Mercado y Volatilidad', href: '/mercado-volatilidad' },
-        { key: 'tecnologia-mineria', label: 'Tecnología y Minería', href: '/tecnologia-mineria' },
-        { key: 'pagos-servicios', label: 'Pagos y Servicios en Cripto', href: '/pagos-servicios' },
-        { key: 'geopolitica-actualidad', label: 'Geopolítica y Actualidad', href: '/geopolitica-actualidad' },
-        { key: 'adopcion-comunidad', label: 'Adopción y Comunidad', href: '/adopcion-comunidad' }
+        { key: 'bitcoin', label: 'Bitcoin', href: '/bitcoin' },
+        { key: 'stablecoins', label: 'Stablecoins', href: '/stablecoins' },
+        { key: 'regulacion', label: 'Regulación', href: '/regulacion' },
+        { key: 'mercados', label: 'Mercados', href: '/mercados' },
+        { key: 'adopcion', label: 'Adopción', href: '/adopcion' },
+        { key: 'hackeo', label: 'Hackeo', href: '/hackeo' },
+        { key: 'tokenizacion', label: 'Tokenización', href: '/tokenizacion' },
+        { key: 'geopolitica', label: 'Geopolítica', href: '/geopolitica' }
       ]
     }
   },
@@ -88,14 +89,14 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         telegram: 'https://t.me/tendenciascrypto'
       },
       categories: [
-        { key: 'innovacion-tecnologia', label: 'Innovación y Tecnología', href: '/innovacion-tecnologia' },
-        { key: 'trading-inversiones', label: 'Trading e Inversiones', href: '/trading-inversiones' },
-        { key: 'criptomonedas-blockchain', label: 'Criptomonedas y Blockchain', href: '/criptomonedas-blockchain' },
-        { key: 'regulacion-politica', label: 'Regulación y Política Cripto', href: '/regulacion-politica' },
-        { key: 'adopcion-comunidad', label: 'Adopción y Comunidad', href: '/adopcion-comunidad' },
-        { key: 'descentralizacion-proyectos', label: 'Descentralización y Proyectos', href: '/descentralizacion-proyectos' },
-        { key: 'crisis-riesgos', label: 'Crisis y Riesgos', href: '/crisis-riesgos' },
-        { key: 'tendencias-globales', label: 'Tendencias Globales', href: '/tendencias-globales' }
+        { key: 'ethereum', label: 'Ethereum', href: '/ethereum' },
+        { key: 'solana', label: 'Solana', href: '/solana' },
+        { key: 'defi', label: 'DeFi', href: '/defi' },
+        { key: 'tokenizacion', label: 'Tokenización', href: '/tokenizacion' },
+        { key: 'nft', label: 'NFT', href: '/nft' },
+        { key: 'regulacion', label: 'Regulación', href: '/regulacion' },
+        { key: 'innovacion', label: 'Innovación', href: '/innovacion' },
+        { key: 'adopcion', label: 'Adopción', href: '/adopcion' }
       ]
     }
   },
@@ -116,9 +117,14 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         telegram: 'https://t.me/tendenciascrypto'
       },
       categories: [
-        { key: 'tendencias', label: 'Tendencias', href: '/tendencias' },
-        { key: 'analisis', label: 'Análisis', href: '/analisis' },
-        { key: 'mercado', label: 'Mercado', href: '/mercado' }
+        { key: 'ethereum', label: 'Ethereum', href: '/ethereum' },
+        { key: 'solana', label: 'Solana', href: '/solana' },
+        { key: 'defi', label: 'DeFi', href: '/defi' },
+        { key: 'tokenizacion', label: 'Tokenización', href: '/tokenizacion' },
+        { key: 'nft', label: 'NFT', href: '/nft' },
+        { key: 'regulacion', label: 'Regulación', href: '/regulacion' },
+        { key: 'innovacion', label: 'Innovación', href: '/innovacion' },
+        { key: 'adopcion', label: 'Adopción', href: '/adopcion' }
       ]
     }
   },
@@ -139,13 +145,14 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         telegram: 'https://t.me/ultimahoracrypto'
       },
       categories: [
-        { key: 'mercados', label: 'Mercados', href: '/mercados' },
+        { key: 'bitcoin', label: 'Bitcoin', href: '/bitcoin' },
+        { key: 'altcoins', label: 'Altcoins', href: '/altcoins' },
         { key: 'regulacion', label: 'Regulación', href: '/regulacion' },
-        { key: 'tecnologia-blockchain', label: 'Tecnología Blockchain', href: '/tecnologia-blockchain' },
-        { key: 'inversion-estrategia', label: 'Inversión y Estrategia', href: '/inversion-estrategia' },
-        { key: 'economia-global', label: 'Economía Global', href: '/economia-global' },
-        { key: 'mineria-seguridad', label: 'Minería y Seguridad', href: '/mineria-seguridad' },
-        { key: 'tendencias-crisis', label: 'Tendencias y Crisis', href: '/tendencias-crisis' }
+        { key: 'politica', label: 'Política', href: '/politica' },
+        { key: 'crimen', label: 'Crimen', href: '/crimen' },
+        { key: 'mercados', label: 'Mercados', href: '/mercados' },
+        { key: 'economia', label: 'Economía', href: '/economia' },
+        { key: 'empresas', label: 'Empresas', href: '/empresas' }
       ]
     }
   },
@@ -166,9 +173,14 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         telegram: 'https://t.me/ultimahoracrypto'
       },
       categories: [
-        { key: 'ultimahora', label: 'Última Hora', href: '/ultimahora' },
-        { key: 'noticias', label: 'Noticias', href: '/noticias' },
-        { key: 'alertas', label: 'Alertas', href: '/alertas' }
+        { key: 'bitcoin', label: 'Bitcoin', href: '/bitcoin' },
+        { key: 'altcoins', label: 'Altcoins', href: '/altcoins' },
+        { key: 'regulacion', label: 'Regulación', href: '/regulacion' },
+        { key: 'politica', label: 'Política', href: '/politica' },
+        { key: 'crimen', label: 'Crimen', href: '/crimen' },
+        { key: 'mercados', label: 'Mercados', href: '/mercados' },
+        { key: 'economia', label: 'Economía', href: '/economia' },
+        { key: 'empresas', label: 'Empresas', href: '/empresas' }
       ]
     }
   },
@@ -187,10 +199,10 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       logoDark: '/bitcoinarg/logo.png',
       socialLinks: {
         telegram: 'https://t.me/bitcoinargnews',
-        twitter: 'https://twitter.com/bitcoinargnews',
-        instagram: 'https://instagram.com/bitcoinargnews',
-        tiktok: 'https://tiktok.com/@bitcoinargnews',
-        youtube: 'https://youtube.com/@bitcoinargnews'
+        instagram: 'https://instagram.com/bitcoin_argentina',
+        tiktok: 'https://tiktok.com/@bitcoin_argentina',
+        youtube: 'https://www.youtube.com/@bitcoinargentinaoficial',
+        email: 'bitcoinargentina.oficial@gmail.com'
       },
       categories: [
         { key: 'bitcoin-finanzas', label: 'Bitcoin y Finanzas Personales', href: '/bitcoin-finanzas' },

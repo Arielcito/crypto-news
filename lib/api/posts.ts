@@ -1,41 +1,45 @@
-import axios from 'axios';
-import { Post } from '@/types/post';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-interface ApiPost {
-  id: number;
-  title: string;
-  excerpt: string;
-  date: string;
-  content: string;
-  categories: Array<{ name: string }>;
-  featuredMedia: string;
-}
-
+import Post from '@/types/post';
+import { axiosInstance } from '@/lib/axios';
 interface ApiResponse {
   data: {
-    posts: ApiPost[];
+    posts: Post[];
   };
+}
+
+interface SinglePostResponse {
+  data: Post;
+  error: string | null;
+  message: string | null;
 }
 
 export const fetchPosts = async (): Promise<Post[]> => {
   try {
-    const response = await axios.get<ApiResponse>(`${API_URL}/api/wp/v2/posts`);
+    const currentDomain = typeof window !== 'undefined' ? window.location.origin : '';
+    const response = await axiosInstance.get<ApiResponse>(`/api/wp/v2/posts?domain=${currentDomain === 'http://localhost:3000' ? 'bitcoinarg.news' : currentDomain}`);
     const apiPosts = response.data.data?.posts || [];
 
-    return apiPosts.map((post) => ({
-      id: post.id.toString(),
-      title: post.title,
-      excerpt: post.excerpt || '',
-      category: post.categories?.[0]?.name || 'Noticias',
-      date: new Date(post.date).toISOString().split('T')[0],
-      readTime: '5 min',
-      image: post.featuredMedia || 'https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-      content: post.content || ''
-    }));
+    return apiPosts;
   } catch (error) {
     console.error('Error fetching posts:', error);
     return [];
+  }
+};
+
+export const fetchPostBySlug = async (slug: string): Promise<Post | null> => {
+  try {
+    const currentDomain = typeof window !== 'undefined' ? window.location.origin : '';
+    const response = await axiosInstance.get<SinglePostResponse>(
+      `/api/wp/v2/posts/by-slug/${slug}`
+    );
+    
+    if (response.data.error) {
+      console.error('Error fetching post:', response.data.error);
+      return null;
+    }
+
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching post by slug:', error);
+    return null;
   }
 }; 

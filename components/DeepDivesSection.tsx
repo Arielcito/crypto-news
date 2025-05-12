@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Clock } from "lucide-react";
 import Image from "next/image";
-import { Post } from "@/types/post";
+import Post from "@/types/post";
 
 interface DeepDivesSectionProps {
   posts: Post[];
@@ -9,11 +9,11 @@ interface DeepDivesSectionProps {
 
 function DeepDiveCard({ post }: { post: Post }) {
   return (
-    <Link href={`/news/${post.id}`} className="block group">
+    <Link href={`/news/${post.slug}`} className="block group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
         <div className="aspect-[16/9] relative overflow-hidden">
           <Image
-            src={post.image || ""}
+            src={post.featuredMedia || ""}
             alt={post.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -26,7 +26,7 @@ function DeepDiveCard({ post }: { post: Post }) {
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {post.readTime}
+              {post.views}
             </span>
           </div>
           <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors line-clamp-2">
@@ -47,7 +47,7 @@ export function DeepDivesSection({ posts }: DeepDivesSectionProps) {
       <h2 className="text-2xl font-bold mb-4">Análisis en Profundidad</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {posts.map((post) => (
-          <DeepDiveCard key={post.id} post={post} />
+          <DeepDiveCard key={post.slug} post={post} />
         ))}
       </div>
     </div>

@@ -36,9 +36,9 @@ export function MiniHeader() {
               alt={site.name} 
               width={60} 
               height={60} 
-              className="transition-transform duration-300"
+              className="hidden  transition-transform duration-300 "
             />
-            <span className="text-xs sm:text-sm font-medium hidden sm:inline">{site.name}</span>
+            <span className="hidden  text-xs sm:text-sm font-medium">{site.name}</span>
           </Link>
 
           {/* Right side - Theme toggle and social links (desktop only) */}

@@ -83,16 +83,18 @@ export function Footer() {
             <p className="text-sm">¿Querés aparecer en nuestra web?</p>
             <p className="text-sm text-muted-foreground">Llegá a miles de lectores interesados en criptomonedas y blockchain.</p>
             <a 
-              href="mailto:123@gmail.com" 
+              href={`mailto:${site.socialLinks.email}`}
               className="text-sm text-primary hover:underline font-medium"
             >
-              Contactanos → 123@gmail.com
+              Contactanos → {site.socialLinks.email}
             </a>
           </div>
         </Container>
         <Container className="mt-8 pt-8 border-t">
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} {site.name}. Todos los derechos reservados.
+            <br />
+            Una empresa de Bitcoin Argentina Group.
           </p>
         </Container>
       </Section>

@@ -102,7 +102,7 @@ export default async function Page({
           {paginatedPosts.length > 0 ? (
             <div className="grid md:grid-cols-3 gap-4">
               {paginatedPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
+                <PostCard key={post.slug} post={post} />
               ))}
             </div>
           ) : (
