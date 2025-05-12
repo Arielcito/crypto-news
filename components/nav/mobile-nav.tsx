@@ -85,27 +85,6 @@ export function MobileNav() {
             ))}
           </div>
 
-          {/* Main Menu */}
-          <h3 className="text-small font-medium">Menú Principal</h3>
-          <Separator className="my-2" />
-          <div className="flex flex-col space-y-2 mb-4">
-            {Object.entries(mainMenu).map(([key, href]) => (
-              <MobileLink key={key} href={href} onOpenChange={setOpen}>
-                {key.charAt(0).toUpperCase() + key.slice(1)}
-              </MobileLink>
-            ))}
-          </div>
-
-          {/* Content Menu */}
-          <h3 className="text-small font-medium">Blog</h3>
-          <Separator className="my-2" />
-          <div className="flex flex-col space-y-2 mb-4">
-            {Object.entries(contentMenu).map(([key, href]) => (
-              <MobileLink key={key} href={href} onOpenChange={setOpen}>
-                {key.charAt(0).toUpperCase() + key.slice(1)}
-              </MobileLink>
-            ))}
-          </div>
 
           {/* Social Links */}
           <h3 className="text-small font-medium">Redes Sociales</h3>

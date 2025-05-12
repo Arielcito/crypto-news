@@ -21,7 +21,7 @@ export function MiniHeader() {
   })
 
   return (
-    <div className="w-full bg-background border-b py-1">
+    <div className="w-full bg-background border-b py-1 sticky top-0 z-40">
       <div className="container mx-auto px-2 sm:px-4">
         <div className="flex items-center justify-between">
           {/* Left side - Mobile menu */}
@@ -36,9 +36,10 @@ export function MiniHeader() {
               alt={site.name} 
               width={60} 
               height={60} 
-              className="hidden  transition-transform duration-300 "
+              className="hidden transition-transform duration-300"
+              priority
             />
-            <span className="hidden  text-xs sm:text-sm font-medium">{site.name}</span>
+            <span className="hidden lg text-xs sm:text-sm font-medium">{site.name}</span>
           </Link>
 
           {/* Right side - Theme toggle and social links (desktop only) */}

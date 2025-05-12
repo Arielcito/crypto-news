@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Clock, TrendingUp, Newspaper } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Post } from "@/types/post";
+import Post  from "@/types/post";
 import { LatestNewsSection } from "./LatestNewsSection";
 import { TopStoriesSection } from "./TopStoriesSection";
 import { DeepDivesSection } from "./DeepDivesSection";
@@ -16,7 +16,7 @@ function PostCard({ post }: { post: Post }) {
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
         <div className="aspect-video relative overflow-hidden">
           <Image
-            src={post.image || ''}
+            src={post.featuredMedia || ''}
             alt={post.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -26,11 +26,11 @@ function PostCard({ post }: { post: Post }) {
         <div className="p-2">
           <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
             <span className="bg-primary/10 text-primary py-0.5 rounded-full text-[10px]">
-              {post.category}
+              {post.categories[0].name}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-2.5 h-2.5" />
-              {post.readTime}
+              {post.views}
             </span>
           </div>
           <h3 className="font-semibold text-xs mb-1 group-hover:text-primary transition-colors">
@@ -51,7 +51,7 @@ function FeaturedPostCard({ post }: { post: Post }) {
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow h-full">
         <div className="aspect-[16/10] relative overflow-hidden">
           <Image
-            src={post.image || ''}
+            src={post.featuredMedia || ''}
             alt={post.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -61,11 +61,11 @@ function FeaturedPostCard({ post }: { post: Post }) {
         <div className="p-2">
           <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
             <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded-full text-[10px]">
-              {post.category}
+              {post.categories[0].name}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-2.5 h-2.5" />
-              {post.readTime}
+              {post.views}
             </span>
           </div>
           <h2 className="text-sm font-bold mb-1 group-hover:text-primary transition-colors">
@@ -87,7 +87,7 @@ function SmallPostCard({ post }: { post: Post }) {
         <div className="grid grid-cols-3 gap-2">
           <div className="aspect-square relative overflow-hidden">
             <Image
-              src={post.image || ''}
+              src={post.featuredMedia || ''}
               alt={post.title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -97,11 +97,11 @@ function SmallPostCard({ post }: { post: Post }) {
           <div className="col-span-2 p-1.5">
             <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-0.5">
               <span className="bg-primary/10 text-primary py-0.5 rounded-full text-[10px]">
-                {post.category}
+                {post.categories[0].name}
               </span>
               <span className="flex items-center gap-1">
                 <Clock className="w-2.5 h-2.5" />
-                {post.readTime}
+                {post.views}
               </span>
             </div>
             <h3 className="font-semibold text-xs line-clamp-2 group-hover:text-primary transition-colors">
