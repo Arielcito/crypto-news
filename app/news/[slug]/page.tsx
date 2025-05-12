@@ -6,6 +6,8 @@ import Image from "next/image";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { TableOfContents } from "@/components/table-of-contents";
 import { fetchPostBySlug, fetchPosts } from "@/lib/api/posts";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface PageProps {
   params: { slug: string };
@@ -79,7 +81,11 @@ export default async function PostPage({ params, searchParams }: PageProps) {
 
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 <div className="lg:col-span-3">
-                  <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                  <div className="prose prose-lg dark:prose-invert max-w-none">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {post.content}
+                    </ReactMarkdown>
+                  </div>
                 </div>
                 <div className="hidden lg:block lg:col-span-1">
                   <TableOfContents content={post.content} />
