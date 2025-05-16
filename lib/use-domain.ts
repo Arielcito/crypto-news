@@ -30,6 +30,7 @@ interface DomainConfig {
       tiktok?: string;
       youtube?: string;
       email?: string;
+      linkedin?: string;
     };
     categories: {
       key: string;
@@ -58,7 +59,8 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         instagram: 'https://instagram.com/bitcoin_argentina',
         tiktok: 'https://tiktok.com/@bitcoin_argentina',
         youtube: 'https://www.youtube.com/@bitcoinargentinaoficial',
-        email: 'bitcoinargentina.oficial@gmail.com'
+        email: 'bitcoinargentina.oficial@gmail.com',
+        linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/'
       },
       categories: [
         { key: 'bitcoin', label: 'Bitcoin', href: '/bitcoin' },
@@ -86,7 +88,8 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       logo: '/tendenciascrypto/logo.png',
       logoDark: '/tendenciascrypto/logo.png',
       socialLinks: {
-        telegram: 'https://t.me/tendenciascrypto'
+        telegram: 'https://t.me/tendenciascrypto',
+        linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/'
       },
       categories: [
         { key: 'ethereum', label: 'Ethereum', href: '/ethereum' },
@@ -114,7 +117,8 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       logo: '/tendenciascrypto/logo.png',
       logoDark: '/tendenciascrypto/logo.png',
       socialLinks: {
-        telegram: 'https://t.me/tendenciascrypto'
+        telegram: 'https://t.me/tendenciascrypto',
+        linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/'
       },
       categories: [
         { key: 'ethereum', label: 'Ethereum', href: '/ethereum' },
@@ -142,7 +146,8 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       logo: '/ultimahoracrypto/logo.png',
       logoDark: '/ultimahoracrypto/logo-dark.png',
       socialLinks: {
-        telegram: 'https://t.me/ultimahoracrypto'
+        telegram: 'https://t.me/ultimahoracrypto',
+        linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/'
       },
       categories: [
         { key: 'bitcoin', label: 'Bitcoin', href: '/bitcoin' },
@@ -170,7 +175,8 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       logo: '/ultimahoracrypto/logo.png',
       logoDark: '/ultimahoracrypto/logo-dark.png',
       socialLinks: {
-        telegram: 'https://t.me/ultimahoracrypto'
+        telegram: 'https://t.me/ultimahoracrypto',
+        linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/'
       },
       categories: [
         { key: 'bitcoin', label: 'Bitcoin', href: '/bitcoin' },
@@ -202,7 +208,8 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         instagram: 'https://instagram.com/bitcoin_argentina',
         tiktok: 'https://tiktok.com/@bitcoin_argentina',
         youtube: 'https://www.youtube.com/@bitcoinargentinaoficial',
-        email: 'bitcoinargentina.oficial@gmail.com'
+        email: 'bitcoinargentina.oficial@gmail.com',
+        linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/'
       },
       categories: [
         { key: 'bitcoin-finanzas', label: 'Bitcoin y Finanzas Personales', href: '/bitcoin-finanzas' },

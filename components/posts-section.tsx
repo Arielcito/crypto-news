@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Clock, TrendingUp, Newspaper } from "lucide-react";
+import { Clock, TrendingUp, Newspaper, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Post  from "@/types/post";
@@ -9,19 +9,29 @@ import { DeepDivesSection } from "./DeepDivesSection";
 import { useQuery } from '@tanstack/react-query';
 import { fetchPosts } from '@/lib/api/posts';
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
 function PostCard({ post }: { post: Post }) {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <Link href={`/news/${post.id}`} className="group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
         <div className="aspect-video relative overflow-hidden">
-          <Image
-            src={post.featuredMedia || ''}
-            alt={post.title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-          />
+          {!imageError ? (
+            <Image
+              src={post.featuredMedia || ''}
+              alt={post.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <ImageIcon className="w-8 h-8 text-muted-foreground" />
+            </div>
+          )}
         </div>
         <div className="p-2">
           <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
@@ -46,17 +56,26 @@ function PostCard({ post }: { post: Post }) {
 }
 
 function FeaturedPostCard({ post }: { post: Post }) {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <Link href={`/news/${post.id}`} className="group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow h-full">
         <div className="aspect-[16/10] relative overflow-hidden">
-          <Image
-            src={post.featuredMedia || ''}
-            alt={post.title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 640px) 100vw, 50vw"
-          />
+          {!imageError ? (
+            <Image
+              src={post.featuredMedia || ''}
+              alt={post.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 640px) 100vw, 50vw"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <ImageIcon className="w-12 h-12 text-muted-foreground" />
+            </div>
+          )}
         </div>
         <div className="p-2">
           <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
@@ -81,18 +100,27 @@ function FeaturedPostCard({ post }: { post: Post }) {
 }
 
 function SmallPostCard({ post }: { post: Post }) {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <Link href={`/news/${post.id}`} className="group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
         <div className="grid grid-cols-3 gap-2">
           <div className="aspect-square relative overflow-hidden">
-            <Image
-              src={post.featuredMedia || ''}
-              alt={post.title}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-              sizes="(max-width: 640px) 33vw, 20vw"
-            />
+            {!imageError ? (
+              <Image
+                src={post.featuredMedia || ''}
+                alt={post.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                sizes="(max-width: 640px) 33vw, 20vw"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className="w-full h-full bg-muted flex items-center justify-center">
+                <ImageIcon className="w-6 h-6 text-muted-foreground" />
+              </div>
+            )}
           </div>
           <div className="col-span-2 p-1.5">
             <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-0.5">
@@ -170,16 +198,16 @@ function SmallPostCardSkeleton() {
 }
 
 export function PostsSection() {
-  const { data: posts = [], isLoading } = useQuery({
+  const { data: allPosts = [], isLoading } = useQuery({
     queryKey: ['posts'],
     queryFn: fetchPosts,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Dividir los posts en tres grupos para cada sección
-  const latestPosts = posts.slice(0, 4);
-  const topStoryPosts = posts.slice(4, 8);
-  const deepDivePosts = posts.slice(8, 12);
+  // Dividir los posts en tres grupos para cada sección específica
+  const latestPosts = allPosts.slice(0, 4);
+  const topStoryPosts = allPosts.slice(4, 8);
+  const deepDivePosts = allPosts.slice(8, 12);
 
   if (isLoading) {
     return (
@@ -240,11 +268,11 @@ export function PostsSection() {
         <DeepDivesSection posts={deepDivePosts} />
       </div>
 
-      {/* Sección de todos los posts */}
+      {/* Sección de todos los posts - sin límites */}
       <div className="space-y-6">
         <h2 className="text-2xl font-bold">Todas las Noticias</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post) => (
+          {allPosts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
         </div>
