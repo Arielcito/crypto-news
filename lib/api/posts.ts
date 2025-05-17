@@ -1,9 +1,7 @@
 import Post from '@/types/post';
 import { axiosInstance } from '@/lib/axios';
 interface ApiResponse {
-  data: {
     posts: Post[];
-  };
 }
 
 interface SinglePostResponse {
@@ -25,7 +23,7 @@ export const fetchPosts = async (): Promise<Post[]> => {
     const currentDomain = typeof window !== 'undefined' ? window.location.origin : '';
     const cleanedDomain = cleanDomain(currentDomain === 'http://localhost:3000' ? 'bitcoinarg.news' : currentDomain);
     const response = await axiosInstance.get<ApiResponse>(`/api/wp/v2/posts?domain=${cleanedDomain}`);
-    const apiPosts = response.data.data?.posts || [];
+    const apiPosts = response.data?.posts || [];
 
     return apiPosts;
   } catch (error) {
