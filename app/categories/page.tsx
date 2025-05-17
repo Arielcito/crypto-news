@@ -20,11 +20,14 @@ export default async function Page() {
       <Container className="space-y-6">
         <Prose className="mb-8">
           <h2>All Categories</h2>
-          <ul className="grid">
+          <ul className="grid gap-4">
             {categories.map((category: any) => (
-              <li key={category.id}>
-                <Link href={`/posts/?category=${category.id}`}>
+              <li key={category.id} className="hover:text-primary transition-colors">
+                <Link href={`/posts/categories/${category.slug}`}>
                   {category.name}
+                  <span className="text-sm text-gray-500 ml-2">
+                    ({category.count} posts)
+                  </span>
                 </Link>
               </li>
             ))}

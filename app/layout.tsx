@@ -30,14 +30,11 @@ const getFaviconPath = (domain: string) => {
 
 // Obtener la configuración del dominio
 const config = getDomainConfig();
-console.log('Domain config:', config);
 
 // Generar metadata dinámicamente
 export async function generateMetadata(): Promise<Metadata> {
-  console.log('Generating metadata with config:', config);
   
   const faviconPath = getFaviconPath(config.site.domain);
-  console.log('Using favicon path:', faviconPath);
 
   return {
     title: config.site.title,

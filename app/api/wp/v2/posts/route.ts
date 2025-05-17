@@ -8,24 +8,25 @@ type PostWithRelations = Post & {
   tags: Tag[];
 };
 
-const createResponse = (data: any = null, error: string | null = null, message: string | null = null, status: number = 200) => {
-  return Response.json({ data, error, message }, { status });
-};
 
 export async function GET(request: NextRequest) {
-  console.log('[GET] /api/wp/v2/posts - Request received');
     try {
     const searchParams = request.nextUrl.searchParams;
     const per_page = parseInt(searchParams.get('per_page') || '10');
     const page = parseInt(searchParams.get('page') || '1');
     const search = searchParams.get('search') || '';
-    const categoriesParam = searchParams.get('categories')?.split(',') || [];
-    const tagsParam = searchParams.get('tags')?.split(',') || [];
-    const domain = searchParams.get('domain') || 'default';
+    
+    // Validate and filter category IDs
+    const categoriesParam = searchParams.get('categories')?.split(',').map(Number).filter(id => !isNaN(id)) || [];
+    
+    // Validate and filter tag IDs
+    const tagsParam = searchParams.get('tags')?.split(',').map(Number).filter(id => !isNaN(id)) || [];
+    
+    const domain = searchParams.get('domain');
 
     const where: Prisma.PostWhereInput = {
       AND: [
-        { domain: domain },
+        domain ? { domain } : {},
         search ? {
           OR: [
             { title: { contains: search, mode: Prisma.QueryMode.insensitive } },
@@ -35,18 +36,18 @@ export async function GET(request: NextRequest) {
         categoriesParam.length > 0 ? {
           categories: {
             some: {
-              id: { in: categoriesParam.map(Number) }
+              id: { in: categoriesParam }
             }
           }
         } : {},
         tagsParam.length > 0 ? {
           tags: {
             some: {
-              id: { in: tagsParam.map(Number) }
+              id: { in: tagsParam }
             }
           }
         } : {}
-      ]
+      ].filter(condition => Object.keys(condition).length > 0) // Remove empty conditions
     };
 
     const [posts, total] = await Promise.all([
@@ -66,32 +67,24 @@ export async function GET(request: NextRequest) {
     headers.set('X-WP-Total', total.toString());
     headers.set('X-WP-TotalPages', Math.ceil(total / per_page).toString());
 
-    return createResponse({ posts, total, totalPages: Math.ceil(total / per_page) }, null, 'Posts retrieved successfully', 200);
+    return Response.json({ posts, total, totalPages: Math.ceil(total / per_page) }, { status: 200 });
   } catch (error: any) {
     console.error('[GET] /api/wp/v2/posts - Error:', error);
-    return createResponse(null, 'Internal server error', error?.message, 500);
+    return Response.json({ error: 'Internal server error', message: error?.message }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
-  console.log('[POST] /api/wp/v2/posts - Request received');
   
   if (!checkBasicAuth(request)) {
-    console.log('[POST] /api/wp/v2/posts - Unauthorized request');
-    return createResponse(null, 'Unauthorized', 'Authentication required', 401);
+    return Response.json({ error: 'Unauthorized', message: 'Authentication required' }, { status: 401 });
   }
 
   try {
-    console.log('[POST] /api/wp/v2/posts - Parsing request body');
     const body = await request.json();
-    console.log('[POST] /api/wp/v2/posts - Request body:', JSON.stringify(body, null, 2));
     
     if (!body.title || !body.content) {
-      console.log('[POST] /api/wp/v2/posts - Missing required fields:', {
-        hasTitle: !!body.title,
-        hasContent: !!body.content
-      });
-      return createResponse(null, 'Bad request', 'Title and content are required', 400);
+      return Response.json({ error: 'Bad request', message: 'Title and content are required' }, { status: 400 });
     }
 
     // Ensure domain is provided or default
@@ -111,7 +104,7 @@ export async function POST(request: NextRequest) {
       if (existingCategories.length !== body.categories.length) {
         const foundIds = existingCategories.map(c => c.id);
         const missingIds = body.categories.filter((id: number) => !foundIds.includes(id));
-        return createResponse(null, 'Bad request', `Categories not found for domain ${domain}: ${missingIds.join(', ')}`, 400);
+        return Response.json({ error: 'Bad request', message: `Categories not found for domain ${domain}: ${missingIds.join(', ')}` }, { status: 400 });
       }
     }
 
@@ -124,7 +117,7 @@ export async function POST(request: NextRequest) {
       if (existingTags.length !== body.tags.length) {
         const foundIds = existingTags.map(t => t.id);
         const missingIds = body.tags.filter((id: number) => !foundIds.includes(id));
-        return createResponse(null, 'Bad request', `Tags not found: ${missingIds.join(', ')}`, 400);
+        return Response.json({ error: 'Bad request', message: `Tags not found: ${missingIds.join(', ')}` }, { status: 400 });
       }
     }
 
@@ -169,27 +162,15 @@ export async function POST(request: NextRequest) {
     // Cast to include relations for logging/response
     const newPostWithRelations = newPost as PostWithRelations;
 
-    console.log('[POST] /api/wp/v2/posts - Post created successfully:', {
-      id: newPostWithRelations.id,
-      title: newPostWithRelations.title,
-      categories: newPostWithRelations.categories.length,
-      tags: newPostWithRelations.tags.length
-    });
-
-    return createResponse(newPostWithRelations, null, 'Post created successfully', 201);
+    return Response.json({ data: newPostWithRelations }, { status: 201 });
   } catch (error: any) {
     console.error('[POST] /api/wp/v2/posts - Error creating post:', error);
-    console.error('[POST] /api/wp/v2/posts - Error details:', {
-      name: error?.name,
-      message: error?.message,
-      stack: error?.stack
-    });
 
     // Handle potential Prisma unique constraint violation for slug
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        return createResponse(null, 'Conflict', 'A post with this slug already exists.', 409);
+        return Response.json({ error: 'Conflict', message: 'A post with this slug already exists.' }, { status: 409 });
     }
 
-    return createResponse(null, 'Bad request', error?.message || 'Invalid request body', 400);
+    return Response.json({ error: 'Bad request', message: error?.message || 'Invalid request body' }, { status: 400 });
   }
 }
