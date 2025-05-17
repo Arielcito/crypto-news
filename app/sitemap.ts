@@ -1,9 +1,9 @@
 import { MetadataRoute } from "next";
-import { getAllPosts } from "@/lib/wordpress";
+import { fetchPosts } from "@/lib/api/posts";
 import { getDomainConfig } from "@/lib/domain-config";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await getAllPosts();
+  const posts = await fetchPosts();
   const { site } = getDomainConfig();
   const staticUrls: MetadataRoute.Sitemap = [
     {
@@ -46,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const postUrls: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `https://${site.domain}/posts/${post.slug}`,
-    lastModified: new Date(post.modified),
+    lastModified: new Date(post.date),
     changeFrequency: "weekly",
     priority: 0.5,
   }));

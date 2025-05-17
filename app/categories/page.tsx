@@ -1,8 +1,8 @@
-import { getAllCategories } from "@/lib/wordpress";
 import { Section, Container, Prose } from "@/components/craft";
 import { Metadata } from "next";
 import BackButton from "@/components/back";
 import Link from "next/link";
+import { fetchCategories } from "@/lib/api/categories";
 
 export const metadata: Metadata = {
   title: "All Categories",
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const categories = await getAllCategories();
+  const categories = await fetchCategories();
 
   return (
     <Section>
