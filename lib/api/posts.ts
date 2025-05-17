@@ -15,13 +15,16 @@ const cleanDomain = (domain: string): string => {
   let cleaned = domain.replace(/^https?:\/\//, '');
   // Remove www. if present
   cleaned = cleaned.replace(/^www\./, '');
+  // Remove trailing slash if present
+  cleaned = cleaned.replace(/\/$/, '');
+  
   return cleaned;
 };
 
 export const fetchPosts = async (): Promise<Post[]> => {
   try {
     const currentDomain = typeof window !== 'undefined' ? window.location.origin : '';
-    const cleanedDomain = cleanDomain(currentDomain === 'http://localhost:3000' ? 'bitcoinarg.news' : currentDomain);
+    const cleanedDomain = cleanDomain(currentDomain === 'http://localhost:3000' ? 'https://www.tendenciascripto.com/' : currentDomain);
     const response = await axiosInstance.get<ApiResponse>(`/api/wp/v2/posts?domain=${cleanedDomain}`);
     const apiPosts = response.data?.posts || [];
 
