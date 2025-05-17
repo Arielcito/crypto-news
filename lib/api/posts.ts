@@ -10,7 +10,7 @@ interface SinglePostResponse {
   message: string | null;
 }
 
-const cleanDomain = (domain: string): string => {
+export const cleanDomain = (domain: string): string => {
   // Remove protocol (http:// or https://)
   let cleaned = domain.replace(/^https?:\/\//, '');
   // Remove www. if present

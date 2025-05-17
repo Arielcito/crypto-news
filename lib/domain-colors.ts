@@ -1,3 +1,5 @@
+import { cleanDomain } from "./api/posts";
+
 export type Domain = 'bitcoinarg.news' | 'tendenciascrypto.com' | 'tendenciascripto.com' | 'ultimahoracrypto.com' | 'ultimahoracripto.com' | 'localhost';
 
 export interface ColorPalette {
@@ -57,14 +59,16 @@ export function getCurrentDomain(): Domain {
   }
 
   const hostname = window.location.hostname.replace(/^www\./, '');
-  
-  if (hostname === 'bitcoinarg.news') {
+
+  const cleanHostname = cleanDomain(hostname);
+
+  if (cleanHostname === 'bitcoinarg.news') {
     return 'bitcoinarg.news';
   }
-  if (hostname === 'tendenciascrypto.com' || hostname === 'tendenciascripto.com') {
+  if (cleanHostname === 'tendenciascrypto.com' || cleanHostname === 'tendenciascripto.com') {
     return 'tendenciascrypto.com';
   }
-  if (hostname === 'ultimahoracrypto.com' || hostname === 'ultimahoracripto.com') {
+  if (cleanHostname === 'ultimahoracrypto.com' || cleanHostname === 'ultimahoracripto.com') {
     return hostname as Domain;
   }
   
