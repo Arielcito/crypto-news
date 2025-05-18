@@ -55,6 +55,9 @@ export async function GET(request: NextRequest) {
         where,
         skip: (page - 1) * per_page,
         take: per_page,
+        orderBy: {
+          date: 'desc'
+        },
         include: {
           categories: true,
           tags: true
