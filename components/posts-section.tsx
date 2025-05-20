@@ -11,11 +11,11 @@ import { fetchPosts } from '@/lib/api/posts';
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 
-function PostCard({ post }: { post: Post }) {
+function PostCard({ post, category }: { post: Post, category: string }) {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <Link href={`/news/${post.id}`} className="group">
+    <Link href={`/${category}/${post.slug}`} className="group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
         <div className="aspect-video relative overflow-hidden">
           {!imageError ? (
@@ -273,7 +273,7 @@ export function PostsSection() {
         <h2 className="text-2xl font-bold">Todas las Noticias</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {allPosts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard key={post.id} post={post} category={post.categories[0].name} />
           ))}
         </div>
       </div>

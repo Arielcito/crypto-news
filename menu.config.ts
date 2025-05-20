@@ -12,5 +12,4 @@ export const contentMenu = {
   pages: "/pages",
   authors: "/posts/authors",
   tags: "/posts/tags",
-  categories: "/posts/categories",
 };

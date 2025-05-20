@@ -74,7 +74,7 @@ export default async function CategoryPage({
 
         {posts.length === 0 && (
           <p className="text-center text-gray-500">
-            No posts found in this category.
+            No hay posts en esta categoría.
           </p>
         )}
 
