@@ -10,7 +10,7 @@ export function PostCard({ post }: { post: Post }) {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <Link href={`/news/${post.id}`} className="group">
+    <Link href={`/news/${post.slug}`} className="group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
         <div className="aspect-video relative overflow-hidden">
           {!imageError ? (

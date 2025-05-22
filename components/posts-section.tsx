@@ -59,7 +59,7 @@ function FeaturedPostCard({ post }: { post: Post }) {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <Link href={`/news/${post.id}`} className="group">
+    <Link href={`/news/${post.slug}`} className="group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow h-full">
         <div className="aspect-[16/10] relative overflow-hidden">
           {!imageError ? (
@@ -103,7 +103,7 @@ function SmallPostCard({ post }: { post: Post }) {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <Link href={`/news/${post.id}`} className="group">
+    <Link href={`/news/${post.slug}`} className="group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
         <div className="grid grid-cols-3 gap-2">
           <div className="aspect-square relative overflow-hidden">
