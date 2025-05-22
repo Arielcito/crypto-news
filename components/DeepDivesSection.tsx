@@ -9,7 +9,7 @@ interface DeepDivesSectionProps {
 
 function DeepDiveCard({ post }: { post: Post }) {
   return (
-    <Link href={`/news/${post.slug}`} className="block group">
+    <Link href={`/${post.categories[0].slug}/${post.slug}`} className="block group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
         <div className="aspect-[16/9] relative overflow-hidden">
           <Image

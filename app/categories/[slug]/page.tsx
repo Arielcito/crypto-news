@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import BackButton from "@/components/back";
 import { fetchCategoryBySlug, fetchPostsByCategory } from "@/lib/api/categories";
 import Post from "@/types/post";
-import { PostCard } from "@/app/components/posts/post-card";
+import { PostCard } from "@/app/posts/post-card";
 
 export async function generateMetadata({
   params,

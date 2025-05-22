@@ -22,7 +22,7 @@ export function RecommendedPosts({ currentPostId, posts }: RecommendedPostsProps
         {recommendedPosts.map(post => (
           <Link 
             key={post.id} 
-            href={`/news/${post.slug}`}
+            href={`/${post.categories[0].slug}/${post.slug}`}
             className="group block"
           >
             <article className="flex gap-4 p-2 rounded-lg hover:bg-muted/50 transition-colors">

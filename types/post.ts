@@ -4,7 +4,7 @@ interface Post {
   excerpt: string;
   date: string;
   content: string;
-  categories: Array<{ id: number; name: string }>;
+  categories: Array<{ id: number; name: string; slug: string }>;
   featuredMedia: string;
   slug: string;
   domain: string;
