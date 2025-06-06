@@ -88,8 +88,8 @@ export const fetchCategoryBySlug = async (slug: string): Promise<Category | null
 export const fetchPostsByCategory = async (categorySlug: string): Promise<Post[]> => {
   try {
     console.log('Fetching posts by category:', categorySlug);
-    const response = await axiosInstance.get<PostsResponse>(`/api/wp/v2/posts?categories=${categorySlug}`);
-    console.log('Response:', response.data);
+    const response: any = await axiosInstance.get<PostsResponse>(`/api/wp/v2/posts?categories=${categorySlug}`);
+    console.log('Response api:', response.data.posts[1].categories);
     const posts = response.data?.posts || [];
     return posts;
   } catch (error) {

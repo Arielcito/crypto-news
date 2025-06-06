@@ -30,8 +30,53 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const search = searchParams.get('search') || '';
     
-    // Validate and filter category IDs
-    const categoriesParam = searchParams.get('categories')?.split(',').map(Number).filter(id => !isNaN(id)) || [];
+    // Handle categories parameter - can be IDs or slugs
+    const categoriesParam = searchParams.get('categories')?.split(',') || [];
+    let categoryFilter = {};
+    
+    if (categoriesParam.length > 0) {
+      // Detect if we have IDs (numbers) or slugs (strings)
+      const categoryIds = categoriesParam.map(Number).filter(id => !isNaN(id));
+      const categorySlugs = categoriesParam.filter(param => isNaN(Number(param)));
+      
+      console.log('[GET] /api/wp/v2/posts - Detected category IDs:', categoryIds);
+      console.log('[GET] /api/wp/v2/posts - Detected category slugs:', categorySlugs);
+      
+      if (categoryIds.length > 0 && categorySlugs.length > 0) {
+        // Mixed IDs and slugs
+        console.log('[GET] /api/wp/v2/posts - Using mixed ID and slug filter');
+        categoryFilter = {
+          categories: {
+            some: {
+              OR: [
+                { id: { in: categoryIds } },
+                { slug: { in: categorySlugs } }
+              ]
+            }
+          }
+        };
+      } else if (categoryIds.length > 0) {
+        // Only IDs
+        console.log('[GET] /api/wp/v2/posts - Using ID filter');
+        categoryFilter = {
+          categories: {
+            some: {
+              id: { in: categoryIds }
+            }
+          }
+        };
+      } else if (categorySlugs.length > 0) {
+        // Only slugs
+        console.log('[GET] /api/wp/v2/posts - Using slug filter');
+        categoryFilter = {
+          categories: {
+            some: {
+              slug: { in: categorySlugs }
+            }
+          }
+        };
+      }
+    }
     
     // Validate and filter tag IDs
     const tagsParam = searchParams.get('tags')?.split(',').map(Number).filter(id => !isNaN(id)) || [];
@@ -47,13 +92,7 @@ export async function GET(request: NextRequest) {
             { content: { contains: search, mode: Prisma.QueryMode.insensitive } }
           ]
         } : {},
-        categoriesParam.length > 0 ? {
-          categories: {
-            some: {
-              id: { in: categoriesParam }
-            }
-          }
-        } : {},
+        categoryFilter,
         tagsParam.length > 0 ? {
           tags: {
             some: {
@@ -63,6 +102,8 @@ export async function GET(request: NextRequest) {
         } : {}
       ].filter(condition => Object.keys(condition).length > 0) // Remove empty conditions
     };
+
+    console.log('[GET] /api/wp/v2/posts - Filtering posts with categories parameter:', categoriesParam);
 
     const [posts, total] = await Promise.all([
       prisma.post.findMany({
