@@ -8,6 +8,21 @@ type PostWithRelations = Post & {
   tags: Tag[];
 };
 
+// Function to clean URLs by removing < > symbols
+function cleanUrls(text: string): string {
+  return text.replace(/<(https?:\/\/[^>]+)>/g, '$1');
+}
+
+// Function to clean post data
+function cleanPostData(post: PostWithRelations): PostWithRelations {
+  return {
+    ...post,
+    content: cleanUrls(post.content),
+    excerpt: post.excerpt ? cleanUrls(post.excerpt) : post.excerpt,
+    featuredMedia: post.featuredMedia ? cleanUrls(post.featuredMedia) : post.featuredMedia
+  };
+}
+
 const createResponse = (data: any = null, error: string | null = null, message: string | null = null, status: number = 200) => {
   return NextResponse.json({ data, error, message }, { status });
 };
@@ -35,8 +50,12 @@ export async function GET(request: NextRequest) {
       return createResponse(null, 'Not found', 'Post not found', 404);
     }
 
+    // Clean URLs from post data
+    console.log(`[GET] /api/wp/v2/posts/by-slug/${slug} - Cleaning URLs from post data by removing < > symbols`);
+    const cleanedPost = cleanPostData(post as PostWithRelations);
+
     console.log(`[GET] /api/wp/v2/posts/by-slug/${slug} - Post found`);
-    return createResponse(post, null, 'Post retrieved successfully');
+    return createResponse(cleanedPost, null, 'Post retrieved successfully');
   } catch (error) {
     console.error(`[GET] /api/wp/v2/posts/by-slug/[slug] - Error:`, error);
     return createResponse(null, 'Internal server error', error instanceof Error ? error.message : 'An unexpected error occurred', 500);
@@ -142,7 +161,11 @@ export async function PUT(request: NextRequest) {
       }
     });
 
-    return createResponse(updatedPost, null, 'Post updated successfully');
+    // Clean URLs from updated post data
+    console.log(`[PUT] /api/wp/v2/posts/by-slug/${slug} - Cleaning URLs from updated post data by removing < > symbols`);
+    const cleanedUpdatedPost = cleanPostData(updatedPost as PostWithRelations);
+
+    return createResponse(cleanedUpdatedPost, null, 'Post updated successfully');
   } catch (error: any) {
     console.error(`[PUT] /api/wp/v2/posts/by-slug/[slug] - Error:`, error);
     if (error instanceof Prisma.PrismaClientKnownRequestError) {

@@ -8,6 +8,21 @@ type PostWithRelations = Post & {
   tags: Tag[];
 };
 
+// Function to clean URLs by removing < > symbols
+function cleanUrls(text: string): string {
+  return text.replace(/<(https?:\/\/[^>]+)>/g, '$1');
+}
+
+// Function to clean post data
+function cleanPostData(post: PostWithRelations): PostWithRelations {
+  return {
+    ...post,
+    content: cleanUrls(post.content),
+    excerpt: post.excerpt ? cleanUrls(post.excerpt) : post.excerpt,
+    featuredMedia: post.featuredMedia ? cleanUrls(post.featuredMedia) : post.featuredMedia
+  };
+}
+
 const createResponse = (data: any = null, error: string | null = null, message: string | null = null, status: number = 200) => {
   return NextResponse.json({ data, error, message }, { status });
 };
@@ -32,8 +47,12 @@ export async function GET(request: NextRequest) {
       return new NextResponse('Post not found', { status: 404 });
     }
 
+    // Clean URLs from post data
+    console.log(`[GET] /api/wp/v2/posts/${id} - Cleaning URLs from post data by removing < > symbols`);
+    const cleanedPost = cleanPostData(post as PostWithRelations);
+
     console.log(`[GET] /api/wp/v2/posts/${id} - Post found`);
-    return NextResponse.json(post);
+    return NextResponse.json(cleanedPost);
   } catch (error) {
     console.error(`[GET] /api/wp/v2/posts/[id] - Error:`, error);
     return new NextResponse('Internal server error', { status: 500 });
@@ -148,23 +167,27 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     // Explicitly cast to PostWithRelations if needed, or ensure the response mapping is correct
     const typedUpdatedPost = updatedPost as PostWithRelations;
 
+    // Clean URLs from updated post data
+    console.log(`[PUT] /api/wp/v2/posts/${id} - Cleaning URLs from updated post data by removing < > symbols`);
+    const cleanedUpdatedPost = cleanPostData(typedUpdatedPost);
+
     const response = {
-      id: typedUpdatedPost.id,
-      date: typedUpdatedPost.date,
-      dateGmt: typedUpdatedPost.dateGmt,
-      modified: typedUpdatedPost.modified,
-      modifiedGmt: typedUpdatedPost.modifiedGmt,
-      slug: typedUpdatedPost.slug,
-      status: typedUpdatedPost.status,
-      title: typedUpdatedPost.title,
-      content: typedUpdatedPost.content,
-      excerpt: typedUpdatedPost.excerpt,
-      author: typedUpdatedPost.author,
-      featuredMedia: typedUpdatedPost.featuredMedia,
-      domain: typedUpdatedPost.domain,
+      id: cleanedUpdatedPost.id,
+      date: cleanedUpdatedPost.date,
+      dateGmt: cleanedUpdatedPost.dateGmt,
+      modified: cleanedUpdatedPost.modified,
+      modifiedGmt: cleanedUpdatedPost.modifiedGmt,
+      slug: cleanedUpdatedPost.slug,
+      status: cleanedUpdatedPost.status,
+      title: cleanedUpdatedPost.title,
+      content: cleanedUpdatedPost.content,
+      excerpt: cleanedUpdatedPost.excerpt,
+      author: cleanedUpdatedPost.author,
+      featuredMedia: cleanedUpdatedPost.featuredMedia,
+      domain: cleanedUpdatedPost.domain,
       // Map related data correctly
-      categories: typedUpdatedPost.categories.map(c => c.id),
-      tags: typedUpdatedPost.tags.map(t => t.id)
+      categories: cleanedUpdatedPost.categories.map(c => c.id),
+      tags: cleanedUpdatedPost.tags.map(t => t.id)
     }; // satisfies PostResponse; - Removed satisfies for flexibility, ensure type safety manually or adjust PostResponse
 
     console.log(`[PUT] /api/wp/v2/posts/${id} - Post updated successfully`);
