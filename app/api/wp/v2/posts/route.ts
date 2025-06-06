@@ -8,6 +8,20 @@ type PostWithRelations = Post & {
   tags: Tag[];
 };
 
+// Function to clean URLs by removing < > symbols
+function cleanUrls(text: string): string {
+  return text.replace(/<(https?:\/\/[^>]+)>/g, '$1');
+}
+
+// Function to clean post data
+function cleanPostData(post: PostWithRelations): PostWithRelations {
+  return {
+    ...post,
+    content: cleanUrls(post.content),
+    excerpt: post.excerpt ? cleanUrls(post.excerpt) : post.excerpt,
+    featuredMedia: post.featuredMedia ? cleanUrls(post.featuredMedia) : post.featuredMedia
+  };
+}
 
 export async function GET(request: NextRequest) {
     try {
@@ -66,11 +80,15 @@ export async function GET(request: NextRequest) {
       prisma.post.count({ where })
     ]);
 
+    // Clean URLs from posts data
+    console.log('[GET] /api/wp/v2/posts - Cleaning URLs from posts data by removing < > symbols');
+    const cleanedPosts = posts.map(post => cleanPostData(post as PostWithRelations));
+
     const headers = new Headers();
     headers.set('X-WP-Total', total.toString());
     headers.set('X-WP-TotalPages', Math.ceil(total / per_page).toString());
 
-    return Response.json({ posts, total, totalPages: Math.ceil(total / per_page) }, { status: 200 });
+    return Response.json({ posts: cleanedPosts, total, totalPages: Math.ceil(total / per_page) }, { status: 200 });
   } catch (error: any) {
     console.error('[GET] /api/wp/v2/posts - Error:', error);
     return Response.json({ error: 'Internal server error', message: error?.message }, { status: 500 });
