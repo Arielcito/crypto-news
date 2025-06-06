@@ -11,30 +11,34 @@ const inter = Inter({ subsets: ["latin"] });
 
 // Función para determinar qué favicon usar basado en el dominio
 const getFaviconPath = (domain: string) => {
-  console.log('Getting favicon for domain:', domain);
+  console.log('🔍 Getting favicon for domain:', domain);
   const path = (() => {
     switch (domain) {
       case 'bitcoinarg.news':
         return '/favicons/bitcoin.ico';
-      case 'www.ultimahoracripto.com':
+      case 'ultimahoracripto.com':
         return '/favicons/ultima.ico';
-      case 'www.tendenciascripto.com':
+      case 'tendenciascripto.com':
         return '/favicons/tendencia.ico';
       default:
         return '/favicons/bitcoin.ico'; // favicon por defecto
     }
   })();
-  console.log('Selected favicon path:', path);
+  console.log('✅ Selected favicon path:', path);
   return path;
 };
 
-// Obtener la configuración del dominio
-const config = getDomainConfig();
-
 // Generar metadata dinámicamente
 export async function generateMetadata(): Promise<Metadata> {
-  
+  // Obtener la configuración del dominio dinámicamente
+  const config = getDomainConfig();
   const faviconPath = getFaviconPath(config.site.domain);
+
+  console.log('🔧 Generating metadata for:', {
+    domain: config.site.domain,
+    siteName: config.site.name,
+    favicon: faviconPath
+  });
 
   return {
     title: config.site.title,
@@ -66,15 +70,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const faviconPath = getFaviconPath(config.site.domain);
-  console.log('Layout rendering with favicon:', faviconPath);
+  // No duplicar el favicon aquí ya que se maneja en generateMetadata
+  console.log('🚀 Layout rendering...');
 
   return (
     <html lang="es" suppressHydrationWarning>
-      <head>
-        <link rel="icon" href={faviconPath} />
-        <link rel="apple-touch-icon" href={faviconPath} />
-      </head>
       <body className={inter.className}>
         <Providers>
           <ThemeProvider>

@@ -74,35 +74,6 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       ]
     }
   },
-  'tendenciascrypto.com': {
-    isBitcoinArg: false,
-    isTendenciasCrypto: true,
-    isUltimaHoraCrypto: false,
-    site: {
-      domain: 'tendenciascrypto.com',
-      name: 'TENDENCIASCRIPTO',
-      description: 'Análisis profundo y tendencias del mercado de criptomonedas en Latinoamérica.',
-      title: 'TENDENCIASCRIPTO.com | Análisis y Tendencias del Mercado Cripto',
-      ogImage: '/tendenciascrypto/og-image.jpg',
-      twitterHandle: '@tendenciascrypto',
-      logo: '/tendenciascrypto/logo.png',
-      logoDark: '/tendenciascrypto/logo.png',
-      socialLinks: {
-        telegram: 'https://t.me/tendenciascrypto',
-        linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/'
-      },
-      categories: [
-        { key: 'ethereum', label: 'Ethereum', href: '/ethereum' },
-        { key: 'solana', label: 'Solana', href: '/solana' },
-        { key: 'defi', label: 'DeFi', href: '/defi' },
-        { key: 'tokenizacion', label: 'Tokenización', href: '/tokenizacion' },
-        { key: 'nft', label: 'NFT', href: '/nft' },
-        { key: 'regulacion', label: 'Regulación', href: '/regulacion' },
-        { key: 'innovacion', label: 'Innovación', href: '/innovacion' },
-        { key: 'adopcion', label: 'Adopción', href: '/adopcion' }
-      ]
-    }
-  },
   'tendenciascripto.com': {
     isBitcoinArg: false,
     isTendenciasCrypto: true,
@@ -129,35 +100,6 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         { key: 'regulacion', label: 'Regulación', href: '/regulacion' },
         { key: 'innovacion', label: 'Innovación', href: '/innovacion' },
         { key: 'adopcion', label: 'Adopción', href: '/adopcion' }
-      ]
-    }
-  },
-  'ultimahoracrypto.com': {
-    isBitcoinArg: false,
-    isTendenciasCrypto: false,
-    isUltimaHoraCrypto: true,
-    site: {
-      domain: 'ultimahoracrypto.com',
-      name: 'Ultima Hora Cripto',
-      description: 'Noticias de última hora sobre criptomonedas y blockchain en Latinoamérica.',
-      title: 'ULTIMAHORACRIPTO.com | Noticias Cripto en Tiempo Real',
-      ogImage: '/ultimahoracrypto/og-image.jpg',
-      twitterHandle: '@ultimahoracrypto',
-      logo: '/ultimahoracrypto/logo.png',
-      logoDark: '/ultimahoracrypto/logo-dark.png',
-      socialLinks: {
-        telegram: 'https://t.me/ultimahoracrypto',
-        linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/'
-      },
-      categories: [
-        { key: 'bitcoin', label: 'Bitcoin', href: '/bitcoin' },
-        { key: 'altcoins', label: 'Altcoins', href: '/altcoins' },
-        { key: 'regulacion', label: 'Regulación', href: '/regulacion' },
-        { key: 'politica', label: 'Política', href: '/politica' },
-        { key: 'crimen', label: 'Crimen', href: '/crimen' },
-        { key: 'mercados', label: 'Mercados', href: '/mercados' },
-        { key: 'economia', label: 'Economía', href: '/economia' },
-        { key: 'empresas', label: 'Empresas', href: '/empresas' }
       ]
     }
   },

@@ -26,16 +26,16 @@ export function DomainSelector() {
         BitcoinArg
       </Button>
       <Button
-        variant={domain === 'tendenciascrypto.com' ? 'default' : 'outline'}
+        variant={domain === 'tendenciascripto.com' ? 'default' : 'outline'}
         size="sm"
-        onClick={() => handleDomainChange('tendenciascrypto.com')}
+        onClick={() => handleDomainChange('tendenciascripto.com')}
       >
         Tendencias
       </Button>
       <Button
-        variant={domain === 'ultimahoracrypto.com' ? 'default' : 'outline'}
+        variant={domain === 'ultimahoracripto.com' ? 'default' : 'outline'}
         size="sm"
-        onClick={() => handleDomainChange('ultimahoracrypto.com')}
+        onClick={() => handleDomainChange('ultimahoracripto.com')}
       >
         Última Hora
       </Button>

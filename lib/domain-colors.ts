@@ -1,6 +1,6 @@
 import { cleanDomain } from "./api/posts";
 
-export type Domain = 'bitcoinarg.news' | 'tendenciascrypto.com' | 'tendenciascripto.com' | 'ultimahoracrypto.com' | 'ultimahoracripto.com' | 'localhost';
+export type Domain = 'bitcoinarg.news' | 'tendenciascripto.com' | 'ultimahoracripto.com' | 'localhost';
 
 export interface ColorPalette {
   primary: string;
@@ -14,20 +14,10 @@ export const domainPalettes: Record<Domain, ColorPalette> = {
     secondary: '#03A9F4', // Celeste
     tertiary: '#ECEFF1', // Gris Claro
   },
-  'tendenciascrypto.com': {
-    primary: '#2979FF', // Azul Eléctrico
-    secondary: '#673AB7', // Púrpura
-    tertiary: '#37474F', // Gris Oscuro
-  },
   'tendenciascripto.com': {
     primary: '#2979FF', // Azul Eléctrico
     secondary: '#673AB7', // Púrpura
     tertiary: '#37474F', // Gris Oscuro
-  },
-  'ultimahoracrypto.com': {
-    primary: '#D32F2F', // Rojo
-    secondary: '#FAFAFA', // Negro
-    tertiary: '#FAFAFA', // Blanco
   },
   'ultimahoracripto.com': {
     primary: '#D32F2F', // Rojo
@@ -65,11 +55,11 @@ export function getCurrentDomain(): Domain {
   if (cleanHostname === 'bitcoinarg.news') {
     return 'bitcoinarg.news';
   }
-  if (cleanHostname === 'tendenciascrypto.com' || cleanHostname === 'tendenciascripto.com') {
-    return 'tendenciascrypto.com';
+  if (cleanHostname === 'tendenciascripto.com' || cleanHostname === 'tendenciascrypto.com') {
+    return 'tendenciascripto.com';
   }
-  if (cleanHostname === 'ultimahoracrypto.com' || cleanHostname === 'ultimahoracripto.com') {
-    return hostname as Domain;
+  if (cleanHostname === 'ultimahoracripto.com' || cleanHostname === 'ultimahoracrypto.com') {
+    return 'ultimahoracripto.com';
   }
   
   return 'localhost';

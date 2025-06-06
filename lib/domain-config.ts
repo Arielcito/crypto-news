@@ -1,4 +1,5 @@
 import { Domain } from './domain-colors';
+import { headers } from 'next/headers';
 
 export const domainConfigs = {
   'bitcoinarg.news': {
@@ -33,40 +34,12 @@ export const domainConfigs = {
       ]
     }
   },
-  'tendenciascrypto.com': {
-    isBitcoinArg: false,
-    isTendenciasCrypto: true,
-    isUltimaHoraCrypto: false,
-    site: {
-      domain: 'tendenciascrypto.com',
-      name: 'TENDENCIASCRIPTO',
-      description: 'Análisis profundo y tendencias del mercado de criptomonedas en Latinoamérica.',
-      title: 'TENDENCIASCRIPTO.com | Análisis y Tendencias del Mercado Cripto',
-      ogImage: '/tendenciascrypto/og-image.jpg',
-      twitterHandle: '@tendenciascrypto',
-      logo: '/tendenciascrypto/logo.png',
-      logoDark: '/tendenciascrypto/logo.png',
-      socialLinks: {
-        telegram: 'https://t.me/tendenciascrypto'
-      },
-      categories: [
-        { key: 'innovacion-tecnologia', label: 'Innovación y Tecnología', href: '/innovacion-tecnologia' },
-        { key: 'trading-inversiones', label: 'Trading e Inversiones', href: '/trading-inversiones' },
-        { key: 'criptomonedas-blockchain', label: 'Criptomonedas y Blockchain', href: '/criptomonedas-blockchain' },
-        { key: 'regulacion-politica', label: 'Regulación y Política Cripto', href: '/regulacion-politica' },
-        { key: 'adopcion-comunidad', label: 'Adopción y Comunidad', href: '/adopcion-comunidad' },
-        { key: 'descentralizacion-proyectos', label: 'Descentralización y Proyectos', href: '/descentralizacion-proyectos' },
-        { key: 'crisis-riesgos', label: 'Crisis y Riesgos', href: '/crisis-riesgos' },
-        { key: 'tendencias-globales', label: 'Tendencias Globales', href: '/tendencias-globales' }
-      ]
-    }
-  },
   'tendenciascripto.com': {
     isBitcoinArg: false,
     isTendenciasCrypto: true,
     isUltimaHoraCrypto: false,
     site: {
-      domain: 'tendenciascrypto.com',
+      domain: 'tendenciascripto.com',
       name: 'TENDENCIASCRIPTO',
       description: 'Análisis profundo y tendencias del mercado de criptomonedas en Latinoamérica.',
       title: 'TENDENCIASCRIPTO.com | Análisis y Tendencias del Mercado Cripto',
@@ -86,34 +59,6 @@ export const domainConfigs = {
         { key: 'descentralizacion-proyectos', label: 'Descentralización y Proyectos', href: '/descentralizacion-proyectos' },
         { key: 'crisis-riesgos', label: 'Crisis y Riesgos', href: '/crisis-riesgos' },
         { key: 'tendencias-globales', label: 'Tendencias Globales', href: '/tendencias-globales' }
-      ]
-    }
-  },
-  'ultimahoracrypto.com': {
-    isBitcoinArg: false,
-    isTendenciasCrypto: false,
-    isUltimaHoraCrypto: true,
-    site: {
-      domain: 'ultimahoracrypto.com',
-      name: 'Ultima Hora Cripto',
-      description: 'Noticias de última hora sobre criptomonedas y blockchain en Latinoamérica.',
-      title: 'ULTIMAHORACRIPTO.com | Noticias Cripto en Tiempo Real',
-      ogImage: '/ultimahoracrypto/og-image.jpg',
-      twitterHandle: '@ultimahoracrypto',
-      logo: '/ultimahoracrypto/logo.png',
-      logoDark: '/ultimahoracrypto/logo-dark.png',
-      socialLinks: {
-        telegram: 'https://t.me/ultimahoracrypto'
-      },
-      categories: [
-        { key: 'criptomonedas', label: 'Criptomonedas', href: '/criptomonedas' },
-        { key: 'mercados', label: 'Mercados', href: '/mercados' },
-        { key: 'regulacion', label: 'Regulación', href: '/regulacion' },
-        { key: 'tecnologia-blockchain', label: 'Tecnología Blockchain', href: '/tecnologia-blockchain' },
-        { key: 'inversion-estrategia', label: 'Inversión y Estrategia', href: '/inversion-estrategia' },
-        { key: 'economia-global', label: 'Economía Global', href: '/economia-global' },
-        { key: 'mineria-seguridad', label: 'Minería y Seguridad', href: '/mineria-seguridad' },
-        { key: 'tendencias-crisis', label: 'Tendencias y Crisis', href: '/tendencias-crisis' }
       ]
     }
   },
@@ -127,7 +72,7 @@ export const domainConfigs = {
       description: 'Noticias de última hora sobre criptomonedas y blockchain en Latinoamérica.',
       title: 'ULTIMAHORACRIPTO.com | Noticias Cripto en Tiempo Real',
       ogImage: '/ultimahoracrypto/og-image.jpg',
-      twitterHandle: '@ultimahoracrypto',
+      twitterHandle: '@ultimahoracripto',
       logo: '/ultimahoracrypto/logo.png',
       logoDark: '/ultimahoracrypto/logo-dark.png',
       socialLinks: {
@@ -179,8 +124,70 @@ export const domainConfigs = {
   }
 } as const;
 
+// Función para detectar el dominio desde los headers
+function detectDomainFromHeaders(): string | null {
+  try {
+    const headersList = headers();
+    const host = headersList.get('host');
+    const forwardedHost = headersList.get('x-forwarded-host');
+    const detectedDomain = headersList.get('x-detected-domain'); // From middleware
+    
+    // Prioridad: 1. Middleware detection, 2. Forwarded host, 3. Host
+    const finalDomain = detectedDomain || forwardedHost || host;
+    
+    console.log('🔍 Detecting domain from headers:', {
+      host,
+      forwardedHost,
+      detectedDomain,
+      finalDomain,
+      availableDomains: Object.keys(domainConfigs)
+    });
+    
+    return finalDomain;
+  } catch (error) {
+    console.log('⚠️ Could not detect domain from headers (probably build time):', error);
+    return null;
+  }
+}
+
 export function getDomainConfig() {
-  const domain = process.env.NEXT_PUBLIC_DOMAIN as Domain || 'localhost';
-  const config = domainConfigs[domain];
-  return config;
+  // Prioridad de detección:
+  // 1. Variable de entorno NEXT_PUBLIC_DOMAIN
+  // 2. Headers de la request (incluyendo middleware)
+  // 3. Fallback a localhost
+  
+  const envDomain = process.env.NEXT_PUBLIC_DOMAIN as Domain;
+  const headerDomain = detectDomainFromHeaders();
+  
+  let domain: string = 'localhost';
+  
+  if (envDomain && domainConfigs[envDomain]) {
+    domain = envDomain;
+    console.log('✅ Using environment domain:', envDomain);
+  } else if (headerDomain && domainConfigs[headerDomain as Domain]) {
+    domain = headerDomain;
+    console.log('✅ Using header domain (exact match):', headerDomain);
+  } else if (headerDomain) {
+    // Si el header domain no está en la configuración exacta, buscar por partes
+    const matchingDomain = Object.keys(domainConfigs).find(d => 
+      headerDomain.includes(d) || d.includes(headerDomain.replace('www.', ''))
+    );
+    if (matchingDomain) {
+      domain = matchingDomain;
+      console.log('✅ Using header domain (partial match):', { headerDomain, matchingDomain });
+    }
+  }
+  
+  const config = domainConfigs[domain as Domain];
+  
+  console.log('🌐 Domain configuration loaded:', {
+    envDomain,
+    headerDomain,
+    selectedDomain: domain,
+    configExists: !!config,
+    siteName: config?.site?.name,
+    timestamp: new Date().toISOString()
+  });
+  
+  return config || domainConfigs['localhost'];
 } 
