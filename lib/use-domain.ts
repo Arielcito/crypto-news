@@ -59,7 +59,7 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         instagram: 'https://instagram.com/bitcoin_argentina',
         tiktok: 'https://tiktok.com/@bitcoin_argentina',
         youtube: 'https://www.youtube.com/@bitcoinargentinaoficial',
-        email: 'bitcoinargentina.oficial@gmail.com',
+        email: 'info@bitcoinargentinagroup.com',
         linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/'
       },
       categories: [
@@ -89,7 +89,8 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       logoDark: '/tendenciascrypto/logo.png',
       socialLinks: {
         telegram: 'https://t.me/tendenciascrypto',
-        linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/'
+        linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/',
+        email: 'info@bitcoinargentinagroup.com'
       },
       categories: [
         { key: 'ethereum', label: 'Ethereum', href: '/ethereum' },
@@ -118,7 +119,8 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       logoDark: '/ultimahoracrypto/logo-dark.png',
       socialLinks: {
         telegram: 'https://t.me/ultimahoracrypto',
-        linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/'
+        linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/',
+        email: 'info@bitcoinargentinagroup.com'
       },
       categories: [
         { key: 'bitcoin', label: 'Bitcoin', href: '/bitcoin' },
@@ -150,7 +152,7 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
         instagram: 'https://instagram.com/bitcoin_argentina',
         tiktok: 'https://tiktok.com/@bitcoin_argentina',
         youtube: 'https://www.youtube.com/@bitcoinargentinaoficial',
-        email: 'bitcoinargentina.oficial@gmail.com',
+        email: 'info@bitcoinargentinagroup.com',
         linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/'
       },
       categories: [
