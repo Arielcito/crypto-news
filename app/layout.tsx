@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/lib/theme-provider";
 import { ClientLayout } from "@/components/client-layout";
 import { getDomainConfig } from "@/lib/domain-config";
 import { Providers } from "./providers";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -72,9 +73,21 @@ export default function RootLayout({
 }) {
   // No duplicar el favicon aquí ya que se maneja en generateMetadata
   console.log('🚀 Layout rendering...');
+  const config = getDomainConfig();
+  const isProduction = process.env.NODE_ENV === 'production';
 
   return (
     <html lang="es" suppressHydrationWarning>
+      <head>
+        {isProduction && (
+          <Script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7010167677917603"
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
+      </head>
       <body className={inter.className}>
         <Providers>
           <ThemeProvider>
