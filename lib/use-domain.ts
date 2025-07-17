@@ -55,7 +55,7 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       logo: '/bitcoinarg/logo.png',
       logoDark: '/bitcoinarg/logo.png',
       socialLinks: {
-        telegram: 'https://t.me/bitcoinargnews',
+        telegram: 'https://t.me/bitcoinargentinacomunidad',
         instagram: 'https://instagram.com/bitcoin_argentina',
         tiktok: 'https://tiktok.com/@bitcoin_argentina',
         youtube: 'https://www.youtube.com/@bitcoinargentinaoficial',
@@ -88,7 +88,7 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       logo: '/tendenciascrypto/logo.png',
       logoDark: '/tendenciascrypto/logo.png',
       socialLinks: {
-        telegram: 'https://t.me/tendenciascrypto',
+        telegram: 'https://t.me/bitcoinargentinacomunidad',
         linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/',
         email: 'info@bitcoinargentinagroup.com'
       },
@@ -118,7 +118,7 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       logo: '/ultimahoracrypto/logo.png',
       logoDark: '/ultimahoracrypto/logo-dark.png',
       socialLinks: {
-        telegram: 'https://t.me/ultimahoracrypto',
+        telegram: 'https://t.me/bitcoinargentinacomunidad',
         linkedin: 'https://www.linkedin.com/company/bitcoin-argentina-group/',
         email: 'info@bitcoinargentinagroup.com'
       },
@@ -148,7 +148,7 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
       logo: '/bitcoinarg/logo.png',
       logoDark: '/bitcoinarg/logo.png',
       socialLinks: {
-        telegram: 'https://t.me/bitcoinargnews',
+        telegram: 'https://t.me/bitcoinargentinacomunidad',
         instagram: 'https://instagram.com/bitcoin_argentina',
         tiktok: 'https://tiktok.com/@bitcoin_argentina',
         youtube: 'https://www.youtube.com/@bitcoinargentinaoficial',
