@@ -20,13 +20,18 @@ const getFaviconPath = (domain: string) => {
       case 'ultimahoracripto.com':
         return '/favicons/ultima.ico';
       case 'tendenciascripto.com':
-        return '/favicons/tendencia.ico';
+        return '/favicons/tendencias.ico';
       default:
         return '/favicons/bitcoin.ico'; // favicon por defecto
     }
   })();
-  console.log('✅ Selected favicon path:', path);
-  return path;
+  
+  // Add cache-busting in development
+  const cacheBuster = process.env.NODE_ENV === 'development' ? `?v=${Date.now()}` : '';
+  const finalPath = `${path}${cacheBuster}`;
+  
+  console.log('✅ Selected favicon path:', finalPath);
+  return finalPath;
 };
 
 // Generar metadata dinámicamente

@@ -21,12 +21,14 @@ const nextConfig = {
   async headers() {
     return [
       {
-        // Cache static assets like favicons for 1 year
+        // Cache favicons with shorter duration for easier updates
         source: '/favicons/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: process.env.NODE_ENV === 'development' 
+              ? 'no-cache, no-store, must-revalidate'
+              : 'public, max-age=86400, stale-while-revalidate=604800',
           },
         ],
       },
