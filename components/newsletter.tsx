@@ -18,7 +18,7 @@ export function TelegramChannel() {
           asChild 
           className="w-fit bg-[#0088cc] hover:bg-[#0088cc]/90 text-white px-6"
         >
-          <a href="https://t.me/bitcoinargnews" target="_blank" rel="noopener noreferrer">
+          <a href="https://t.me/bitcoinargentinacomunidad" target="_blank" rel="noopener noreferrer">
             <FaTelegram className="mr-2 h-4 w-4" />
             Unirse al canal
           </a>

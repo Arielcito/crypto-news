@@ -37,7 +37,7 @@ export function SocialMediaButtons() {
       </Link>
       
       <Link 
-        href="https://t.me/bitcoinargnews" 
+        href="https://t.me/bitcoinargentinacomunidad" 
         target="_blank" 
         rel="noopener noreferrer"
         className="text-primary hover:text-primary/80 transition-colors"

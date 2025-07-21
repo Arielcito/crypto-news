@@ -27,7 +27,7 @@ export const siteConfigs: Record<Domain, SiteConfig> = {
     twitterHandle: '@bitcoinargnews',
     socialLinks: {
       twitter: 'https://twitter.com/bitcoinargnews',
-      telegram: 'https://t.me/bitcoinargnews',
+      telegram: 'https://t.me/bitcoinargentinacomunidad',
       discord: 'https://discord.gg/bitcoinarg',
     },
     categories: [
@@ -82,7 +82,7 @@ export const siteConfigs: Record<Domain, SiteConfig> = {
     twitterHandle: '@bitcoinargnews',
     socialLinks: {
       twitter: 'https://twitter.com/bitcoinargnews',
-      telegram: 'https://t.me/bitcoinargnews',
+      telegram: 'https://t.me/bitcoinargentinacomunidad',
       discord: 'https://discord.gg/bitcoinarg',
     },
     categories: [

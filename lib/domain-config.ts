@@ -16,7 +16,7 @@ export const domainConfigs = {
       logo: '/bitcoinarg/logo.png',
       logoDark: '/bitcoinarg/logo.png',
       socialLinks: {
-        telegram: 'https://t.me/bitcoinargnews',
+        telegram: 'https://t.me/bitcoinargentinacomunidad',
         twitter: 'https://twitter.com/bitcoinargnews',
         instagram: 'https://instagram.com/bitcoinargnews',
         tiktok: 'https://tiktok.com/@bitcoinargnews',
@@ -104,7 +104,7 @@ export const domainConfigs = {
       logo: '/bitcoinarg/logo.png',
       logoDark: '/bitcoinarg/logo.png',
       socialLinks: {
-        telegram: 'https://t.me/bitcoinargnews',
+        telegram: 'https://t.me/bitcoinargentinacomunidad',
         twitter: 'https://twitter.com/bitcoinargnews',
         instagram: 'https://instagram.com/bitcoinargnews',
         tiktok: 'https://tiktok.com/@bitcoinargnews',
