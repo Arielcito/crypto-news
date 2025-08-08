@@ -23,7 +23,7 @@
     --tertiary-foreground: 0 0% 9%;
 
     --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
+    --muted-foreground: 0 0% 35%; /* Improved contrast from 45.1% to 35% */
 
     --accent: 0 0% 96.1%;
     --accent-foreground: 0 0% 9%;

@@ -1,3 +1,7 @@
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -34,12 +38,14 @@ const nextConfig = {
         ],
       },
       {
-        // Cache logos and images for 1 day but allow revalidation
-        source: '/:path*\\.(png|jpg|jpeg|svg|ico)',
+        // Cache static assets aggressively (1 year with immutable)
+        source: '/:path*\\.(png|jpg|jpeg|svg|ico|js|css|woff|woff2)',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=86400, stale-while-revalidate=604800',
+            value: process.env.NODE_ENV === 'development'
+              ? 'no-cache, no-store, must-revalidate'
+              : 'public, max-age=31536000, immutable',
           },
         ],
       },
@@ -57,4 +63,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig; 
+module.exports = withBundleAnalyzer(nextConfig); 

@@ -19,30 +19,28 @@ export function HeroHeader() {
   const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Solo actualizamos el estado si hay un cambio significativo
-      if (Math.abs(currentScrollY - lastScrollY) > 5) {
-        setIsScrolled(currentScrollY > 100);
-        setLastScrollY(currentScrollY);
-      }
-    };
-
-    // Usamos requestAnimationFrame para suavizar la animación
     let ticking = false;
-    const scrollListener = () => {
+    
+    const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          handleScroll();
+          const currentScrollY = window.scrollY;
+          
+          // Solo actualizamos el estado si hay un cambio significativo
+          if (Math.abs(currentScrollY - lastScrollY) > 10) {
+            setIsScrolled(currentScrollY > 100);
+            setLastScrollY(currentScrollY);
+          }
           ticking = false;
         });
         ticking = true;
       }
     };
 
-    window.addEventListener('scroll', scrollListener, { passive: true });
-    return () => window.removeEventListener('scroll', scrollListener);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, [lastScrollY]);
 
   return (
