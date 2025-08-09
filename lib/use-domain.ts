@@ -110,9 +110,9 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
     isUltimaHoraCrypto: true,
     site: {
       domain: 'ultimahoracripto.com',
-      name: 'ULTIMAHORA CRIPTO',
+      name: 'ULTIMA HORA CRIPTO',
       description: 'Noticias de última hora sobre criptomonedas y blockchain en Latinoamérica.',
-      title: 'ULTIMAHORA CRIPTO | Noticias Cripto en Tiempo Real',
+      title: 'ULTIMA HORA CRIPTO | Noticias Cripto en Tiempo Real',
       ogImage: '/ultimahoracrypto/og-image.jpg',
       twitterHandle: '@ultimahoracrypto',
       logo: '/ultimahoracrypto/logo.png',
