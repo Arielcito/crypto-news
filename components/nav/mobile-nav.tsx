@@ -79,7 +79,7 @@ export function MobileNav() {
           <Separator className="my-2" />
           <div className="flex flex-col space-y-2 mb-4">
             {site.categories.map((category) => (
-              <MobileLink key={category.href} href={category.href} onOpenChange={setOpen}>
+              <MobileLink key={category.href} href={'/categories' + category.href} onOpenChange={setOpen}>
                 {category.label}
               </MobileLink>
             ))}
