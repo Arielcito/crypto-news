@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/lib/theme-provider";
 import { ClientLayout } from "@/components/client-layout";
 import { getDomainConfig } from "@/lib/domain-config";
 import { Providers } from "./providers";
+import { Analytics } from "@/components/analytics";
 import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -120,6 +121,7 @@ export default function RootLayout({
             <ClientLayout>{children}</ClientLayout>
           </ThemeProvider>
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
