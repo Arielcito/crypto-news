@@ -94,7 +94,7 @@ export function Footer() {
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} {site.name}. Todos los derechos reservados.
             <br />
-            Una empresa de Bitcoin Argentina Group.
+            Una empresa de <a href="https://bitcoinargentina.group" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Bitcoin Argentina Group</a>.
           </p>
         </Container>
       </Section>
