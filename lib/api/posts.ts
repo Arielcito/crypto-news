@@ -4,6 +4,18 @@ interface ApiResponse {
     posts: Post[];
 }
 
+export interface PaginatedPostsResponse {
+  posts: Post[];
+  total: number;
+  totalPages: number;
+}
+
+export interface FetchPaginatedPostsParams {
+  page: number;
+  perPage: number;
+  domain?: string;
+}
+
 interface SinglePostResponse {
   data: Post;
   error: string | null;
@@ -32,6 +44,28 @@ export const fetchPosts = async (): Promise<Post[]> => {
   } catch (error) {
     console.error('Error fetching posts:', error);
     return [];
+  }
+};
+
+export const fetchPaginatedPosts = async ({ page, perPage, domain }: FetchPaginatedPostsParams): Promise<PaginatedPostsResponse> => {
+  try {
+    const currentDomain = domain || (typeof window !== 'undefined' ? window.location.origin : '');
+    const cleanedDomain = cleanDomain(currentDomain === 'http://localhost:3000' ? 'https://www.tendenciascripto.com/' : currentDomain);
+
+    console.log(`📄 Fetching paginated posts — page: ${page}, perPage: ${perPage}, domain: ${cleanedDomain}`);
+
+    const response = await axiosInstance.get<PaginatedPostsResponse>(
+      `/api/wp/v2/posts?domain=${cleanedDomain}&page=${page}&per_page=${perPage}`
+    );
+
+    return {
+      posts: response.data?.posts || [],
+      total: response.data?.total || 0,
+      totalPages: response.data?.totalPages || 0,
+    };
+  } catch (error) {
+    console.error('❌ Error fetching paginated posts:', error);
+    return { posts: [], total: 0, totalPages: 0 };
   }
 };
 

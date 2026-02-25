@@ -6,10 +6,22 @@ import Post  from "@/types/post";
 import { LatestNewsSection } from "./LatestNewsSection";
 import { TopStoriesSection } from "./TopStoriesSection";
 import { DeepDivesSection } from "./DeepDivesSection";
+import { PodcastSection } from "./PodcastSection";
 import { useQuery } from '@tanstack/react-query';
 import { fetchPosts } from '@/lib/api/posts';
+import { usePaginatedPosts } from '@/lib/use-paginated-posts';
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 
 function PostCard({ post, category }: { post: Post, category: string }) {
   const [imageError, setImageError] = useState(false);
@@ -110,6 +122,116 @@ function SmallPostCardSkeleton() {
   );
 }
 
+function getVisiblePages(current: number, total: number): (number | 'ellipsis')[] {
+  if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
+
+  const pages: (number | 'ellipsis')[] = [];
+
+  if (current <= 3) {
+    pages.push(1, 2, 3, 4, 'ellipsis', total);
+  } else if (current >= total - 2) {
+    pages.push(1, 'ellipsis', total - 3, total - 2, total - 1, total);
+  } else {
+    pages.push(1, 'ellipsis', current - 1, current, current + 1, 'ellipsis', total);
+  }
+
+  return pages;
+}
+
+function AllPostsPaginated() {
+  const {
+    posts,
+    total,
+    totalPages,
+    page,
+    isLoading,
+    isPageTransitioning,
+    goToPage,
+    hasNextPage,
+    hasPrevPage,
+    nextPage,
+    prevPage,
+  } = usePaginatedPosts({ perPage: 2 });
+
+  const visiblePages = getVisiblePages(page, totalPages);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Todas las Noticias</h2>
+        {total > 0 && (
+          <span className="text-sm text-muted-foreground">
+            {total} noticias
+          </span>
+        )}
+      </div>
+
+      <div className="relative min-h-[200px]">
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[1, 2].map((i) => (
+              <PostCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={page}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${isPageTransitioning ? 'pointer-events-none' : ''}`}
+            >
+              {posts.map((post) => (
+                <PostCard key={post.id} post={post} category={post.categories[0]?.name ?? 'general'} />
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        )}
+      </div>
+
+      {totalPages > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={(e) => { e.preventDefault(); prevPage(); }}
+                className={`cursor-pointer select-none transition-opacity duration-200 ${!hasPrevPage ? 'pointer-events-none opacity-40' : 'hover:bg-accent'}`}
+              />
+            </PaginationItem>
+
+            {visiblePages.map((p, i) =>
+              p === 'ellipsis' ? (
+                <PaginationItem key={`ellipsis-${i}`}>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              ) : (
+                <PaginationItem key={p}>
+                  <PaginationLink
+                    isActive={p === page}
+                    onClick={(e) => { e.preventDefault(); goToPage(p); }}
+                    className="cursor-pointer select-none"
+                  >
+                    {p}
+                  </PaginationLink>
+                </PaginationItem>
+              )
+            )}
+
+            <PaginationItem>
+              <PaginationNext
+                onClick={(e) => { e.preventDefault(); nextPage(); }}
+                className={`cursor-pointer select-none transition-opacity duration-200 ${!hasNextPage ? 'pointer-events-none opacity-40' : 'hover:bg-accent'}`}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
+    </div>
+  );
+}
+
 export function PostsSection() {
   const { data: allPosts = [], isLoading } = useQuery({
     queryKey: ['posts'],
@@ -181,15 +303,9 @@ export function PostsSection() {
         <DeepDivesSection posts={deepDivePosts} />
       </div>
 
-      {/* Sección de todos los posts - sin límites */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold">Todas las Noticias</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {allPosts.map((post) => (
-            <PostCard key={post.id} post={post} category={post.categories[0].name} />
-          ))}
-        </div>
-      </div>
+      <PodcastSection />
+
+      <AllPostsPaginated />
     </div>
   );
 } 
