@@ -4,138 +4,141 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-### Development
 ```bash
-# Start development server
-npm run dev
+npm run dev          # Start development server (DO NOT run unless user says to)
+npm run build        # Production build (runs prisma generate first)
+npm run lint         # ESLint
+npx tsc --noEmit     # Type check — always run after changes
 
-# Build for production (includes Prisma generate)
-npm run build
+npx prisma generate  # Regenerate Prisma client after schema changes
+npx prisma db seed   # Seed database (never run migrations automatically)
+npx prisma studio    # Browse database in browser
 
-# Start production server
-npm start
-
-# Lint code
-npm run lint
-
-# Type check (always run after changes)
-npx tsc --noEmit
-```
-
-### Database
-```bash
-# Generate Prisma client
-npx prisma generate
-
-# Seed database
-npx prisma db seed
-
-# View database in browser
-npx prisma studio
+ANALYZE=true npm run build  # Bundle analysis
 ```
 
 ## Architecture
 
 ### Multi-Domain News Platform
-This is a Next.js application that serves three cryptocurrency news domains:
-- `bitcoinarg.news` - Argentina/LATAM focused Bitcoin news
-- `tendenciascripto.com` - Blockchain/DeFi/Web3 analysis
-- `ultimahoracripto.com` - Breaking crypto news
 
-### Key Architecture Components
+Single Next.js 14 (App Router) codebase serving three crypto news sites:
 
-#### Domain Detection System
-- `middleware.ts` - Detects domain from headers, sets CORS, adds debugging headers
-- `lib/domain-config.ts` - Contains domain-specific configurations, colors, social links, categories
-- `lib/domain-colors.ts` - Theme colors for each domain
-- `lib/use-domain.ts` - React hook for domain detection
+| Domain | Focus | Primary Color |
+|---|---|---|
+| `bitcoinarg.news` | Argentina/LATAM Bitcoin | #F7931A (orange) |
+| `tendenciascripto.com` | Blockchain/DeFi/Web3 analysis | #2979FF (electric blue) |
+| `ultimahoracripto.com` | Breaking crypto news | #D32F2F (red) |
 
-#### Database & API
-- **Prisma ORM** with PostgreSQL
-- **API Routes** follow WordPress REST API patterns (`/api/wp/v2/`)
-- **Multi-domain posts** with domain-specific categories
-- **Schema**: Posts, DomainCategories, Tags with domain isolation
+Localhost defaults to bitcoinarg.news colors in development.
 
-#### Frontend Architecture
-- **App Router** with dynamic routing per domain
-- **Component Structure**: 
-  - `components/ui/` - shadcn/ui components
-  - `components/` - Feature components
-  - `app/` - Pages and layouts
-- **State Management**: TanStack Query for server state
-- **Styling**: Tailwind CSS with domain-specific CSS variables
-- **Theming**: next-themes with domain-specific color schemes
+### Domain Detection Flow
 
-### Domain-Specific Features
-- **Dynamic metadata** generation based on domain
-- **Domain-specific logos** and favicons
-- **Category filtering** by domain
-- **Social media links** per domain
-- **SEO optimization** with domain-specific OG images
+```
+Request → middleware.ts (detect domain from host/origin headers, set CORS, inject X-Detected-Domain header)
+       → lib/domain-config.ts (getDomainConfig() reads headers or NEXT_PUBLIC_DOMAIN env var)
+       → lib/use-domain.ts (useDomain() hook — client-side, reads cookie "selected_domain" or window.location)
+       → lib/domain-colors.ts (color palettes, getCurrentPalette())
+       → lib/theme-provider.tsx (applies --primary/--secondary/--tertiary CSS variables)
+```
 
-### Data Flow
-1. Middleware detects domain from request headers
-2. Domain config provides site-specific settings
-3. API routes filter content by domain
-4. Components render domain-specific UI and content
-5. Theme provider applies domain-specific colors
+Key: `useDomain()` returns `{ domain, setDomain, colors, site, isBitcoinArg, isTendenciasCrypto, isUltimaHoraCrypto }`. Use this hook in any component that needs domain context.
+
+### Database (Prisma + PostgreSQL)
+
+Three models with domain isolation:
+- **Post** — `domain` field, many-to-many with DomainCategories and Tags. Content is Markdown. `featuredMedia` is a URL string (not numeric ID).
+- **DomainCategories** — scoped `@@unique([domain, slug])`, soft-deleted via `isActive` flag
+- **Tag** — globally unique by slug, has `domain` field
+
+### API Routes
+
+Follow WordPress REST API patterns under `/api/wp/v2/`:
+
+| Endpoint | Methods | Notes |
+|---|---|---|
+| `/api/wp/v2/posts` | GET, POST | GET: query `per_page`, `page`, `search`, `categories`, `tags`, `domain`. POST: requires Basic Auth |
+| `/api/wp/v2/posts/by-slug/[slug]` | GET | Returns `{ data, error, message }` |
+| `/api/wp/v2/categories` | GET, POST, PUT, DELETE | DELETE is soft-delete (sets isActive=false) |
+| `/api/wp/v2/og` | GET | OG image generation |
+
+API auth (`lib/auth.ts`): Basic HTTP auth using `WORDPRESS_USERNAME` / `WORDPRESS_PASSWORD` env vars.
+
+API response format: `{ data: T, error: string | null, message: string | null }`
+
+### Frontend Stack
+
+- **State**: TanStack React Query (`app/providers.tsx` wraps QueryClientProvider)
+- **HTTP**: Axios instance in `lib/axios.ts` (uses `NEXT_PUBLIC_API_URL`)
+- **API clients**: `lib/api/posts.ts` and `lib/api/categories.ts`
+- **Styling**: Tailwind CSS 3 + CSS variables for domain colors, tailwindcss-animate, @tailwindcss/typography
+- **Animations**: Framer Motion — use smooth non-linear easing
+- **Markdown**: react-markdown + remark-gfm for post content
+- **UI primitives**: shadcn/ui (Radix-based) in `components/ui/`
+- **Icons**: lucide-react + react-icons
+- **Forms**: react-hook-form
+
+### Page Routing
+
+| Route | Type | Description |
+|---|---|---|
+| `/` (app/page.tsx) | Client | Home — PostsSection + lazy TelegramChannel |
+| `/[category]/[slug]` | Server | Post detail — markdown content, TOC sidebar, RecommendedPosts |
+| `/categories/[slug]` | Server | Category archive — PostCard grid |
+
+### Layout Chain
+
+`app/layout.tsx` (metadata + favicon per domain, preconnect hints, AdSense)
+→ `app/providers.tsx` (TanStack Query)
+→ `lib/theme-provider.tsx` (dark/light theme + domain CSS vars)
+→ `components/client-layout.tsx` (MiniHeader → HeroHeader → CryptoPriceBanner → main → Footer)
+
+Footer and TelegramChannel are lazy-loaded via `next/dynamic`.
+
+### Analytics
+
+Google Analytics 4 per domain (`lib/use-analytics.ts`):
+- `NEXT_PUBLIC_GA_ID_BITCOINARG`
+- `NEXT_PUBLIC_GA_ID_TENDENCIAS`
+- `NEXT_PUBLIC_GA_ID_ULTIMAHORA`
+
+Only active in production. Component: `components/analytics.tsx` uses `@next/third-parties`.
+
+## Environment Variables
+
+```
+DATABASE_URL                      # PostgreSQL connection string
+NEXT_PUBLIC_API_URL               # Axios base URL
+NEXT_PUBLIC_DOMAIN                # Domain override (also falls back to VERCEL_URL)
+WORDPRESS_USERNAME                # Basic auth for write API routes
+WORDPRESS_PASSWORD                # Basic auth for write API routes
+NEXT_PUBLIC_GA_ID_BITCOINARG      # GA4 measurement ID
+NEXT_PUBLIC_GA_ID_TENDENCIAS      # GA4 measurement ID
+NEXT_PUBLIC_GA_ID_ULTIMAHORA      # GA4 measurement ID
+```
 
 ## Development Guidelines
 
-### Adding New Components
-- Follow shadcn/ui patterns for UI components
-- Use domain context via `useDomain()` hook
-- Implement atomic design principles
-- Check existing component patterns before creating new ones
+### Package Management
+- Use `npm` (package-lock.json is the lockfile)
+
+### Adding a New Domain
+1. Add config to `domainConfigs` in `lib/domain-config.ts`
+2. Add palette to `domainPalettes` in `lib/domain-colors.ts`
+3. Add domain mapping in `middleware.ts`
+4. Create assets in `public/<domain>/`
+5. Add favicon path in `app/layout.tsx`
+6. Add CSS variable overrides in `app/globals.css`
+7. Add GA env var mapping in `lib/use-analytics.ts`
 
 ### Working with Posts
-- All posts are stored in single table with domain field
-- Use `lib/api/posts.ts` for data fetching
-- Content is stored in Markdown format
-- Featured media are URL strings (changed from numeric IDs)
+- Single `Post` table with `domain` field for multi-domain isolation
+- Content stored as Markdown, rendered via react-markdown
+- `featuredMedia` is a URL string
+- Use `lib/api/posts.ts` for fetching
 
-### Database Changes
-- **Never run migrations** in development
-- Use `npx prisma db seed` to populate test data
-- Always run `npx prisma generate` after schema changes
-
-### Type Safety
-- Always run `npx tsc --noEmit` after changes
-- Check existing types in `lib/types.d.ts` and `types/` before creating new ones
-- Use interfaces that match database schema
-
-### Package Management
-- Use `pnpm` as package manager
-- Never use npm or yarn
-
-### Logging
-- Add strategic logs showing key process moments
-- Use console.log with emoji prefixes for debugging
-- Domain detection includes extensive logging
-
-## Domain Configuration
-
-### Adding New Domain
-1. Add domain to `domainConfigs` in `lib/domain-config.ts`
-2. Add domain mapping in `middleware.ts`
-3. Create domain-specific assets in `public/`
-4. Add favicon path in `app/layout.tsx`
-5. Update CSS variables in `app/globals.css`
-
-### Domain-Specific Styling
-Each domain has its own color scheme:
-- **bitcoinarg.news**: Orange Bitcoin (#F7931A), Blue (#03A9F4), Light Gray (#ECEFF1)
-- **tendenciascripto.com**: Electric Blue (#2979FF), Purple (#673AB7), Dark Gray (#37474F)  
-- **ultimahoracripto.com**: Red (#D32F2F), Black (#212121), White (#FAFAFA)
-
-## Testing
-- No specific test framework configured
-- Check README.md for any testing instructions
-- Run build command to verify production readiness
-
-## Production Considerations
-- Uses standalone output mode for Docker deployment
-- Includes Google AdSense integration
-- Optimized caching for static assets
-- CORS configured for allowed domains
-- Vercel Analytics integration
+### Production
+- `output: 'standalone'` in next.config.js for Docker deployment
+- Static assets cached 1 year (immutable); favicons cached 1 day
+- CORS configured in middleware for allowed domains
+- Google AdSense conditionally loaded in production
+- Vercel Analytics integrated
