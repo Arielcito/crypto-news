@@ -2,6 +2,7 @@ import { checkBasicAuth } from '@/lib/auth';
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma, Post, DomainCategories, Tag } from '@prisma/client';
+import { slugVariants } from '@/lib/utils';
 
 type PostWithRelations = Post & {
   categories: DomainCategories[];
@@ -42,7 +43,10 @@ export async function GET(request: NextRequest) {
       console.log('[GET] /api/wp/v2/posts - Detected category IDs:', categoryIds);
       console.log('[GET] /api/wp/v2/posts - Detected category slugs:', categorySlugs);
       
-      if (categoryIds.length > 0 && categorySlugs.length > 0) {
+      // Expand slugs to include accent variants (e.g. "regulación" + "regulacion")
+      const expandedSlugs = categorySlugs.flatMap(slugVariants);
+
+      if (categoryIds.length > 0 && expandedSlugs.length > 0) {
         // Mixed IDs and slugs
         console.log('[GET] /api/wp/v2/posts - Using mixed ID and slug filter');
         categoryFilter = {
@@ -50,7 +54,7 @@ export async function GET(request: NextRequest) {
             some: {
               OR: [
                 { id: { in: categoryIds } },
-                { slug: { in: categorySlugs } }
+                { slug: { in: expandedSlugs } }
               ]
             }
           }
@@ -65,13 +69,13 @@ export async function GET(request: NextRequest) {
             }
           }
         };
-      } else if (categorySlugs.length > 0) {
+      } else if (expandedSlugs.length > 0) {
         // Only slugs
-        console.log('[GET] /api/wp/v2/posts - Using slug filter');
+        console.log('[GET] /api/wp/v2/posts - Using slug filter (with accent variants):', expandedSlugs);
         categoryFilter = {
           categories: {
             some: {
-              slug: { in: categorySlugs }
+              slug: { in: expandedSlugs }
             }
           }
         };

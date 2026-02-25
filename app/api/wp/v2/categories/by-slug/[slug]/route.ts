@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { slugVariants } from '@/lib/utils';
 
 const createResponse = (data: any = null, error: string | null = null, message: string | null = null, status: number = 200) => {
   return Response.json({ data, error, message }, { status });
@@ -10,20 +11,19 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   console.log('[GET] /api/wp/v2/categories/by-slug/[slug] - Request received');
-  
+
   try {
     const { slug } = params;
     const searchParams = request.nextUrl.searchParams;
     const domain = searchParams.get('domain');
-
-    const where = {
-      slug,
-      isActive: true,
-      ...(domain ? { domain } : {})
-    };
+    const variants = slugVariants(slug);
 
     const category = await prisma.domainCategories.findFirst({
-      where
+      where: {
+        slug: { in: variants },
+        isActive: true,
+        ...(domain ? { domain } : {})
+      }
     });
 
     if (!category) {
