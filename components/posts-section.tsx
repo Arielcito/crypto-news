@@ -151,7 +151,7 @@ function AllPostsPaginated() {
     hasPrevPage,
     nextPage,
     prevPage,
-  } = usePaginatedPosts({ perPage: 2 });
+  } = usePaginatedPosts({ perPage: 12 });
 
   const visiblePages = getVisiblePages(page, totalPages);
 
@@ -168,8 +168,8 @@ function AllPostsPaginated() {
 
       <div className="relative min-h-[200px]">
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[1, 2].map((i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 12 }, (_, i) => (
               <PostCardSkeleton key={i} />
             ))}
           </div>
@@ -181,7 +181,7 @@ function AllPostsPaginated() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${isPageTransitioning ? 'pointer-events-none' : ''}`}
+              className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${isPageTransitioning ? 'pointer-events-none' : ''}`}
             >
               {posts.map((post) => (
                 <PostCard key={post.id} post={post} category={post.categories[0]?.name ?? 'general'} />

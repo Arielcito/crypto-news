@@ -7,7 +7,7 @@ import { useState } from "react";
 const PODCAST_EPISODE = {
   title: "Bitcoin Argentina Podcast",
   description: "Mirá nuestro último episodio en YouTube.",
-  thumbnail: "https://i.ytimg.com/vi/sWzD_EVip38/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLBySBOOVYJNH6u928KouPBGLMgNLw",
+  thumbnail: "/bitcoinarg/podcast-cover.jpg",
   url: "https://www.youtube.com/@bitcoinargentinaoficial",
 };
 
