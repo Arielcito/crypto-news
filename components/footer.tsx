@@ -29,7 +29,7 @@ export function Footer() {
             </Link>
 
               <p>
-                <Balancer>+8 años informando sobre criptomonedas en Argentina y Latinoamérica.</Balancer>
+                <Balancer>+{new Date().getFullYear() - 2017} años informando sobre criptomonedas en Argentina y Latinoamérica.</Balancer>
               </p>
             
           </div>
