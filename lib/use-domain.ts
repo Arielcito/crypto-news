@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Domain, getCurrentDomain, getCurrentPalette, setSelectedDomain } from './domain-colors';
+import { useInitialDomain } from './initial-domain-context';
 
 interface DomainConfig {
   domain: Domain;
@@ -170,9 +171,15 @@ export const domainConfigs: Record<Domain, Omit<DomainConfig, 'domain' | 'colors
 };
 
 export function useDomain() {
+  const initialDomain = useInitialDomain();
+
   const [domain, setDomain] = useState<Domain>(() => {
+    if (initialDomain) {
+      return initialDomain;
+    }
+
     if (typeof window === 'undefined') {
-      return process.env.NODE_ENV === 'development' ? 'localhost' : getCurrentDomain();
+      return process.env.NODE_ENV === 'development' ? 'localhost' : 'localhost';
     }
 
     const cookieDomain = document.cookie
@@ -184,7 +191,7 @@ export function useDomain() {
       return cookieDomain;
     }
 
-    return process.env.NODE_ENV === 'development' ? 'localhost' : getCurrentDomain();
+    return getCurrentDomain();
   });
 
   const colors = getCurrentPalette(domain);

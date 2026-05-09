@@ -129,11 +129,19 @@ export async function GET(request: NextRequest) {
     console.log('[GET] /api/wp/v2/posts - Cleaning URLs from posts data by removing < > symbols');
     const cleanedPosts = posts.map(post => cleanPostData(post as PostWithRelations));
 
-    const headers = new Headers();
-    headers.set('X-WP-Total', total.toString());
-    headers.set('X-WP-TotalPages', Math.ceil(total / per_page).toString());
-
-    return Response.json({ posts: cleanedPosts, total, totalPages: Math.ceil(total / per_page) }, { status: 200 });
+    return Response.json(
+      { posts: cleanedPosts, total, totalPages: Math.ceil(total / per_page) },
+      {
+        status: 200,
+        headers: {
+          'X-WP-Total': total.toString(),
+          'X-WP-TotalPages': Math.ceil(total / per_page).toString(),
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+          'CDN-Cache-Control': 'public, s-maxage=60',
+          'Vercel-CDN-Cache-Control': 'public, s-maxage=60',
+        },
+      }
+    );
   } catch (error: any) {
     console.error('[GET] /api/wp/v2/posts - Error:', error);
     return Response.json({ error: 'Internal server error', message: error?.message }, { status: 500 });

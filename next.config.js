@@ -2,11 +2,16 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 
+const isProd = process.env.NODE_ENV === 'production';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    unoptimized: true,
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,52 +20,47 @@ const nextConfig = {
     ],
   },
   output: 'standalone',
-  experimental: {
-    appDir: true,
-  },
-  // Force the domain to be detected from the host header in production
   env: {
     NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN || process.env.VERCEL_URL || 'localhost',
   },
-  // Optimized caching for static assets
   async headers() {
     return [
       {
-        // Cache favicons with shorter duration for easier updates
         source: '/favicons/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: process.env.NODE_ENV === 'development' 
-              ? 'no-cache, no-store, must-revalidate'
-              : 'public, max-age=86400, stale-while-revalidate=604800',
+            value: isProd
+              ? 'public, max-age=86400, stale-while-revalidate=604800'
+              : 'no-cache, no-store, must-revalidate',
           },
         ],
       },
       {
-        // Cache static assets aggressively (1 year with immutable)
-        source: '/:path*\\.(png|jpg|jpeg|svg|ico|js|css|woff|woff2)',
+        source: '/:path*\\.(png|jpg|jpeg|svg|ico|js|css|woff|woff2|webp|avif)',
         headers: [
           {
             key: 'Cache-Control',
-            value: process.env.NODE_ENV === 'development'
-              ? 'no-cache, no-store, must-revalidate'
-              : 'public, max-age=31536000, immutable',
+            value: isProd
+              ? 'public, max-age=31536000, immutable'
+              : 'no-cache, no-store, must-revalidate',
           },
         ],
       },
     ];
   },
-  // Add rewrites to handle domain-specific routing if needed
   async rewrites() {
     return [];
   },
-  // Logging for production debugging
-  logging: {
-    fetches: {
-      fullUrl: true,
-    },
-  },
+  ...(isProd
+    ? {}
+    : {
+        logging: {
+          fetches: {
+            fullUrl: true,
+          },
+        },
+      }),
 };
 
-module.exports = withBundleAnalyzer(nextConfig); 
+module.exports = withBundleAnalyzer(nextConfig);

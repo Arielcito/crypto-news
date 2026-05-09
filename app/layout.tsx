@@ -2,57 +2,55 @@ import "./globals.css";
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { headers } from "next/headers";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { ClientLayout } from "@/components/client-layout";
 import { getDomainConfig } from "@/lib/domain-config";
 import { Providers } from "./providers";
 import { Analytics } from "@/components/analytics";
 import Script from "next/script";
+import type { Domain } from "@/lib/domain-colors";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: "swap", preload: true });
 
-// Función para determinar qué favicon usar basado en el dominio
 const getFaviconPath = (domain: string) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🔍 Getting favicon for domain:', domain);
+  switch (domain) {
+    case 'bitcoinarg.news':
+      return '/favicons/bitcoin.ico';
+    case 'ultimahoracripto.com':
+      return '/favicons/ultima.ico';
+    case 'tendenciascripto.com':
+      return '/favicons/tendencias.ico';
+    default:
+      return '/favicons/bitcoin.ico';
   }
-  
-  const path = (() => {
-    switch (domain) {
-      case 'bitcoinarg.news':
-        return '/favicons/bitcoin.ico';
-      case 'ultimahoracripto.com':
-        return '/favicons/ultima.ico';
-      case 'tendenciascripto.com':
-        return '/favicons/tendencias.ico';
-      default:
-        return '/favicons/bitcoin.ico'; // favicon por defecto
-    }
-  })();
-  
-  // Add cache-busting in development
-  const cacheBuster = process.env.NODE_ENV === 'development' ? `?v=${Date.now()}` : '';
-  const finalPath = `${path}${cacheBuster}`;
-  
-  if (process.env.NODE_ENV === 'development') {
-    console.log('✅ Selected favicon path:', finalPath);
-  }
-  return finalPath;
 };
 
-// Generar metadata dinámicamente
+const KNOWN_DOMAINS: Domain[] = ['bitcoinarg.news', 'tendenciascripto.com', 'ultimahoracripto.com', 'localhost'];
+
+function detectInitialDomain(): Domain {
+  try {
+    const h = headers();
+    const detected = h.get('x-detected-domain');
+    if (detected && KNOWN_DOMAINS.includes(detected as Domain)) {
+      return detected as Domain;
+    }
+    const host = h.get('host') || '';
+    const cleanHost = host.replace(/^www\./, '').split(':')[0];
+    if (cleanHost === 'bitcoinarg.news') return 'bitcoinarg.news';
+    if (cleanHost === 'tendenciascripto.com' || cleanHost === 'tendenciascrypto.com') return 'tendenciascripto.com';
+    if (cleanHost === 'ultimahoracripto.com' || cleanHost === 'ultimahoracrypto.com') return 'ultimahoracripto.com';
+  } catch {
+    // headers() throws during static generation — fall through
+  }
+  const envDomain = process.env.NEXT_PUBLIC_DOMAIN as Domain | undefined;
+  if (envDomain && KNOWN_DOMAINS.includes(envDomain)) return envDomain;
+  return 'localhost';
+}
+
 export async function generateMetadata(): Promise<Metadata> {
-  // Obtener la configuración del dominio dinámicamente
   const config = getDomainConfig();
   const faviconPath = getFaviconPath(config.site.domain);
-
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🔧 Generating metadata for:', {
-      domain: config.site.domain,
-      siteName: config.site.name,
-      favicon: faviconPath
-    });
-  }
 
   return {
     title: config.site.title,
@@ -84,39 +82,28 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // No duplicar el favicon aquí ya que se maneja en generateMetadata
-  const config = getDomainConfig();
-  
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🚀 Layout rendering...');
-  }
+  const initialDomain = detectInitialDomain();
   const isProduction = process.env.NODE_ENV === 'production';
 
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        {/* Preconnect to external domains */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="preconnect" href="https://api.coingecko.com" />
-        <link rel="preconnect" href="https://storage.googleapis.com" />
-        <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
-        
-        {/* DNS prefetch for additional performance */}
+        <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
-        <link rel="dns-prefetch" href="//vercel.com" />
-        
+
         {isProduction && (
           <Script
-            async
+            id="adsbygoogle-init"
             src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7010167677917603"
             crossOrigin="anonymous"
-            strategy="afterInteractive"
+            strategy="lazyOnload"
           />
         )}
       </head>
       <body className={inter.className}>
-        <Providers>
+        <Providers initialDomain={initialDomain}>
           <ThemeProvider>
             <ClientLayout>{children}</ClientLayout>
           </ThemeProvider>

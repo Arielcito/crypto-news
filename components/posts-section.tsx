@@ -1,14 +1,15 @@
+'use client';
+
 import Link from "next/link";
-import { Clock, TrendingUp, Newspaper, ImageIcon } from "lucide-react";
+import { Clock, ImageIcon } from "lucide-react";
 import Image from "next/image";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Post  from "@/types/post";
 import { LatestNewsSection } from "./LatestNewsSection";
 import { TopStoriesSection } from "./TopStoriesSection";
 import { DeepDivesSection } from "./DeepDivesSection";
 import { PodcastSection } from "./PodcastSection";
 import { useQuery } from '@tanstack/react-query';
-import { fetchPosts } from '@/lib/api/posts';
+import { fetchPaginatedPosts } from '@/lib/api/posts';
 import { usePaginatedPosts } from '@/lib/use-paginated-posts';
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
@@ -226,13 +227,13 @@ function AllPostsPaginated() {
 }
 
 export function PostsSection() {
-  const { data: allPosts = [], isLoading } = useQuery({
-    queryKey: ['posts'],
-    queryFn: fetchPosts,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+  const { data, isLoading } = useQuery({
+    queryKey: ['featuredPosts'],
+    queryFn: () => fetchPaginatedPosts({ page: 1, perPage: 12 }),
+    staleTime: 1000 * 60 * 5,
   });
 
-  // Dividir los posts en tres grupos para cada sección específica
+  const allPosts = data?.posts ?? [];
   const latestPosts = allPosts.slice(0, 4);
   const topStoryPosts = allPosts.slice(4, 8);
   const deepDivePosts = allPosts.slice(8, 12);

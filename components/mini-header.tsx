@@ -1,3 +1,5 @@
+'use client'
+
 import { ThemeToggle } from './theme-toggle'
 import { useDomain } from '@/lib/use-domain'
 import { Button } from './ui/button'
@@ -11,14 +13,6 @@ import { MobileNav } from '@/components/nav/mobile-nav'
 export function MiniHeader() {
   const { site } = useDomain()
   const { theme } = useTheme()
-  
-  // Get current date in Spanish
-  const currentDate = new Date().toLocaleDateString('es-ES', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
 
   return (
     <div className="w-full bg-background border-b py-1 sticky top-0 z-40">
