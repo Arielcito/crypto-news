@@ -228,7 +228,7 @@ function AllPostsPaginated() {
 
 export function PostsSection() {
   const { data, isLoading } = useQuery({
-    queryKey: ['featuredPosts'],
+    queryKey: ['paginatedPosts', 1, 12],
     queryFn: () => fetchPaginatedPosts({ page: 1, perPage: 12 }),
     staleTime: 1000 * 60 * 5,
   });
