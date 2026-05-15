@@ -36,12 +36,13 @@ export async function GET(request: NextRequest) {
     console.log(`[GET] /api/wp/v2/posts/by-slug/${slug} - Fetching post`);
 
     const post = await prisma.post.findFirst({
-      where: { 
+      where: {
         slug
       },
       include: {
         categories: true,
-        tags: true
+        tags: true,
+        authorRef: true
       }
     });
 

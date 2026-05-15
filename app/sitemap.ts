@@ -40,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const domain = detectDomain();
   const base = `https://${domain}`;
 
-  const [posts, categories] = await Promise.all([
+  const [posts, categories, authors] = await Promise.all([
     prisma.post.findMany({
       where: { domain, status: "publish" },
       select: {
@@ -59,6 +59,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     prisma.domainCategories.findMany({
       where: { domain, isActive: true },
       select: { slug: true },
+    }),
+    prisma.author.findMany({
+      where: { domain, isActive: true },
+      select: { slug: true, updatedAt: true },
     }),
   ]);
 
@@ -89,7 +93,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.4,
     },
+    {
+      url: `${base}/autores`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.5,
+    },
   ];
+
+  const authorUrls: MetadataRoute.Sitemap = authors.map((a) => ({
+    url: `${base}/autores/${a.slug}`,
+    lastModified: a.updatedAt ?? now,
+    changeFrequency: "weekly",
+    priority: 0.6,
+  }));
 
   const categoryUrls: MetadataRoute.Sitemap = categories.map((c) => ({
     url: `${base}/categories/${c.slug}`,
@@ -107,5 +124,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-  return [...staticUrls, ...categoryUrls, ...postUrls];
+  return [...staticUrls, ...categoryUrls, ...authorUrls, ...postUrls];
 }

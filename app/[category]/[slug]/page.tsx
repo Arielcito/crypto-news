@@ -10,13 +10,19 @@ import { RecommendedPosts } from "@/components/recommended-posts";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { TableOfContents } from "@/components/table-of-contents";
 import { JsonLd } from "@/components/json-ld";
-import { fetchPostBySlug, fetchPosts } from "@/lib/api/posts";
+import { AuthorBio } from "@/components/author-bio";
+import {
+  getPostBySlugServer,
+  getRecentPostsForRecommendations,
+} from "@/lib/api/posts-server";
 import {
   absoluteUrl,
   breadcrumbSchema,
+  detectRequestDomain,
   getSiteIdentity,
   newsArticleSchema,
 } from "@/lib/seo";
+import type { Author } from "@/types/author";
 
 interface PageProps {
   params: { category: string; slug: string };
@@ -34,8 +40,22 @@ function stripMarkdown(text: string, max = 160): string {
   return `${stripped.slice(0, max - 1)}…`;
 }
 
+function buildAuthorRef(author: Author | null) {
+  if (!author) return undefined;
+  return {
+    name: author.name,
+    slug: author.slug,
+    bio: author.bio,
+    avatar: author.avatar,
+    jobTitle: author.jobTitle,
+    twitter: author.twitter,
+    linkedin: author.linkedin,
+    website: author.website,
+  };
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const post = await fetchPostBySlug(params.slug);
+  const post = await getPostBySlugServer(params.slug);
   if (!post) {
     return {
       title: "Noticia no encontrada",
@@ -58,6 +78,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: post.title,
     description,
     alternates: { canonical: path },
+    authors: post.authorRef ? [{ name: post.authorRef.name }] : undefined,
     openGraph: {
       type: "article",
       url,
@@ -67,6 +88,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: identity.locale,
       images: [{ url: image, alt: post.title }],
       publishedTime,
+      authors: post.authorRef ? [post.authorRef.name] : undefined,
       section: post.categories[0]?.name,
       tags: post.categories.map((c) => c.name),
     },
@@ -82,13 +104,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function PostPage({ params }: PageProps) {
-  const post = await fetchPostBySlug(params.slug);
+  const post = await getPostBySlugServer(params.slug);
 
   if (!post) {
     notFound();
   }
 
-  const allPosts = await fetchPosts();
+  const domain = detectRequestDomain();
+  const recommended = await getRecentPostsForRecommendations(domain, post.slug, 10);
   const identity = getSiteIdentity();
   const categorySlug = post.categories[0]?.slug || params.category;
   const categoryName = post.categories[0]?.name || "Sin categoría";
@@ -106,6 +129,7 @@ export default async function PostPage({ params }: PageProps) {
     image,
     datePublished: post.date,
     section: categoryName,
+    author: buildAuthorRef(post.authorRef),
   });
 
   const breadcrumbJsonLd = breadcrumbSchema([
@@ -132,10 +156,21 @@ export default async function PostPage({ params }: PageProps) {
             <article className="prose prose-lg max-w-none dark:prose-invert">
               <h1 className="text-4xl font-bold mb-6">{post.title}</h1>
 
-              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6">
                 <span className="bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
                   {categoryName}
                 </span>
+                {post.authorRef && (
+                  <span>
+                    Por{" "}
+                    <a
+                      href={`/autores/${post.authorRef.slug}`}
+                      className="font-medium text-primary hover:underline"
+                    >
+                      {post.authorRef.name}
+                    </a>
+                  </span>
+                )}
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   <time dateTime={new Date(post.date).toISOString()}>
@@ -181,12 +216,14 @@ export default async function PostPage({ params }: PageProps) {
                   <TableOfContents content={post.content} />
                 </div>
               </div>
+
+              {post.authorRef && <AuthorBio author={post.authorRef} />}
             </article>
           </div>
 
           <div className="lg:col-span-1">
             <div className="sticky top-8">
-              <RecommendedPosts currentPostId={post.slug} posts={allPosts} />
+              <RecommendedPosts currentPostId={post.slug} posts={recommended} />
             </div>
           </div>
         </div>

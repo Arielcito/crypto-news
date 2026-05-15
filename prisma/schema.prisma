@@ -25,12 +25,37 @@ model Post {
   content       String   @db.Text
   excerpt       String?  @db.Text
   author        Int
+  authorRef     Author?  @relation(fields: [authorRefId], references: [id])
+  authorRefId   Int?     @map("author_ref_id")
   featuredMedia String?  @map("featured_media")
   domain        String
   categories    DomainCategories[]
   tags          Tag[]
 
   @@map("posts")
+  @@index([authorRefId])
+}
+
+model Author {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String
+  bio         String?  @db.Text
+  avatar      String?
+  email       String?
+  twitter     String?
+  linkedin    String?
+  website     String?
+  credentials String?  @db.Text
+  jobTitle    String?  @map("job_title")
+  domain      String
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  posts       Post[]
+
+  @@unique([domain, slug])
+  @@map("authors")
 }
 
 model DomainCategories {

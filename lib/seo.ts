@@ -235,6 +235,18 @@ export function websiteSchema() {
   };
 }
 
+type AuthorRef = {
+  name: string;
+  slug?: string;
+  url?: string;
+  bio?: string | null;
+  avatar?: string | null;
+  jobTitle?: string | null;
+  twitter?: string | null;
+  linkedin?: string | null;
+  website?: string | null;
+};
+
 type ArticleInput = {
   title: string;
   description: string;
@@ -242,9 +254,34 @@ type ArticleInput = {
   image?: string | null;
   datePublished: string | Date;
   dateModified?: string | Date;
-  authorName?: string;
+  author?: AuthorRef;
   section?: string;
 };
+
+function authorSchemaNode(author: AuthorRef | undefined) {
+  const id = getSiteIdentity();
+  const base = `https://${id.domain}`;
+  if (!author) {
+    return {
+      "@type": "Organization",
+      name: id.name,
+      url: base,
+    };
+  }
+  const sameAs = [author.twitter, author.linkedin, author.website].filter(
+    (v): v is string => Boolean(v),
+  );
+  return {
+    "@type": "Person",
+    name: author.name,
+    url: author.url ?? (author.slug ? `${base}/autores/${author.slug}` : undefined),
+    image: author.avatar ?? undefined,
+    description: author.bio ?? undefined,
+    jobTitle: author.jobTitle ?? undefined,
+    sameAs: sameAs.length > 0 ? sameAs : undefined,
+    worksFor: { "@id": `${base}#organization` },
+  };
+}
 
 export function newsArticleSchema(article: ArticleInput) {
   const id = getSiteIdentity();
@@ -267,11 +304,7 @@ export function newsArticleSchema(article: ArticleInput) {
     image: article.image ? [article.image] : [`${base}${id.logo}`],
     datePublished: published,
     dateModified: modified,
-    author: {
-      "@type": "Organization",
-      name: article.authorName || id.name,
-      url: base,
-    },
+    author: authorSchemaNode(article.author),
     publisher: { "@id": `${base}#organization` },
     mainEntityOfPage: {
       "@type": "WebPage",
@@ -280,6 +313,25 @@ export function newsArticleSchema(article: ArticleInput) {
     isAccessibleForFree: true,
     inLanguage: id.locale.split("_")[0],
     articleSection: article.section,
+  };
+}
+
+export function personSchema(author: AuthorRef) {
+  const id = getSiteIdentity();
+  const base = `https://${id.domain}`;
+  const sameAs = [author.twitter, author.linkedin, author.website].filter(
+    (v): v is string => Boolean(v),
+  );
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: author.name,
+    url: author.url ?? (author.slug ? `${base}/autores/${author.slug}` : base),
+    image: author.avatar ?? undefined,
+    description: author.bio ?? undefined,
+    jobTitle: author.jobTitle ?? undefined,
+    sameAs: sameAs.length > 0 ? sameAs : undefined,
+    worksFor: { "@id": `${base}#organization` },
   };
 }
 

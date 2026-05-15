@@ -10,7 +10,7 @@ export async function GET() {
   const identity = getSiteIdentity();
   const base = `https://${domain}`;
 
-  const [categories, recentPosts] = await Promise.all([
+  const [categories, recentPosts, authors] = await Promise.all([
     prisma.domainCategories.findMany({
       where: { domain, isActive: true },
       select: { name: true, slug: true },
@@ -27,6 +27,11 @@ export async function GET() {
       },
       orderBy: { date: "desc" },
       take: 30,
+    }),
+    prisma.author.findMany({
+      where: { domain, isActive: true },
+      select: { name: true, slug: true, jobTitle: true },
+      orderBy: { name: "asc" },
     }),
   ]);
 
@@ -55,6 +60,16 @@ export async function GET() {
     lines.push("## Categorías");
     for (const c of categories) {
       lines.push(`- [${c.name}](${base}/categories/${c.slug})`);
+    }
+    lines.push("");
+  }
+
+  if (authors.length > 0) {
+    lines.push("## Equipo editorial");
+    lines.push(`Listado completo: [${base}/autores](${base}/autores)`);
+    for (const a of authors) {
+      const title = a.jobTitle ? `${a.name} (${a.jobTitle})` : a.name;
+      lines.push(`- [${title}](${base}/autores/${a.slug})`);
     }
     lines.push("");
   }
