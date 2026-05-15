@@ -1,55 +1,111 @@
-import { MetadataRoute } from "next";
-import { fetchPosts } from "@/lib/api/posts";
-import { getDomainConfig } from "@/lib/domain-config";
+import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+const KNOWN_DOMAINS = [
+  "bitcoinarg.news",
+  "tendenciascripto.com",
+  "ultimahoracripto.com",
+] as const;
+
+type KnownDomain = (typeof KNOWN_DOMAINS)[number];
+
+function detectDomain(): KnownDomain {
+  try {
+    const h = headers();
+    const detected = h.get("x-detected-domain");
+    if (detected && (KNOWN_DOMAINS as readonly string[]).includes(detected)) {
+      return detected as KnownDomain;
+    }
+    const host = (h.get("x-forwarded-host") || h.get("host") || "")
+      .replace(/^www\./, "")
+      .split(":")[0];
+    if ((KNOWN_DOMAINS as readonly string[]).includes(host)) {
+      return host as KnownDomain;
+    }
+  } catch {
+    // headers() may fail outside a request context — fall through to env
+  }
+  const envDomain = process.env.NEXT_PUBLIC_DOMAIN;
+  if (envDomain && (KNOWN_DOMAINS as readonly string[]).includes(envDomain)) {
+    return envDomain as KnownDomain;
+  }
+  return "bitcoinarg.news";
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await fetchPosts();
-  const { site } = getDomainConfig();
+  const domain = detectDomain();
+  const base = `https://${domain}`;
+
+  const [posts, categories] = await Promise.all([
+    prisma.post.findMany({
+      where: { domain, status: "publish" },
+      select: {
+        slug: true,
+        modified: true,
+        date: true,
+        categories: {
+          select: { slug: true, isActive: true },
+          where: { isActive: true },
+          take: 1,
+        },
+      },
+      orderBy: { date: "desc" },
+      take: 5000,
+    }),
+    prisma.domainCategories.findMany({
+      where: { domain, isActive: true },
+      select: { slug: true },
+    }),
+  ]);
+
+  const now = new Date();
+
   const staticUrls: MetadataRoute.Sitemap = [
     {
-      url: `https://${site.domain}`,
-      lastModified: new Date(),
-      changeFrequency: "yearly",
+      url: `${base}`,
+      lastModified: now,
+      changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: `https://${site.domain}/posts`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `https://${site.domain}/pages`,
-      lastModified: new Date(),
+      url: `${base}/about`,
+      lastModified: now,
       changeFrequency: "monthly",
       priority: 0.5,
     },
     {
-      url: `https://${site.domain}/authors`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
+      url: `${base}/politica-editorial`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.4,
     },
     {
-      url: `https://${site.domain}/`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `https://${site.domain}/tags`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
+      url: `${base}/contacto`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.4,
     },
   ];
 
-  const postUrls: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `https://${site.domain}/posts/${post.slug}`,
-    lastModified: new Date(post.date),
-    changeFrequency: "weekly",
-    priority: 0.5,
+  const categoryUrls: MetadataRoute.Sitemap = categories.map((c) => ({
+    url: `${base}/categories/${c.slug}`,
+    lastModified: now,
+    changeFrequency: "daily",
+    priority: 0.7,
   }));
 
-  return [...staticUrls, ...postUrls];
-} 
+  const postUrls: MetadataRoute.Sitemap = posts
+    .filter((p) => p.categories.length > 0)
+    .map((p) => ({
+      url: `${base}/${p.categories[0].slug}/${p.slug}`,
+      lastModified: p.modified ?? p.date ?? now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    }));
+
+  return [...staticUrls, ...categoryUrls, ...postUrls];
+}

@@ -1,48 +1,87 @@
-'use client';
+import nextDynamic from "next/dynamic";
 
-// Craft Imports
 import { Section, Container } from "@/components/craft";
-import { PostsSection } from "@/components/posts-section";
-import { getCurrentDomain } from "@/lib/domain-colors";
+import { LatestNewsSection } from "@/components/LatestNewsSection";
+import { TopStoriesSection } from "@/components/TopStoriesSection";
+import { DeepDivesSection } from "@/components/DeepDivesSection";
+import { PodcastSection } from "@/components/PodcastSection";
+import { prisma } from "@/lib/prisma";
+import { detectRequestDomain, getSiteIdentity } from "@/lib/seo";
+import type Post from "@/types/post";
 
-// Next.js Imports
-import { useEffect, useState } from "react";
-import dynamic from 'next/dynamic';
+const AllPostsPaginated = nextDynamic(
+  () => import("@/components/posts-section").then((mod) => ({ default: mod.AllPostsPaginated })),
+  {
+    loading: () => <div className="h-64 animate-pulse bg-gray-50 rounded-lg" />,
+  },
+);
 
-// Dynamic imports for below-the-fold components
-const TelegramChannel = dynamic(() => import("@/components/newsletter").then(mod => ({ default: mod.TelegramChannel })), {
-  ssr: false,
-  loading: () => <div className="h-32 animate-pulse bg-gray-100 rounded-lg" />
-});
+const TelegramChannel = nextDynamic(
+  () => import("@/components/newsletter").then((mod) => ({ default: mod.TelegramChannel })),
+  {
+    ssr: false,
+    loading: () => <div className="h-32 animate-pulse bg-gray-100 rounded-lg" />,
+  },
+);
 
-// This page is using the craft.tsx component and design system
-export default function Home() {
-  const [domain, setDomain] = useState<string>('localhost');
+export const dynamic = "force-dynamic";
 
-  useEffect(() => {
-    // Initial domain check
-    setDomain(getCurrentDomain());
+async function getInitialPosts(): Promise<Post[]> {
+  const domain = detectRequestDomain();
+  const posts = await prisma.post.findMany({
+    where: { domain, status: "publish" },
+    include: {
+      categories: { select: { id: true, name: true, slug: true } },
+    },
+    orderBy: { date: "desc" },
+    take: 12,
+  });
 
-    // Listen for domain changes
-    const handleDomainChange = () => {
-      setDomain(getCurrentDomain());
-    };
-
-    window.addEventListener('domain-changed', handleDomainChange);
-    return () => window.removeEventListener('domain-changed', handleDomainChange);
-  }, []);
-
-  return (
-    <>
-      <Section>
-        <Container>
-          <main className="space-y-12">
-            <PostsSection />
-            <TelegramChannel key={domain} />
-          </main>
-        </Container>
-      </Section>
-    </>
-  );
+  return posts.map((p) => ({
+    id: p.id,
+    title: p.title,
+    excerpt: p.excerpt ?? "",
+    date: p.date.toISOString(),
+    content: p.content,
+    categories: p.categories.map((c) => ({ id: c.id, name: c.name, slug: c.slug })),
+    featuredMedia: p.featuredMedia ?? "",
+    slug: p.slug,
+    domain: p.domain,
+  }));
 }
 
+export default async function Home() {
+  const initialPosts = await getInitialPosts();
+  const identity = getSiteIdentity();
+  const latestPosts = initialPosts.slice(0, 4);
+  const topStoryPosts = initialPosts.slice(4, 8);
+  const deepDivePosts = initialPosts.slice(8, 12);
+
+  return (
+    <Section>
+      <Container>
+        <main className="space-y-12">
+          <header className="sr-only">
+            <h1>{identity.name}</h1>
+            <p>{identity.description}</p>
+          </header>
+
+          <div className="container mx-auto px-4 space-y-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <LatestNewsSection posts={latestPosts} />
+              <TopStoriesSection posts={topStoryPosts} />
+              <div className="flex flex-col gap-8">
+                <DeepDivesSection posts={deepDivePosts} />
+                <PodcastSection />
+              </div>
+            </div>
+
+            <AllPostsPaginated />
+          </div>
+
+          <TelegramChannel />
+        </main>
+      </Container>
+    </Section>
+  );
+}

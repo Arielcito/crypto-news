@@ -139,7 +139,7 @@ function getVisiblePages(current: number, total: number): (number | 'ellipsis')[
   return pages;
 }
 
-function AllPostsPaginated() {
+export function AllPostsPaginated() {
   const {
     posts,
     total,

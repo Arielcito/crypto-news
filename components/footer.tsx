@@ -16,7 +16,7 @@ export function Footer() {
   return (
     <footer>
       <Section>
-        <Container className="grid md:grid-cols-[1.5fr_0.5fr_1fr] gap-12 h-full">
+        <Container className="grid md:grid-cols-[1.5fr_0.7fr_0.5fr_1fr] gap-12 h-full">
           <div className="flex flex-col gap-6 not-prose">
             <Link href="/" className="flex items-center gap-4">
               <Image
@@ -31,8 +31,20 @@ export function Footer() {
               <p>
                 <Balancer>+{new Date().getFullYear() - 2017} años informando sobre criptomonedas en Argentina y Latinoamérica.</Balancer>
               </p>
-            
+
           </div>
+          <nav aria-label="Institucional" className="flex flex-col gap-3 text-sm">
+            <h5 className="font-medium text-base">Institucional</h5>
+            <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">
+              Sobre nosotros
+            </Link>
+            <Link href="/politica-editorial" className="text-muted-foreground hover:text-primary transition-colors">
+              Política editorial
+            </Link>
+            <Link href="/contacto" className="text-muted-foreground hover:text-primary transition-colors">
+              Contacto
+            </Link>
+          </nav>
           <div className="flex flex-col gap-4 text-sm">
             <h5 className="font-medium text-base">Social</h5>
             <div className="flex gap-4">

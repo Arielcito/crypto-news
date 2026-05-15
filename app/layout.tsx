@@ -8,6 +8,8 @@ import { ClientLayout } from "@/components/client-layout";
 import { getDomainConfig } from "@/lib/domain-config";
 import { Providers } from "./providers";
 import { Analytics } from "@/components/analytics";
+import { JsonLd } from "@/components/json-ld";
+import { organizationSchema, websiteSchema } from "@/lib/seo";
 import Script from "next/script";
 import type { Domain } from "@/lib/domain-colors";
 
@@ -51,11 +53,18 @@ function detectInitialDomain(): Domain {
 export async function generateMetadata(): Promise<Metadata> {
   const config = getDomainConfig();
   const faviconPath = getFaviconPath(config.site.domain);
+  const baseDomain = config.site.domain === 'localhost' ? 'bitcoinarg.news' : config.site.domain;
 
   return {
-    title: config.site.title,
+    title: {
+      default: config.site.title,
+      template: `%s | ${config.site.name}`,
+    },
     description: config.site.description,
-    metadataBase: new URL(`https://${config.site.domain}`),
+    metadataBase: new URL(`https://${baseDomain}`),
+    alternates: {
+      canonical: '/',
+    },
     icons: {
       icon: faviconPath,
       shortcut: faviconPath,
@@ -66,6 +75,8 @@ export async function generateMetadata(): Promise<Metadata> {
       description: config.site.description,
       images: config.site.ogImage,
       type: 'website',
+      siteName: config.site.name,
+      locale: 'es_AR',
     },
     twitter: {
       card: 'summary_large_image',
@@ -73,6 +84,18 @@ export async function generateMetadata(): Promise<Metadata> {
       description: config.site.description,
       images: config.site.ogImage,
       creator: config.site.twitterHandle,
+      site: config.site.twitterHandle,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
     },
   };
 }
@@ -92,6 +115,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://api.coingecko.com" />
         <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        <JsonLd data={[organizationSchema(), websiteSchema()]} id="ld-site" />
 
         {isProduction && (
           <Script
