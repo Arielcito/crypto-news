@@ -41,29 +41,49 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = `https://${domain}`;
 
   const [posts, categories, authors] = await Promise.all([
-    prisma.post.findMany({
-      where: { domain, status: "publish" },
-      select: {
-        slug: true,
-        modified: true,
-        date: true,
-        categories: {
-          select: { slug: true, isActive: true },
-          where: { isActive: true },
-          take: 1,
+    prisma.post
+      .findMany({
+        where: { domain, status: "publish" },
+        select: {
+          slug: true,
+          modified: true,
+          date: true,
+          categories: {
+            select: { slug: true, isActive: true },
+            where: { isActive: true },
+            take: 1,
+          },
         },
-      },
-      orderBy: { date: "desc" },
-      take: 5000,
-    }),
-    prisma.domainCategories.findMany({
-      where: { domain, isActive: true },
-      select: { slug: true },
-    }),
-    prisma.author.findMany({
-      where: { domain, isActive: true },
-      select: { slug: true, updatedAt: true },
-    }),
+        orderBy: { date: "desc" },
+        take: 5000,
+      })
+      .catch((error) => {
+        console.error("[sitemap] posts query failed:", error);
+        return [] as Array<{
+          slug: string;
+          modified: Date | null;
+          date: Date | null;
+          categories: { slug: string; isActive: boolean }[];
+        }>;
+      }),
+    prisma.domainCategories
+      .findMany({
+        where: { domain, isActive: true },
+        select: { slug: true },
+      })
+      .catch((error) => {
+        console.error("[sitemap] categories query failed:", error);
+        return [] as { slug: string }[];
+      }),
+    prisma.author
+      .findMany({
+        where: { domain, isActive: true },
+        select: { slug: true, updatedAt: true },
+      })
+      .catch((error) => {
+        console.error("[sitemap] authors query failed:", error);
+        return [] as { slug: string; updatedAt: Date | null }[];
+      }),
   ]);
 
   const now = new Date();

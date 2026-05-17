@@ -14,13 +14,19 @@ function cleanUrls(text: string | null | undefined): string {
 export async function getPostBySlugServer(
   slug: string,
 ): Promise<PostWithAuthor | null> {
-  const record = await prisma.post.findFirst({
-    where: { slug },
-    include: {
-      categories: { select: { id: true, name: true, slug: true } },
-      authorRef: true,
-    },
-  });
+  let record;
+  try {
+    record = await prisma.post.findFirst({
+      where: { slug },
+      include: {
+        categories: { select: { id: true, name: true, slug: true } },
+        authorRef: true,
+      },
+    });
+  } catch (error) {
+    console.error("[posts-server] getPostBySlugServer failed:", error);
+    return null;
+  }
 
   if (!record) return null;
 
@@ -63,14 +69,20 @@ export async function getRecentPostsForRecommendations(
   excludeSlug: string,
   limit = 10,
 ): Promise<Post[]> {
-  const records = await prisma.post.findMany({
-    where: { domain, status: "publish", slug: { not: excludeSlug } },
-    orderBy: { date: "desc" },
-    take: limit,
-    include: {
-      categories: { select: { id: true, name: true, slug: true } },
-    },
-  });
+  let records;
+  try {
+    records = await prisma.post.findMany({
+      where: { domain, status: "publish", slug: { not: excludeSlug } },
+      orderBy: { date: "desc" },
+      take: limit,
+      include: {
+        categories: { select: { id: true, name: true, slug: true } },
+      },
+    });
+  } catch (error) {
+    console.error("[posts-server] getRecentPostsForRecommendations failed:", error);
+    return [];
+  }
 
   return records.map((p) => ({
     id: p.id,

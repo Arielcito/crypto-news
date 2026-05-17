@@ -11,28 +11,49 @@ export async function GET() {
   const base = `https://${domain}`;
 
   const [categories, recentPosts, authors] = await Promise.all([
-    prisma.domainCategories.findMany({
-      where: { domain, isActive: true },
-      select: { name: true, slug: true },
-      orderBy: { name: "asc" },
-    }),
-    prisma.post.findMany({
-      where: { domain, status: "publish" },
-      select: {
-        title: true,
-        slug: true,
-        excerpt: true,
-        date: true,
-        categories: { select: { slug: true }, take: 1 },
-      },
-      orderBy: { date: "desc" },
-      take: 30,
-    }),
-    prisma.author.findMany({
-      where: { domain, isActive: true },
-      select: { name: true, slug: true, jobTitle: true },
-      orderBy: { name: "asc" },
-    }),
+    prisma.domainCategories
+      .findMany({
+        where: { domain, isActive: true },
+        select: { name: true, slug: true },
+        orderBy: { name: "asc" },
+      })
+      .catch((error) => {
+        console.error("[llms.txt] categories query failed:", error);
+        return [] as { name: string; slug: string }[];
+      }),
+    prisma.post
+      .findMany({
+        where: { domain, status: "publish" },
+        select: {
+          title: true,
+          slug: true,
+          excerpt: true,
+          date: true,
+          categories: { select: { slug: true }, take: 1 },
+        },
+        orderBy: { date: "desc" },
+        take: 30,
+      })
+      .catch((error) => {
+        console.error("[llms.txt] posts query failed:", error);
+        return [] as Array<{
+          title: string;
+          slug: string;
+          excerpt: string | null;
+          date: Date | null;
+          categories: { slug: string }[];
+        }>;
+      }),
+    prisma.author
+      .findMany({
+        where: { domain, isActive: true },
+        select: { name: true, slug: true, jobTitle: true },
+        orderBy: { name: "asc" },
+      })
+      .catch((error) => {
+        console.error("[llms.txt] authors query failed:", error);
+        return [] as { name: string; slug: string; jobTitle: string | null }[];
+      }),
   ]);
 
   const lines: string[] = [];

@@ -27,32 +27,38 @@ const TelegramChannel = nextDynamic(
 export const dynamic = "force-dynamic";
 
 async function getInitialPosts(): Promise<Post[]> {
-  const domain = detectRequestDomain();
-  const posts = await prisma.post.findMany({
-    where: { domain, status: "publish" },
-    include: {
-      categories: { select: { id: true, name: true, slug: true } },
-    },
-    orderBy: { date: "desc" },
-    take: 12,
-  });
+  try {
+    const domain = detectRequestDomain();
+    const posts = await prisma.post.findMany({
+      where: { domain, status: "publish" },
+      include: {
+        categories: { select: { id: true, name: true, slug: true } },
+      },
+      orderBy: { date: "desc" },
+      take: 12,
+    });
 
-  return posts.map((p) => ({
-    id: p.id,
-    title: p.title,
-    excerpt: p.excerpt ?? "",
-    date: p.date.toISOString(),
-    content: p.content,
-    categories: p.categories.map((c) => ({ id: c.id, name: c.name, slug: c.slug })),
-    featuredMedia: p.featuredMedia ?? "",
-    slug: p.slug,
-    domain: p.domain,
-  }));
+    return posts.map((p) => ({
+      id: p.id,
+      title: p.title,
+      excerpt: p.excerpt ?? "",
+      date: p.date.toISOString(),
+      content: p.content,
+      categories: p.categories.map((c) => ({ id: c.id, name: c.name, slug: c.slug })),
+      featuredMedia: p.featuredMedia ?? "",
+      slug: p.slug,
+      domain: p.domain,
+    }));
+  } catch (error) {
+    console.error("[home] getInitialPosts failed, falling back to client fetch:", error);
+    return [];
+  }
 }
 
 export default async function Home() {
   const initialPosts = await getInitialPosts();
   const identity = getSiteIdentity();
+  const hasSsrPosts = initialPosts.length > 0;
   const latestPosts = initialPosts.slice(0, 4);
   const topStoryPosts = initialPosts.slice(4, 8);
   const deepDivePosts = initialPosts.slice(8, 12);
@@ -67,14 +73,16 @@ export default async function Home() {
           </header>
 
           <div className="container mx-auto px-4 space-y-12">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <LatestNewsSection posts={latestPosts} />
-              <TopStoriesSection posts={topStoryPosts} />
-              <div className="flex flex-col gap-8">
-                <DeepDivesSection posts={deepDivePosts} />
-                <PodcastSection />
+            {hasSsrPosts && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <LatestNewsSection posts={latestPosts} />
+                <TopStoriesSection posts={topStoryPosts} />
+                <div className="flex flex-col gap-8">
+                  <DeepDivesSection posts={deepDivePosts} />
+                  <PodcastSection />
+                </div>
               </div>
-            </div>
+            )}
 
             <AllPostsPaginated />
           </div>

@@ -42,19 +42,25 @@ export async function getAuthorWithPosts(
   slug: string,
   domain: string,
 ): Promise<AuthorWithPosts | null> {
-  const record = await prisma.author.findFirst({
-    where: { slug, domain, isActive: true },
-    include: {
-      posts: {
-        where: { status: "publish", domain },
-        orderBy: { date: "desc" },
-        take: 50,
-        include: {
-          categories: { select: { id: true, name: true, slug: true } },
+  let record;
+  try {
+    record = await prisma.author.findFirst({
+      where: { slug, domain, isActive: true },
+      include: {
+        posts: {
+          where: { status: "publish", domain },
+          orderBy: { date: "desc" },
+          take: 50,
+          include: {
+            categories: { select: { id: true, name: true, slug: true } },
+          },
         },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error("[authors] getAuthorWithPosts failed:", error);
+    return null;
+  }
 
   if (!record) return null;
 
@@ -75,9 +81,14 @@ export async function getAuthorWithPosts(
 }
 
 export async function listActiveAuthors(domain: string): Promise<Author[]> {
-  const records = await prisma.author.findMany({
-    where: { domain, isActive: true },
-    orderBy: { name: "asc" },
-  });
-  return records.map(serializeAuthor);
+  try {
+    const records = await prisma.author.findMany({
+      where: { domain, isActive: true },
+      orderBy: { name: "asc" },
+    });
+    return records.map(serializeAuthor);
+  } catch (error) {
+    console.error("[authors] listActiveAuthors failed:", error);
+    return [];
+  }
 }
