@@ -94,6 +94,7 @@ export default function RootLayout({
 }) {
   const initialDomain = detectInitialDomain();
   const isProduction = process.env.NODE_ENV === 'production';
+  const config = getDomainConfig();
 
   return (
     <html lang="es" suppressHydrationWarning>
@@ -102,6 +103,12 @@ export default function RootLayout({
         <link rel="preconnect" href="https://api.coingecko.com" />
         <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={`${config.site.name} — Feed RSS`}
+          href="/feed.xml"
+        />
         <JsonLd data={[organizationSchema(), websiteSchema()]} id="ld-site" />
 
         {isProduction && (

@@ -75,6 +75,7 @@ export async function GET() {
   );
   lines.push(`- [Contacto](${base}/contacto): canales editoriales y comerciales.`);
   lines.push(`- [Sitemap](${base}/sitemap.xml): índice completo de URLs.`);
+  lines.push(`- [RSS feed](${base}/feed.xml): últimas 50 noticias en formato RSS 2.0.`);
   lines.push("");
 
   if (categories.length > 0) {

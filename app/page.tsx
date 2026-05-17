@@ -67,10 +67,7 @@ export default async function Home() {
     <Section>
       <Container>
         <main className="space-y-12">
-          <header className="sr-only">
-            <h1>{identity.name}</h1>
-            <p>{identity.description}</p>
-          </header>
+          <p className="sr-only">{identity.description}</p>
 
           <div className="container mx-auto px-4 space-y-12">
             {hasSsrPosts && (

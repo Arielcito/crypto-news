@@ -19,9 +19,11 @@ import {
   absoluteUrl,
   breadcrumbSchema,
   detectRequestDomain,
+  faqPageSchema,
   getSiteIdentity,
   newsArticleSchema,
 } from "@/lib/seo";
+import { extractFaqs } from "@/lib/faq-parser";
 import type { Author } from "@/types/author";
 
 interface PageProps {
@@ -138,10 +140,14 @@ export default async function PostPage({ params }: PageProps) {
     { name: post.title, url },
   ]);
 
+  const faqs = extractFaqs(post.content);
+  const faqJsonLd = faqPageSchema(faqs);
+
   return (
     <Container>
       <JsonLd data={articleJsonLd} id="ld-article" />
       <JsonLd data={breadcrumbJsonLd} id="ld-breadcrumb" />
+      {faqJsonLd && <JsonLd data={faqJsonLd} id="ld-faq" />}
       <div className="py-8">
         <Breadcrumb
           items={[
