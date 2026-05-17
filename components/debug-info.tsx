@@ -73,16 +73,6 @@ export function DebugInfo() {
               {config.isBitcoinArg ? '✓' : '✗'}
             </span>
           </div>
-          <div className="text-xs">
-            Tendencias: <span className={config.isTendenciasCrypto ? 'text-green-400' : 'text-red-400'}>
-              {config.isTendenciasCrypto ? '✓' : '✗'}
-            </span>
-          </div>
-          <div className="text-xs">
-            UltimaHora: <span className={config.isUltimaHoraCrypto ? 'text-green-400' : 'text-red-400'}>
-              {config.isUltimaHoraCrypto ? '✓' : '✗'}
-            </span>
-          </div>
         </div>
         
         <div className="pt-2 text-xs text-gray-500">

@@ -36,7 +36,7 @@ export const cleanDomain = (domain: string): string => {
 export const fetchPosts = async (): Promise<Post[]> => {
   try {
     const currentDomain = typeof window !== 'undefined' ? window.location.origin : '';
-    const cleanedDomain = cleanDomain(currentDomain === 'http://localhost:3000' ? 'https://www.tendenciascripto.com/' : currentDomain);
+    const cleanedDomain = cleanDomain(currentDomain.includes('localhost') ? 'https://www.bitcoinarg.news/' : currentDomain);
     const response = await axiosInstance.get<ApiResponse>(`/api/wp/v2/posts?domain=${cleanedDomain}`);
     const apiPosts = response.data?.posts || [];
 
@@ -50,7 +50,7 @@ export const fetchPosts = async (): Promise<Post[]> => {
 export const fetchPaginatedPosts = async ({ page, perPage, domain }: FetchPaginatedPostsParams): Promise<PaginatedPostsResponse> => {
   try {
     const currentDomain = domain || (typeof window !== 'undefined' ? window.location.origin : '');
-    const cleanedDomain = cleanDomain(currentDomain === 'http://localhost:3000' ? 'https://www.tendenciascripto.com/' : currentDomain);
+    const cleanedDomain = cleanDomain(currentDomain.includes('localhost') ? 'https://www.bitcoinarg.news/' : currentDomain);
 
     console.log(`📄 Fetching paginated posts — page: ${page}, perPage: ${perPage}, domain: ${cleanedDomain}`);
 

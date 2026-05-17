@@ -3,11 +3,7 @@ import { headers } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
-const KNOWN_DOMAINS = [
-  "bitcoinarg.news",
-  "tendenciascripto.com",
-  "ultimahoracripto.com",
-] as const;
+const KNOWN_DOMAINS = ["bitcoinarg.news"] as const;
 
 type KnownDomain = (typeof KNOWN_DOMAINS)[number];
 

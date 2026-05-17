@@ -1,10 +1,6 @@
 import { headers } from "next/headers";
 
-export const KNOWN_DOMAINS = [
-  "bitcoinarg.news",
-  "tendenciascripto.com",
-  "ultimahoracripto.com",
-] as const;
+export const KNOWN_DOMAINS = ["bitcoinarg.news"] as const;
 
 export type KnownDomain = (typeof KNOWN_DOMAINS)[number];
 
@@ -85,50 +81,6 @@ const SITE_IDENTITIES: Record<KnownDomain, SiteIdentity> = {
       url: "https://bitcoinargentinagroup.com",
     },
     coverage: "Argentina y Latinoamérica",
-  },
-  "tendenciascripto.com": {
-    domain: "tendenciascripto.com",
-    name: "TENDENCIAS CRIPTO",
-    legalName: "TENDENCIASCRIPTO.com",
-    shortName: "TENDENCIAS CRIPTO",
-    description:
-      "Análisis profundo y tendencias del mercado de criptomonedas, blockchain y DeFi en Latinoamérica.",
-    twitterHandle: "@tendenciascrypto",
-    logo: "/tendenciascrypto/logo.png",
-    socialLinks: [
-      "https://t.me/bitcoinargentinacomunidad",
-      "https://www.linkedin.com/company/bitcoin-argentina-group/",
-    ],
-    locale: "es_LA",
-    email: "info@bitcoinarg.news",
-    foundingYear: 2017,
-    parentOrganization: {
-      name: "Bitcoin Argentina Group",
-      url: "https://bitcoinargentinagroup.com",
-    },
-    coverage: "Latinoamérica",
-  },
-  "ultimahoracripto.com": {
-    domain: "ultimahoracripto.com",
-    name: "ÚLTIMA HORA CRIPTO",
-    legalName: "ULTIMAHORACRIPTO.com",
-    shortName: "ÚLTIMA HORA CRIPTO",
-    description:
-      "Noticias de última hora sobre criptomonedas, blockchain y mercados en Latinoamérica.",
-    twitterHandle: "@ultimahoracripto",
-    logo: "/ultimahoracrypto/logo.png",
-    socialLinks: [
-      "https://t.me/bitcoinargentinacomunidad",
-      "https://www.linkedin.com/company/bitcoin-argentina-group/",
-    ],
-    locale: "es_LA",
-    email: "info@bitcoinarg.news",
-    foundingYear: 2017,
-    parentOrganization: {
-      name: "Bitcoin Argentina Group",
-      url: "https://bitcoinargentinagroup.com",
-    },
-    coverage: "Latinoamérica",
   },
 };
 

@@ -1,6 +1,6 @@
 import { cleanDomain } from "./api/posts";
 
-export type Domain = 'bitcoinarg.news' | 'tendenciascripto.com' | 'ultimahoracripto.com' | 'localhost';
+export type Domain = 'bitcoinarg.news' | 'localhost';
 
 export interface ColorPalette {
   primary: string;
@@ -14,18 +14,8 @@ export const domainPalettes: Record<Domain, ColorPalette> = {
     secondary: '#03A9F4', // Celeste
     tertiary: '#ECEFF1', // Gris Claro
   },
-  'tendenciascripto.com': {
-    primary: '#2979FF', // Azul Eléctrico
-    secondary: '#673AB7', // Púrpura
-    tertiary: '#37474F', // Gris Oscuro
-  },
-  'ultimahoracripto.com': {
-    primary: '#D32F2F', // Rojo
-    secondary: '#FAFAFA', // Negro
-    tertiary: '#FAFAFA', // Blanco
-  },
   'localhost': {
-    primary: '#F7931A', // Default to BitcoinArg colors
+    primary: '#F7931A',
     secondary: '#03A9F4',
     tertiary: '#ECEFF1',
   },
@@ -38,44 +28,35 @@ export function getCurrentDomain(): Domain {
     return 'localhost';
   }
 
-  // Check cookie first
   const cookieDomain = document.cookie
     .split('; ')
     .find(row => row.startsWith(`${COOKIE_KEY}=`))
     ?.split('=')[1] as Domain;
 
-  if (cookieDomain) {
+  if (cookieDomain === 'bitcoinarg.news' || cookieDomain === 'localhost') {
     return cookieDomain;
   }
 
   const hostname = window.location.hostname.replace(/^www\./, '');
-
   const cleanHostname = cleanDomain(hostname);
 
   if (cleanHostname === 'bitcoinarg.news') {
     return 'bitcoinarg.news';
   }
-  if (cleanHostname === 'tendenciascripto.com' || cleanHostname === 'tendenciascrypto.com') {
-    return 'tendenciascripto.com';
-  }
-  if (cleanHostname === 'ultimahoracripto.com' || cleanHostname === 'ultimahoracrypto.com') {
-    return 'ultimahoracripto.com';
-  }
-  
+
   return 'localhost';
 }
 
 export const setSelectedDomain = (domain: Domain) => {
   if (typeof window === 'undefined') return;
-  
-  // Set cookie with 1 year expiration
+
   const date = new Date();
   date.setFullYear(date.getFullYear() + 1);
   document.cookie = `${COOKIE_KEY}=${domain}; expires=${date.toUTCString()}; path=/`;
-  
+
   window.dispatchEvent(new Event('domain-changed'));
 };
 
 export function getCurrentPalette(domain: Domain = getCurrentDomain()) {
   return domainPalettes[domain];
-} 
+}

@@ -15,20 +15,9 @@ import type { Domain } from "@/lib/domain-colors";
 
 const inter = Inter({ subsets: ["latin"], display: "swap", preload: true });
 
-const getFaviconPath = (domain: string) => {
-  switch (domain) {
-    case 'bitcoinarg.news':
-      return '/favicons/bitcoin.ico';
-    case 'ultimahoracripto.com':
-      return '/favicons/ultima.ico';
-    case 'tendenciascripto.com':
-      return '/favicons/tendencias.ico';
-    default:
-      return '/favicons/bitcoin.ico';
-  }
-};
+const FAVICON_PATH = '/favicons/bitcoin.ico';
 
-const KNOWN_DOMAINS: Domain[] = ['bitcoinarg.news', 'tendenciascripto.com', 'ultimahoracripto.com', 'localhost'];
+const KNOWN_DOMAINS: Domain[] = ['bitcoinarg.news', 'localhost'];
 
 function detectInitialDomain(): Domain {
   try {
@@ -40,8 +29,6 @@ function detectInitialDomain(): Domain {
     const host = h.get('host') || '';
     const cleanHost = host.replace(/^www\./, '').split(':')[0];
     if (cleanHost === 'bitcoinarg.news') return 'bitcoinarg.news';
-    if (cleanHost === 'tendenciascripto.com' || cleanHost === 'tendenciascrypto.com') return 'tendenciascripto.com';
-    if (cleanHost === 'ultimahoracripto.com' || cleanHost === 'ultimahoracrypto.com') return 'ultimahoracripto.com';
   } catch {
     // headers() throws during static generation — fall through
   }
@@ -52,7 +39,7 @@ function detectInitialDomain(): Domain {
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = getDomainConfig();
-  const faviconPath = getFaviconPath(config.site.domain);
+  const faviconPath = FAVICON_PATH;
   const baseDomain = config.site.domain === 'localhost' ? 'bitcoinarg.news' : config.site.domain;
 
   return {
