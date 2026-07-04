@@ -1,28 +1,16 @@
 import { checkBasicAuth } from '@/lib/auth';
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { Prisma, Post, DomainCategories, Tag } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { slugVariants } from '@/lib/utils';
-
-type PostWithRelations = Post & {
-  categories: DomainCategories[];
-  tags: Tag[];
-};
-
-// Function to clean URLs by removing < > symbols
-function cleanUrls(text: string): string {
-  return text.replace(/<(https?:\/\/[^>]+)>/g, '$1');
-}
-
-// Function to clean post data
-function cleanPostData(post: PostWithRelations): PostWithRelations {
-  return {
-    ...post,
-    content: cleanUrls(post.content),
-    excerpt: post.excerpt ? cleanUrls(post.excerpt) : post.excerpt,
-    featuredMedia: post.featuredMedia ? cleanUrls(post.featuredMedia) : post.featuredMedia
-  };
-}
+import {
+  PostWithRelations,
+  cleanPostData,
+  generateSlug,
+  generateExcerpt,
+  validateCategoriesForDomain,
+  validateTagsExist,
+} from '@/lib/services/posts-service';
 
 export async function GET(request: NextRequest) {
     try {
@@ -89,6 +77,7 @@ export async function GET(request: NextRequest) {
 
     const where: Prisma.PostWhereInput = {
       AND: [
+        { isActive: true },
         domain ? { domain } : {},
         search ? {
           OR: [
@@ -166,32 +155,17 @@ export async function POST(request: NextRequest) {
 
     // Validate that categories exist for the given domain
     if (body.categories?.length) {
-      const existingCategories = await prisma.domainCategories.findMany({
-        where: { 
-          AND: [
-            { id: { in: body.categories } },
-            { domain: domain }
-          ]
-        }
-      });
-      
-      if (existingCategories.length !== body.categories.length) {
-        const foundIds = existingCategories.map(c => c.id);
-        const missingIds = body.categories.filter((id: number) => !foundIds.includes(id));
-        return Response.json({ error: 'Bad request', message: `Categories not found for domain ${domain}: ${missingIds.join(', ')}` }, { status: 400 });
+      const categoryValidation = await validateCategoriesForDomain(body.categories, domain);
+      if (!categoryValidation.valid) {
+        return Response.json({ error: 'Bad request', message: `Categories not found for domain ${domain}: ${categoryValidation.missingIds.join(', ')}` }, { status: 400 });
       }
     }
 
     // Validate that tags exist (assuming tags are not domain-specific for now)
     if (body.tags?.length) {
-      const existingTags = await prisma.tag.findMany({
-        where: { id: { in: body.tags } }
-      });
-      
-      if (existingTags.length !== body.tags.length) {
-        const foundIds = existingTags.map(t => t.id);
-        const missingIds = body.tags.filter((id: number) => !foundIds.includes(id));
-        return Response.json({ error: 'Bad request', message: `Tags not found: ${missingIds.join(', ')}` }, { status: 400 });
+      const tagValidation = await validateTagsExist(body.tags);
+      if (!tagValidation.valid) {
+        return Response.json({ error: 'Bad request', message: `Tags not found: ${tagValidation.missingIds.join(', ')}` }, { status: 400 });
       }
     }
 
@@ -199,7 +173,7 @@ export async function POST(request: NextRequest) {
       title: body.title,
       contentLength: body.content.length,
       excerpt: body.excerpt ? body.excerpt.length : 'auto-generated',
-      slug: body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      slug: generateSlug(body.title),
       status: body.status || 'publish',
       author: body.author || 1,
       featuredMedia: body.featured_media || null,
@@ -211,8 +185,8 @@ export async function POST(request: NextRequest) {
     const newPostData: Prisma.PostCreateInput = {
         title: body.title,
         content: body.content,
-        excerpt: body.excerpt || body.content.substring(0, 200) + '...',
-        slug: body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        excerpt: body.excerpt || generateExcerpt(body.content),
+        slug: generateSlug(body.title),
         status: body.status || 'publish',
         author: body.author || 1,
         featuredMedia: body.featured_media || null,

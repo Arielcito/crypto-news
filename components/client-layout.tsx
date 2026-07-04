@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { CryptoPriceBanner } from '@/components/crypto-price-banner';
 import { HeroHeader } from '@/components/hero-header';
 import { MiniHeader } from '@/components/mini-header';
@@ -11,6 +12,12 @@ const Footer = dynamic(() => import('@/components/footer').then(mod => ({ defaul
 });
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith('/admin')) {
+    return <div className="min-h-screen">{children}</div>;
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col">
       <MiniHeader />

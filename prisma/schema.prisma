@@ -29,6 +29,7 @@ model Post {
   authorRefId   Int?     @map("author_ref_id")
   featuredMedia String?  @map("featured_media")
   domain        String
+  isActive      Boolean  @default(true) @map("is_active")
   categories    DomainCategories[]
   tags          Tag[]
 

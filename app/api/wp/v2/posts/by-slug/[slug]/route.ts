@@ -1,27 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { Prisma, Post, DomainCategories, Tag } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { checkBasicAuth } from '@/lib/auth';
-
-type PostWithRelations = Post & {
-  categories: DomainCategories[];
-  tags: Tag[];
-};
-
-// Function to clean URLs by removing < > symbols
-function cleanUrls(text: string): string {
-  return text.replace(/<(https?:\/\/[^>]+)>/g, '$1');
-}
-
-// Function to clean post data
-function cleanPostData(post: PostWithRelations): PostWithRelations {
-  return {
-    ...post,
-    content: cleanUrls(post.content),
-    excerpt: post.excerpt ? cleanUrls(post.excerpt) : post.excerpt,
-    featuredMedia: post.featuredMedia ? cleanUrls(post.featuredMedia) : post.featuredMedia
-  };
-}
+import {
+  PostWithRelations,
+  cleanPostData,
+  validateCategoriesForDomain,
+  validateTagsExist,
+} from '@/lib/services/posts-service';
 
 const createResponse = (data: any = null, error: string | null = null, message: string | null = null, status: number = 200) => {
   return NextResponse.json({ data, error, message }, { status });
@@ -37,7 +23,8 @@ export async function GET(request: NextRequest) {
 
     const post = await prisma.post.findFirst({
       where: {
-        slug
+        slug,
+        isActive: true
       },
       include: {
         categories: true,
@@ -92,32 +79,17 @@ export async function PUT(request: NextRequest) {
 
     // Validate categories if provided
     if (body.categories?.length) {
-      const existingCategories = await prisma.domainCategories.findMany({
-        where: { 
-          AND: [
-            { id: { in: body.categories } },
-            { domain: domain }
-          ]
-        }
-      });
-      
-      if (existingCategories.length !== body.categories.length) {
-        const foundIds = existingCategories.map(c => c.id);
-        const missingIds = body.categories.filter((catId: number) => !foundIds.includes(catId));
-        return createResponse(null, 'Bad request', `Categories not found for domain ${domain}: ${missingIds.join(', ')}`, 400);
+      const categoryValidation = await validateCategoriesForDomain(body.categories, domain);
+      if (!categoryValidation.valid) {
+        return createResponse(null, 'Bad request', `Categories not found for domain ${domain}: ${categoryValidation.missingIds.join(', ')}`, 400);
       }
     }
 
     // Validate tags if provided
     if (body.tags?.length) {
-      const existingTags = await prisma.tag.findMany({
-        where: { id: { in: body.tags } }
-      });
-      
-      if (existingTags.length !== body.tags.length) {
-        const foundIds = existingTags.map(t => t.id);
-        const missingIds = body.tags.filter((tagId: number) => !foundIds.includes(tagId));
-        return createResponse(null, 'Bad request', `Tags not found: ${missingIds.join(', ')}`, 400);
+      const tagValidation = await validateTagsExist(body.tags);
+      if (!tagValidation.valid) {
+        return createResponse(null, 'Bad request', `Tags not found: ${tagValidation.missingIds.join(', ')}`, 400);
       }
     }
 

@@ -30,7 +30,7 @@ async function getInitialPosts(): Promise<Post[]> {
   try {
     const domain = detectRequestDomain();
     const posts = await prisma.post.findMany({
-      where: { domain, status: "publish" },
+      where: { domain, status: "publish", isActive: true },
       include: {
         categories: { select: { id: true, name: true, slug: true } },
       },

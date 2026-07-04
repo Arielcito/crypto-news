@@ -20,6 +20,9 @@ const nextConfig = {
     ],
   },
   output: 'standalone',
+  experimental: {
+    serverComponentsExternalPackages: ['@vercel/blob', 'undici'],
+  },
   env: {
     NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN || process.env.VERCEL_URL || 'localhost',
   },

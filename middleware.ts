@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { unsealData } from 'iron-session';
+import { sessionOptions, type AdminSessionData } from '@/lib/session';
 
 const allowedDomains = [
   'www.bitcoinarg.news',
@@ -15,9 +17,30 @@ const domainMapping: Record<string, string> = {
   'localhost': 'localhost',
 };
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const host = request.headers.get('host') || '';
   const origin = request.headers.get('origin') || '';
+  const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+    const cookie = request.cookies.get(sessionOptions.cookieName)?.value;
+    let isLoggedIn = false;
+
+    if (cookie) {
+      try {
+        const session = await unsealData<AdminSessionData>(cookie, {
+          password: sessionOptions.password,
+        });
+        isLoggedIn = session.isLoggedIn === true;
+      } catch {
+        isLoggedIn = false;
+      }
+    }
+
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+  }
 
   if (request.nextUrl.pathname.startsWith('/api/')) {
     const response = NextResponse.next();

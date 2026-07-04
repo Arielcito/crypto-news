@@ -17,7 +17,7 @@ export async function getPostBySlugServer(
   let record;
   try {
     record = await prisma.post.findFirst({
-      where: { slug },
+      where: { slug, isActive: true },
       include: {
         categories: { select: { id: true, name: true, slug: true } },
         authorRef: true,
@@ -72,7 +72,7 @@ export async function getRecentPostsForRecommendations(
   let records;
   try {
     records = await prisma.post.findMany({
-      where: { domain, status: "publish", slug: { not: excludeSlug } },
+      where: { domain, status: "publish", slug: { not: excludeSlug }, isActive: true },
       orderBy: { date: "desc" },
       take: limit,
       include: {

@@ -45,7 +45,7 @@ export async function GET() {
 
   try {
     posts = await prisma.post.findMany({
-      where: { domain, status: "publish" },
+      where: { domain, status: "publish", isActive: true },
       orderBy: { date: "desc" },
       take: 50,
       select: {
