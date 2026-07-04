@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAdminLogin } from '@/lib/use-admin-auth';
 import { loginSchema } from '@/lib/validations/admin';
+import { ADMIN_INPUT_CLASS } from '@/lib/constants';
 import type { LoginInput } from '@/lib/types/admin';
 
 export function LoginForm() {
@@ -41,13 +42,16 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="username">Usuario</Label>
+        <Label htmlFor="username" style={{ color: 'hsl(var(--admin-bg-foreground))' }}>
+          Usuario
+        </Label>
         <Input
           id="username"
           type="text"
           autoComplete="username"
+          className={ADMIN_INPUT_CLASS}
           {...register('username')}
         />
         {errors.username && (
@@ -55,11 +59,14 @@ export function LoginForm() {
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Contraseña</Label>
+        <Label htmlFor="password" style={{ color: 'hsl(var(--admin-bg-foreground))' }}>
+          Contraseña
+        </Label>
         <Input
           id="password"
           type="password"
           autoComplete="current-password"
+          className={ADMIN_INPUT_CLASS}
           {...register('password')}
         />
         {errors.password && (

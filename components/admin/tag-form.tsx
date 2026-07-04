@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ADMIN_INPUT_CLASS } from '@/lib/constants';
 import { createTagSchema } from '@/lib/validations/admin';
 import type { AdminTag, CreateTagInput } from '@/lib/types/admin';
 
@@ -55,7 +56,7 @@ export function TagForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="name">Nombre</Label>
-        <Input id="name" type="text" {...register('name')} />
+        <Input id="name" type="text" className={ADMIN_INPUT_CLASS} {...register('name')} />
         {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
       </div>
       <div className="space-y-2">
@@ -63,6 +64,7 @@ export function TagForm({
         <Input
           id="slug"
           type="text"
+          className={ADMIN_INPUT_CLASS}
           {...register('slug', {
             onChange: () => setSlugTouched(true),
           })}

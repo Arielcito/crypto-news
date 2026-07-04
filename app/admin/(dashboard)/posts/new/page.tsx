@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { PostForm } from '@/components/admin/post-form';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { useCreatePost } from '@/lib/use-admin-posts';
 import type { CreatePostInput } from '@/lib/types/admin';
 
@@ -25,8 +26,8 @@ export default function NewPostPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Nueva nota</h1>
+    <div>
+      <AdminPageHeader eyebrow="Contenido" title="Nueva nota" />
       <PostForm onSubmit={handleSubmit} isPending={createMutation.isPending} submitLabel="Crear nota" />
     </div>
   );

@@ -1,9 +1,10 @@
 import { CategoriesList } from '@/components/admin/categories-list';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 
 export default function AdminCategoriesPage() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Categorías</h1>
+    <div>
+      <AdminPageHeader eyebrow="Taxonomía" title="Categorías" />
       <CategoriesList />
     </div>
   );

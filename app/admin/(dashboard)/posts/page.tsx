@@ -1,9 +1,10 @@
 import { PostsList } from '@/components/admin/posts-list';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 
 export default function AdminPostsPage() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Notas</h1>
+    <div>
+      <AdminPageHeader eyebrow="Contenido" title="Notas" />
       <PostsList />
     </div>
   );

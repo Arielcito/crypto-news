@@ -1,9 +1,10 @@
 import { TagsList } from '@/components/admin/tags-list';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 
 export default function AdminTagsPage() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Tags</h1>
+    <div>
+      <AdminPageHeader eyebrow="Taxonomía" title="Tags" />
       <TagsList />
     </div>
   );

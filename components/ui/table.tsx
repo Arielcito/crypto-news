@@ -19,8 +19,13 @@ Table.displayName = "Table"
 const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
+>(({ className, style, ...props }, ref) => (
+  <thead
+    ref={ref}
+    className={cn("[&_tr]:border-b", className)}
+    style={{ borderColor: "hsl(var(--admin-surface-border))", ...style }}
+    {...props}
+  />
 ))
 TableHeader.displayName = "TableHeader"
 
@@ -43,9 +48,10 @@ const TableFooter = React.forwardRef<
   <tfoot
     ref={ref}
     className={cn(
-      "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+      "border-t font-medium [&>tr]:last:border-b-0",
       className
     )}
+    style={{ borderColor: "hsl(var(--admin-surface-border))" }}
     {...props}
   />
 ))
@@ -54,13 +60,14 @@ TableFooter.displayName = "TableFooter"
 const TableRow = React.forwardRef<
   HTMLTableRowElement,
   React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => (
+>(({ className, style, ...props }, ref) => (
   <tr
     ref={ref}
     className={cn(
-      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      "border-b transition-colors data-[state=selected]:bg-muted",
       className
     )}
+    style={{ borderColor: "hsl(var(--admin-surface-border))", ...style }}
     {...props}
   />
 ))
@@ -69,13 +76,14 @@ TableRow.displayName = "TableRow"
 const TableHead = React.forwardRef<
   HTMLTableCellElement,
   React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
+>(({ className, style, ...props }, ref) => (
   <th
     ref={ref}
     className={cn(
-      "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      "h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide [&:has([role=checkbox])]:pr-0",
       className
     )}
+    style={{ color: "hsl(var(--admin-muted-foreground))", ...style }}
     {...props}
   />
 ))

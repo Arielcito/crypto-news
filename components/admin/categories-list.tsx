@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { FolderTree, Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,6 +28,12 @@ import {
   useDeleteCategory,
 } from '@/lib/use-admin-categories';
 import type { AdminCategory, CreateCategoryInput } from '@/lib/types/admin';
+
+const ADMIN_SURFACE_STYLE = {
+  backgroundColor: 'hsl(var(--admin-surface))',
+  borderColor: 'hsl(var(--admin-surface-border))',
+  color: 'hsl(var(--admin-surface-foreground))',
+};
 
 export function CategoriesList() {
   const { data, isLoading, isError, error } = useAdminCategories();
@@ -89,7 +95,7 @@ export function CategoriesList() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex justify-end">
         <Button onClick={() => setCreateOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
@@ -99,18 +105,27 @@ export function CategoriesList() {
 
       {isLoading ? (
         <div className="space-y-2">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" style={{ backgroundColor: 'hsl(var(--admin-surface-border))' }} />
+          <Skeleton className="h-10 w-full" style={{ backgroundColor: 'hsl(var(--admin-surface-border))' }} />
+          <Skeleton className="h-10 w-full" style={{ backgroundColor: 'hsl(var(--admin-surface-border))' }} />
         </div>
       ) : isError ? (
         <p className="text-sm text-destructive">
           Error al cargar las categorías: {error instanceof Error ? error.message : 'Error desconocido'}
         </p>
       ) : categories.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No hay categorías todavía.</p>
+        <div
+          className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed py-16 text-center"
+          style={{ borderColor: 'hsl(var(--admin-surface-border))' }}
+        >
+          <FolderTree className="h-8 w-8" style={{ color: 'hsl(var(--admin-muted-foreground))' }} />
+          <p className="text-sm font-medium">No hay categorías todavía</p>
+          <p className="text-sm" style={{ color: 'hsl(var(--admin-muted-foreground))' }}>
+            Creá la primera para empezar a ordenar tus notas.
+          </p>
+        </div>
       ) : (
-        <div className="rounded-md border overflow-x-auto">
+        <div className="overflow-x-auto rounded-lg border" style={ADMIN_SURFACE_STYLE}>
           <Table>
             <TableHeader>
               <TableRow>
@@ -123,8 +138,10 @@ export function CategoriesList() {
               {categories.map((category) => (
                 <TableRow key={category.id}>
                   <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell className="text-muted-foreground">{category.slug}</TableCell>
-                  <TableCell className="text-right space-x-2">
+                  <TableCell style={{ color: 'hsl(var(--admin-muted-foreground))' }}>
+                    {category.slug}
+                  </TableCell>
+                  <TableCell className="space-x-1 text-right">
                     <Button variant="ghost" size="icon" onClick={() => setEditing(category)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
