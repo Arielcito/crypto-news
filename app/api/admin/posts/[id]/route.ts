@@ -89,6 +89,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       slug: input.slug,
       status: input.status,
       featuredMedia: input.featuredMedia,
+      featured: input.featured,
       modified: new Date(),
       modifiedGmt: new Date(),
     };

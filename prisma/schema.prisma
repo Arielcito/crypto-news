@@ -30,6 +30,7 @@ model Post {
   featuredMedia String?  @map("featured_media")
   domain        String
   isActive      Boolean  @default(true) @map("is_active")
+  featured      Boolean  @default(false)
   categories    DomainCategories[]
   tags          Tag[]
 

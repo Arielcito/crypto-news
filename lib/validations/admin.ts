@@ -15,6 +15,7 @@ export const createPostSchema = z.object({
   status: postStatusEnum.default('draft'),
   authorRefId: z.number().int().positive().optional(),
   featuredMedia: z.string().url().optional().nullable(),
+  featured: z.boolean().optional().default(false),
   categories: z.array(z.number().int().positive()).optional().default([]),
   tags: z.array(z.number().int().positive()).optional().default([]),
 });

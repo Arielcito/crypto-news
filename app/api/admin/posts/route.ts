@@ -114,6 +114,7 @@ export async function POST(request: NextRequest) {
         author: input.authorRefId ?? 1,
         authorRefId: input.authorRefId,
         featuredMedia: input.featuredMedia,
+        featured: input.featured ?? false,
         domain: ADMIN_DOMAIN,
         categories: { connect: input.categories?.map((id) => ({ id })) || [] },
         tags: { connect: input.tags?.map((id) => ({ id })) || [] },

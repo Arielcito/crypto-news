@@ -74,7 +74,7 @@ export function TopStoriesSection({ posts }: TopStoriesSectionProps) {
 
   return (
     <div className="flex-1">
-      <h2 className="text-2xl font-bold mb-4">Historias Destacadas</h2>
+      <h2 className="text-2xl font-bold mb-4">Noticias Destacadas</h2>
       <div className="space-y-6">
         <FeaturedStoryCard post={featuredPost} />
         <div className="space-y-4">

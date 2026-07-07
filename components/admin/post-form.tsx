@@ -104,6 +104,7 @@ export function PostForm({
       status: (initialValues?.status as 'publish' | 'draft') ?? 'draft',
       authorRefId: initialValues?.authorRefId ?? undefined,
       featuredMedia: initialValues?.featuredMedia ?? null,
+      featured: initialValues?.featured ?? false,
       categories: initialValues?.categories.map((c) => c.id) ?? [],
       tags: initialValues?.tags.map((t) => t.id) ?? [],
     },
@@ -112,6 +113,7 @@ export function PostForm({
   const title = watch('title');
   const content = watch('content');
   const featuredMedia = watch('featuredMedia');
+  const featured = watch('featured');
   const selectedCategories = watch('categories') ?? [];
   const selectedTags = watch('tags') ?? [];
 
@@ -271,6 +273,17 @@ export function PostForm({
                   </Select>
                 )}
               />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="featured"
+                checked={featured}
+                onCheckedChange={(checked) => setValue('featured', checked === true)}
+              />
+              <Label htmlFor="featured" className="cursor-pointer">
+                Destacado (Noticias Destacadas)
+              </Label>
             </div>
           </FormSection>
 
