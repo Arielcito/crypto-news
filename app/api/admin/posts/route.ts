@@ -9,6 +9,7 @@ import {
   validateCategoriesForDomain,
   validateTagsExist,
 } from '@/lib/services/posts-service';
+import { notifyPostPublished } from '@/lib/services/discord';
 import { ADMIN_DOMAIN } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {
@@ -123,6 +124,7 @@ export async function POST(request: NextRequest) {
     });
 
     console.log(`[POST] /api/admin/posts - Created post ${post.id}`);
+    await notifyPostPublished(post);
     return NextResponse.json({ data: post, error: null, message: 'Post created successfully' }, { status: 201 });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {

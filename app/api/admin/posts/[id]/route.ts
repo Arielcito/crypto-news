@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { updatePostSchema } from '@/lib/validations/admin';
 import { validateCategoriesForDomain, validateTagsExist } from '@/lib/services/posts-service';
+import { notifyPostPublished } from '@/lib/services/discord';
 import { ADMIN_DOMAIN } from '@/lib/constants';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
@@ -118,6 +119,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     });
 
     console.log(`[PUT] /api/admin/posts/${id} - Updated successfully`);
+    // Cubre el caso draft → publish: notifyPostPublished corta solo si el post
+    // no está publicado o si ya se notificó antes.
+    await notifyPostPublished(updated);
     return NextResponse.json({ data: updated, error: null, message: 'Post updated successfully' });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
