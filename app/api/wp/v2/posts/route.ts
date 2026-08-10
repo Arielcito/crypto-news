@@ -11,6 +11,7 @@ import {
   validateCategoriesForDomain,
   validateTagsExist,
 } from '@/lib/services/posts-service';
+import { notifyPostPublished } from '@/lib/services/discord';
 
 export async function GET(request: NextRequest) {
     try {
@@ -209,6 +210,11 @@ export async function POST(request: NextRequest) {
 
     // Cast to include relations for logging/response
     const newPostWithRelations = newPost as PostWithRelations;
+
+    // Esta es la ruta que usa la ingesta automática, así que es la que dispara
+    // la mayoría de los avisos a Discord. notifyPostPublished filtra por dominio
+    // y por status, y nunca lanza.
+    await notifyPostPublished(newPost);
 
     return Response.json({ data: newPostWithRelations }, { status: 201 });
   } catch (error: any) {

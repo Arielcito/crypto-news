@@ -110,6 +110,14 @@ async function send(embed: DiscordEmbed, attempt = 1): Promise<boolean> {
  * (volver a guardar el post) lo vuelve a intentar.
  */
 export async function notifyPostPublished(post: NotifiablePost): Promise<boolean> {
+  // /api/wp/v2/posts acepta cualquier `domain` (incluso "default"), y el link del
+  // embed siempre apunta a ADMIN_DOMAIN. Sin este corte publicaríamos en #noticias
+  // notas de otro sitio con una URL que no existe.
+  if (post.domain !== ADMIN_DOMAIN) {
+    console.log(`[discord] post ${post.id} del dominio "${post.domain}" — no se notifica`);
+    return false;
+  }
+
   if (post.status !== 'publish') {
     console.log(`[discord] post ${post.id} en estado "${post.status}" — no se notifica`);
     return false;
