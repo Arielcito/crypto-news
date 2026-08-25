@@ -12,6 +12,7 @@ import {
   validateTagsExist,
 } from '@/lib/services/posts-service';
 import { notifyPostPublished } from '@/lib/services/discord';
+import { isMirroredUrl, mirrorRemoteImage } from '@/lib/services/media-mirror';
 
 export async function GET(request: NextRequest) {
     try {
@@ -170,14 +171,40 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const slug = generateSlug(body.title);
+
+    /*
+     * La imagen que manda la ingesta vive en el servidor de la fuente. Se copia
+     * a Blob para que el post no dependa de que un tercero no rote ni borre la
+     * URL. Si el espejado falla (imagen caída, formato raro, host lento) se
+     * guarda la original: una portada prestada es mejor que no publicar.
+     */
+    let featuredMedia: string | null = body.featured_media || null;
+    if (
+      typeof featuredMedia === 'string' &&
+      /^https?:\/\//i.test(featuredMedia) &&
+      !isMirroredUrl(featuredMedia) &&
+      body.mirror_media !== false
+    ) {
+      try {
+        featuredMedia = await mirrorRemoteImage(featuredMedia, slug);
+        console.log('[POST] /api/wp/v2/posts - Imagen espejada en Blob:', featuredMedia);
+      } catch (error) {
+        console.warn(
+          '[POST] /api/wp/v2/posts - No se pudo espejar la imagen, se usa la original:',
+          error instanceof Error ? error.message : error
+        );
+      }
+    }
+
     console.log('[POST] /api/wp/v2/posts - Creating post with data:', {
       title: body.title,
       contentLength: body.content.length,
       excerpt: body.excerpt ? body.excerpt.length : 'auto-generated',
-      slug: generateSlug(body.title),
+      slug,
       status: body.status || 'publish',
       author: body.author || 1,
-      featuredMedia: body.featured_media || null,
+      featuredMedia,
       domain: domain,
       categories: body.categories?.length || 0,
       tags: body.tags?.length || 0
@@ -187,10 +214,10 @@ export async function POST(request: NextRequest) {
         title: body.title,
         content: body.content,
         excerpt: body.excerpt || generateExcerpt(body.content),
-        slug: generateSlug(body.title),
+        slug,
         status: body.status || 'publish',
         author: body.author || 1,
-        featuredMedia: body.featured_media || null,
+        featuredMedia,
         domain: domain,
         categories: {
           connect: body.categories?.map((id: number) => ({ id })) || []
