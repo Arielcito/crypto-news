@@ -14,29 +14,29 @@ datasource db {
 }
 
 model Post {
-  id            Int      @id @default(autoincrement())
-  date          DateTime @default(now())
-  dateGmt       DateTime @default(now()) @map("date_gmt")
-  modified      DateTime @default(now())
-  modifiedGmt   DateTime @default(now()) @map("modified_gmt")
-  slug          String   @unique
-  status        String   @default("publish")
-  title         String
-  content       String   @db.Text
-  excerpt       String?  @db.Text
-  author        Int
-  authorRef     Author?  @relation(fields: [authorRefId], references: [id])
-  authorRefId   Int?     @map("author_ref_id")
-  featuredMedia String?  @map("featured_media")
-  domain        String
-  isActive      Boolean  @default(true) @map("is_active")
-  featured      Boolean  @default(false)
-  discordPostedAt DateTime? @map("discord_posted_at")
-  categories    DomainCategories[]
-  tags          Tag[]
+  id              Int                @id @default(autoincrement())
+  date            DateTime           @default(now())
+  dateGmt         DateTime           @default(now()) @map("date_gmt")
+  modified        DateTime           @default(now())
+  modifiedGmt     DateTime           @default(now()) @map("modified_gmt")
+  slug            String             @unique
+  status          String             @default("publish")
+  title           String
+  content         String             @db.Text
+  excerpt         String?            @db.Text
+  author          Int
+  authorRef       Author?            @relation(fields: [authorRefId], references: [id])
+  authorRefId     Int?               @map("author_ref_id")
+  featuredMedia   String?            @map("featured_media")
+  domain          String
+  isActive        Boolean            @default(true) @map("is_active")
+  featured        Boolean            @default(false)
+  discordPostedAt DateTime?          @map("discord_posted_at")
+  categories      DomainCategories[]
+  tags            Tag[]
 
-  @@map("posts")
   @@index([authorRefId])
+  @@map("posts")
 }
 
 model Author {
@@ -62,24 +62,274 @@ model Author {
 }
 
 model DomainCategories {
-  id          Int      @id @default(autoincrement())
-  domain      String
-  name        String
-  slug        String
-  isActive    Boolean  @default(true) @map("is_active")
-  posts       Post[]
+  id       Int     @id @default(autoincrement())
+  domain   String
+  name     String
+  slug     String
+  isActive Boolean @default(true) @map("is_active")
+  posts    Post[]
 
   @@unique([domain, slug])
   @@map("domain_categories")
 }
 
 model Tag {
-  id          Int      @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
-  slug        String   @unique
-  description String?  @db.Text
+  slug        String  @unique
+  description String? @db.Text
   domain      String
   posts       Post[]
 
   @@map("tags")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Dashboard de agencia — ver docs/prds/agency-dashboard.md
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum ClientStatus {
+  ACTIVE
+  PAUSED
+  CHURNED
+}
+
+enum PackageStatus {
+  OPEN
+  COMPLETED
+}
+
+/// Sólo dos estados. "Vencida" se DERIVA de dueDate contra el ahora: un estado
+/// guardado se desactualiza solo y obliga a un job que lo repare.
+enum TaskStatus {
+  PENDING
+  DONE
+}
+
+enum SocialNetwork {
+  INSTAGRAM
+  FACEBOOK
+  X
+  TIKTOK
+  YOUTUBE
+}
+
+/// De dónde salió la pieza: publicada por el agregador o nativa e importada.
+enum PostOrigin {
+  POSTPROXY
+  NATIVE
+}
+
+/// Cuentas del panel. Reemplaza al par ADMIN_USERNAME/ADMIN_PASSWORD en env.
+model User {
+  id                 Int      @id @default(autoincrement())
+  email              String   @unique
+  name               String
+  passwordHash       String   @map("password_hash")
+  role               Role     @default(EMPLOYEE)
+  isActive           Boolean  @default(true) @map("is_active")
+  mustChangePassword Boolean  @default(false) @map("must_change_password")
+  /// Se incrementa al cambiar password o desactivar: invalida toda sesión abierta.
+  sessionVersion     Int      @default(1) @map("session_version")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  assignedTasks    Task[]   @relation("TaskAssignee")
+  uploadedBriefs   Brief[]
+  generatedReports Report[]
+
+  @@map("users")
+}
+
+model Client {
+  id            Int          @id @default(autoincrement())
+  name          String
+  slug          String       @unique
+  status        ClientStatus @default(ACTIVE)
+  /// Ancla barata para la contabilidad futura. Unidades enteras de moneda.
+  monthlyAmount Int?         @map("monthly_amount")
+  notes         String?      @db.Text
+  isActive      Boolean      @default(true) @map("is_active")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  profiles ClientProfile[]
+  packages Package[]
+  briefs   Brief[]
+
+  @@map("clients")
+}
+
+/// Mapeo local cliente ↔ cuenta de PostProxy. Nuestra base manda: si mañana
+/// cambiamos de agregador, el mapeo sobrevive.
+model ClientProfile {
+  id                 Int           @id @default(autoincrement())
+  clientId           Int           @map("client_id")
+  client             Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  postproxyProfileId String        @map("postproxy_profile_id")
+  network            SocialNetwork
+  handle             String?
+  /// Vencimiento del token en PostProxy. Se muestra en la UI: sin esto las
+  /// métricas se cortan en silencio y nadie se entera.
+  expiresAt          DateTime?     @map("expires_at")
+  isActive           Boolean       @default(true) @map("is_active")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  posts          SocialPost[]
+  accountMetrics SocialAccountMetric[]
+
+  @@unique([postproxyProfileId, network])
+  @@index([clientId])
+  @@map("client_profiles")
+}
+
+/// Paquete mensual: lo comprometido con el cliente para ese mes.
+model Package {
+  id              Int           @id @default(autoincrement())
+  clientId        Int           @map("client_id")
+  client          Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  /// Primer día del mes, en UTC.
+  month           DateTime      @db.Date
+  committedPieces Int           @map("committed_pieces")
+  amount          Int?
+  status          PackageStatus @default(OPEN)
+  notes           String?       @db.Text
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  tasks   Task[]
+  reports Report[]
+
+  @@unique([clientId, month])
+  @@map("packages")
+}
+
+model Task {
+  id          Int           @id @default(autoincrement())
+  packageId   Int           @map("package_id")
+  package     Package       @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  assigneeId  Int?          @map("assignee_id")
+  assignee    User?         @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  title       String
+  network     SocialNetwork
+  format      String
+  dueDate     DateTime      @map("due_date")
+  status      TaskStatus    @default(PENDING)
+  /// Link de la pieza publicada. Cruza con SocialPost.permalink en tiempo de
+  /// lectura, no por FK: la pieza puede tardar horas en aparecer en el catálogo.
+  permalink   String?
+  completedAt DateTime?     @map("completed_at")
+  notes       String?       @db.Text
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@index([packageId])
+  @@index([assigneeId, status])
+  @@index([dueDate])
+  @@map("tasks")
+}
+
+/// Brief del cliente. La URL del Blob nunca se expone al cliente HTTP: la
+/// descarga pasa por un proxy que valida sesión y rol.
+model Brief {
+  id           Int      @id @default(autoincrement())
+  clientId     Int      @map("client_id")
+  client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  filename     String
+  blobUrl      String   @map("blob_url")
+  size         Int
+  contentType  String   @map("content_type")
+  uploadedById Int?     @map("uploaded_by_id")
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([clientId])
+  @@map("briefs")
+}
+
+/// Reporte interno de un paquete. `snapshot` congela los números al momento de
+/// generarlo: un reporte de octubre no cambia si se abre en diciembre.
+model Report {
+  id            Int      @id @default(autoincrement())
+  packageId     Int      @map("package_id")
+  package       Package  @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  generatedById Int?     @map("generated_by_id")
+  generatedBy   User?    @relation(fields: [generatedById], references: [id], onDelete: SetNull)
+  snapshot      Json
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([packageId])
+  @@map("reports")
+}
+
+/// Catálogo de piezas bajado de PostProxy.
+model SocialPost {
+  id              Int            @id @default(autoincrement())
+  postproxyPostId String         @map("postproxy_post_id")
+  network         SocialNetwork
+  clientProfileId Int?           @map("client_profile_id")
+  clientProfile   ClientProfile? @relation(fields: [clientProfileId], references: [id], onDelete: SetNull)
+  permalink       String?
+  body            String?        @db.Text
+  origin          PostOrigin     @default(NATIVE)
+  publishedAt     DateTime?      @map("published_at")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  metrics SocialPostMetric[]
+
+  @@unique([postproxyPostId, network])
+  @@index([clientProfileId, publishedAt])
+  @@index([permalink])
+  @@map("social_posts")
+}
+
+/// Una lectura de contadores de una pieza. Los contadores son ACUMULADOS: el
+/// rendimiento de la pieza es la ÚLTIMA lectura, nunca la suma de todas.
+/// `null` = la red no informa esa métrica. No es cero.
+model SocialPostMetric {
+  id           Int        @id @default(autoincrement())
+  socialPostId Int        @map("social_post_id")
+  socialPost   SocialPost @relation(fields: [socialPostId], references: [id], onDelete: Cascade)
+  recordedAt   DateTime   @map("recorded_at")
+  impressions  Int?
+  reach        Int?
+  likes        Int?
+  comments     Int?
+  saves        Int?
+  shares       Int?
+  clicks       Int?
+
+  /// Re-sincronizar la misma lectura es idempotente.
+  @@unique([socialPostId, recordedAt])
+  @@index([socialPostId, recordedAt(sort: Desc)])
+  @@map("social_post_metrics")
+}
+
+/// Una lectura del estado de la cuenta. El crecimiento de seguidores es la
+/// RESTA entre dos lecturas, nunca una suma.
+model SocialAccountMetric {
+  id                Int           @id @default(autoincrement())
+  clientProfileId   Int           @map("client_profile_id")
+  clientProfile     ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+  recordedAt        DateTime      @map("recorded_at")
+  followers         Int?
+  posts             Int?
+  reach1d           Int?          @map("reach_1d")
+  reach7d           Int?          @map("reach_7d")
+  reach30d          Int?          @map("reach_30d")
+  profileViews7d    Int?          @map("profile_views_7d")
+  accountsEngaged7d Int?          @map("accounts_engaged_7d")
+  interactions7d    Int?          @map("interactions_7d")
+  websiteClicks7d   Int?          @map("website_clicks_7d")
+
+  @@unique([clientProfileId, recordedAt])
+  @@index([clientProfileId, recordedAt(sort: Desc)])
+  @@map("social_account_metrics")
 }

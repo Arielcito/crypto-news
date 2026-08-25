@@ -21,7 +21,7 @@ export function LoginForm() {
     formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { username: '', password: '' },
+    defaultValues: { email: '', password: '' },
   });
 
   const onSubmit = (input: LoginInput) => {
@@ -31,8 +31,12 @@ export function LoginForm() {
           toast.error(response.message || response.error);
           return;
         }
-        toast.success('Bienvenido');
-        router.push('/admin/posts');
+        toast.success(`Hola, ${response.data?.name ?? ''}`.trim());
+        if (response.data?.mustChangePassword) {
+          router.push('/admin/cambiar-password');
+        } else {
+          router.push(response.data?.role === 'EMPLOYEE' ? '/admin/agencia/mis-tareas' : '/admin/agencia');
+        }
         router.refresh();
       },
       onError: (error) => {
@@ -44,19 +48,17 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="username" style={{ color: 'hsl(var(--admin-bg-foreground))' }}>
-          Usuario
+        <Label htmlFor="email" style={{ color: 'hsl(var(--admin-bg-foreground))' }}>
+          Email
         </Label>
         <Input
-          id="username"
-          type="text"
-          autoComplete="username"
+          id="email"
+          type="email"
+          autoComplete="email"
           className={ADMIN_INPUT_CLASS}
-          {...register('username')}
+          {...register('email')}
         />
-        {errors.username && (
-          <p className="text-sm text-destructive">{errors.username.message}</p>
-        )}
+        {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="password" style={{ color: 'hsl(var(--admin-bg-foreground))' }}>
