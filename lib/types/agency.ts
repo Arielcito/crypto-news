@@ -146,6 +146,12 @@ export interface FollowersPoint {
   values: Partial<Record<SocialNetwork, number | null>>;
 }
 
+/** Un punto de una serie de un solo valor (la tendencia bajo una tarjeta). */
+export interface TrendPoint {
+  date: string;
+  value: number;
+}
+
 /** Rendimiento final de una pieza: su última lectura de contadores. */
 export interface PieceRow {
   socialPostId: number;
@@ -182,6 +188,8 @@ export interface OrganicMetrics {
   syncedAt: string | null;
   accounts: AccountSummary[];
   series: FollowersPoint[];
+  /** Acumulado de impresiones por día. Su último punto es `totals.impressions`. */
+  impressionsTrend: TrendPoint[];
   top: PieceRow[];
   worst: PieceRow[];
   totals: PiecesSummary;

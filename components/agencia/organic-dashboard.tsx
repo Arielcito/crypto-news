@@ -140,6 +140,32 @@ export function OrganicDashboard({
         />
       ) : (
         <>
+          {/*
+            * Impresiones primero: es el número que se mira antes que ningún otro
+            * y estaba debajo del gráfico de seguidores, fuera de la primera
+            * pantalla. Los seguidores quedan abajo — cambian de a decenas por
+            * mes y no son lo que se revisa a diario.
+            */}
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              label="Impresiones"
+              value={formatMetric(metrics.totals.impressions)}
+              trend={metrics.impressionsTrend.map((point) => point.value)}
+              hint={`Acumulado de ${metrics.totals.pieces} piezas del período`}
+            />
+            <StatCard label="Interacciones" value={formatMetric(metrics.totals.interactions)} />
+            <StatCard
+              label="Engagement"
+              value={formatPercent(metrics.totals.engagement)}
+              hint={
+                metrics.totals.interactionsPerPiece !== null
+                  ? `${metrics.totals.interactionsPerPiece.toFixed(1)} interacciones por pieza`
+                  : undefined
+              }
+            />
+            <StatCard label="Piezas medidas" value={String(metrics.totals.pieces)} />
+          </div>
+
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {metrics.accounts.map((account) => (
               <StatCard
@@ -158,21 +184,6 @@ export function OrganicDashboard({
           >
             <FollowersChart series={metrics.series} />
           </AgencyCard>
-
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="Piezas medidas" value={String(metrics.totals.pieces)} />
-            <StatCard label="Impresiones" value={formatMetric(metrics.totals.impressions)} />
-            <StatCard label="Interacciones" value={formatMetric(metrics.totals.interactions)} />
-            <StatCard
-              label="Engagement"
-              value={formatPercent(metrics.totals.engagement)}
-              hint={
-                metrics.totals.interactionsPerPiece !== null
-                  ? `${metrics.totals.interactionsPerPiece.toFixed(1)} interacciones por pieza`
-                  : undefined
-              }
-            />
-          </div>
 
           <AgencyCard title="Piezas" description="Ordenadas por interacciones de su última lectura.">
             <Tabs defaultValue="top">

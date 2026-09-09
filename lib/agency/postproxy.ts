@@ -145,6 +145,15 @@ function metric(
   return typeof value === 'number' ? value : null;
 }
 
+/**
+ * Suma métricas que pueden faltar. `null` si no vino ninguna: sumar sólo los
+ * `null` daría 0, que diría "no hubo interacciones" en vez de "no se informan".
+ */
+function sum(...values: (number | null)[]): number | null {
+  const present = values.filter((value): value is number => value !== null);
+  return present.length === 0 ? null : present.reduce((total, value) => total + value, 0);
+}
+
 export function networkOf(platform: string | undefined): SocialNetwork | null {
   return NETWORKS[platform?.toLowerCase() ?? ''] ?? null;
 }
@@ -194,11 +203,15 @@ function normalizePostReading(
       postId,
       network,
       recordedAt,
-      impressions: metric(s, 'views') ?? metric(raw, 'viewCount'),
+      // PostProxy normaliza las vistas de YouTube y TikTok bajo `impressions`;
+      // el crudo de la red las llama `view_count`. No existe `views`.
+      impressions: metric(s, 'impressions') ?? metric(raw, 'view_count'),
+      // YouTube no informa cuentas únicas alcanzadas por video.
       reach: null,
-      likes: metric(s, 'likes') ?? metric(raw, 'likeCount'),
-      comments: metric(s, 'comments') ?? metric(raw, 'commentCount'),
-      saves: null,
+      likes: metric(s, 'likes') ?? metric(raw, 'like_count'),
+      comments: metric(s, 'comments') ?? metric(raw, 'comment_count'),
+      saves: metric(s, 'saved') ?? metric(raw, 'favorite_count'),
+      // La API de YouTube no expone compartidos por video: null, no 0.
       shares: null,
       clicks: null,
     };
@@ -209,12 +222,12 @@ function normalizePostReading(
       postId,
       network,
       recordedAt,
-      impressions: metric(s, 'views') ?? metric(raw, 'video_views'),
+      impressions: metric(s, 'impressions') ?? metric(raw, 'view_count'),
       reach: metric(raw, 'reach'),
-      likes: metric(s, 'likes'),
-      comments: metric(s, 'comments'),
-      saves: metric(raw, 'saved'),
-      shares: metric(s, 'shares') ?? metric(raw, 'shares'),
+      likes: metric(s, 'likes') ?? metric(raw, 'like_count'),
+      comments: metric(s, 'comments') ?? metric(raw, 'comment_count'),
+      saves: metric(s, 'saved') ?? metric(raw, 'saved'),
+      shares: metric(s, 'shares') ?? metric(raw, 'share_count'),
       clicks: null,
     };
   }
@@ -248,15 +261,32 @@ function normalizeAccountReading(
     postproxyProfileId,
     network,
     recordedAt,
+    /*
+     * Cada red nombra lo mismo distinto y PostProxy pasa el crudo tal cual:
+     * Instagram/Facebook mandan snake_case (`followers_count`, `fan_count`),
+     * TikTok manda `follower_count` en singular y YouTube directamente camelCase
+     * (`subscriberCount`). Una sola clave equivocada deja la tarjeta en "—".
+     */
     followers:
-      metric(s, 'followers_count') ?? metric(s, 'fan_count') ?? metric(s, 'subscriber_count'),
-    posts: metric(s, 'media_count') ?? metric(s, 'video_count'),
+      metric(s, 'followers_count') ??
+      metric(s, 'follower_count') ??
+      metric(s, 'fan_count') ??
+      metric(s, 'subscriber_count') ??
+      metric(s, 'subscriberCount'),
+    posts:
+      metric(s, 'media_count') ??
+      metric(s, 'video_count') ??
+      metric(s, 'videoCount') ??
+      metric(s, 'post_count'),
     reach1d: metric(s, 'reach_1d'),
     reach7d: metric(s, 'reach_7d'),
     reach30d: metric(s, 'reach_30d'),
     profileViews7d: metric(s, 'profile_views_7d'),
     accountsEngaged7d: metric(s, 'accounts_engaged_7d'),
-    interactions7d: metric(s, 'total_interactions_7d'),
+    // Instagram trae el total ya sumado; YouTube lo entrega desagregado.
+    interactions7d:
+      metric(s, 'total_interactions_7d') ??
+      sum(metric(s, 'likes_7d'), metric(s, 'comments_7d'), metric(s, 'shares_7d')),
     websiteClicks7d: metric(s, 'website_clicks_7d'),
   };
 }

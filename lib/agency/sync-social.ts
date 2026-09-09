@@ -1,7 +1,7 @@
-import type { SocialNetwork } from '@prisma/client';
+import { Prisma, type SocialNetwork } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { daysAgo } from '@/lib/agency/dates';
-import { createPostProxyClient, type PostProxyClient } from '@/lib/agency/postproxy';
+import { chunk, createPostProxyClient, type PostProxyClient } from '@/lib/agency/postproxy';
 
 /**
  * Orquestación de la sincronización: le pide a PostProxy el catálogo y los
@@ -24,6 +24,49 @@ const CATALOG_LIMIT = 500;
  * cara que la anterior, para siempre.
  */
 const STATS_DAYS = 90;
+
+/** Filas por INSERT. Postgres admite muchas más, pero el payload ya pesa. */
+const UPSERT_CHUNK = 200;
+
+type Cell = number | Date | null;
+
+const quoted = (columns: string[]) => columns.map((column) => `"${column}"`).join(', ');
+
+/**
+ * Inserta lecturas y REPARA las que ya estaban.
+ *
+ * `createMany({ skipDuplicates: true })` era idempotente pero también amnésico:
+ * si una lectura se guardó con nulls —porque el adapter buscaba la clave
+ * equivocada, que es exactamente lo que pasó con TikTok y YouTube—, la fila
+ * quedaba nula para siempre aunque PostProxy siguiera teniendo el número. El
+ * `COALESCE(EXCLUDED.x, tabla.x)` pisa sólo lo que ahora sí viene y nunca
+ * reemplaza un número guardado por un null nuevo.
+ */
+async function upsertReadings(
+  table: string,
+  keyColumns: [string, string],
+  valueColumns: string[],
+  rows: Cell[][]
+): Promise<number> {
+  let written = 0;
+
+  for (const batch of chunk(rows, UPSERT_CHUNK)) {
+    const values = Prisma.join(batch.map((row) => Prisma.sql`(${Prisma.join(row)})`));
+    const updates = Prisma.join(
+      valueColumns.map((column) =>
+        Prisma.raw(`"${column}" = COALESCE(EXCLUDED."${column}", "${table}"."${column}")`)
+      )
+    );
+
+    written += await prisma.$executeRaw`
+      INSERT INTO ${Prisma.raw(`"${table}"`)} (${Prisma.raw(quoted([...keyColumns, ...valueColumns]))})
+      VALUES ${values}
+      ON CONFLICT (${Prisma.raw(quoted(keyColumns))}) DO UPDATE SET ${updates}
+    `;
+  }
+
+  return written;
+}
 
 export interface SyncResult {
   posts: number;
@@ -91,30 +134,33 @@ export async function syncPostStats(api: PostProxyClient = client()): Promise<nu
   const byKey = new Map(posts.map((p) => [`${p.postproxyPostId}:${p.network}`, p.id]));
   const readings = await api.postStats(posts.map((p) => p.postproxyPostId));
 
-  // `skipDuplicates` sobre la única (socialPostId, recordedAt): re-sincronizar la
-  // misma lectura es idempotente y no duplica la historia.
   const rows = readings
-    .map((reading) => {
+    .map((reading): Cell[] | null => {
       const socialPostId = byKey.get(`${reading.postId}:${reading.network}`);
       if (!socialPostId) return null;
-      return {
+      return [
         socialPostId,
-        recordedAt: reading.recordedAt,
-        impressions: reading.impressions,
-        reach: reading.reach,
-        likes: reading.likes,
-        comments: reading.comments,
-        saves: reading.saves,
-        shares: reading.shares,
-        clicks: reading.clicks,
-      };
+        reading.recordedAt,
+        reading.impressions,
+        reading.reach,
+        reading.likes,
+        reading.comments,
+        reading.saves,
+        reading.shares,
+        reading.clicks,
+      ];
     })
-    .filter((row): row is NonNullable<typeof row> => row !== null);
+    .filter((row): row is Cell[] => row !== null);
 
   if (rows.length === 0) return 0;
-  const result = await prisma.socialPostMetric.createMany({ data: rows, skipDuplicates: true });
-  console.log(`[sync-social] ${result.count} lecturas de pieza nuevas`);
-  return result.count;
+  const count = await upsertReadings(
+    'social_post_metrics',
+    ['social_post_id', 'recorded_at'],
+    ['impressions', 'reach', 'likes', 'comments', 'saves', 'shares', 'clicks'],
+    rows
+  );
+  console.log(`[sync-social] ${count} lecturas de pieza guardadas`);
+  return count;
 }
 
 /** Baja seguidores y alcance de cada cuenta conectada. */
@@ -132,29 +178,44 @@ export async function syncAccountStats(api: PostProxyClient = client()): Promise
   const readings = await api.accountStats(profiles);
 
   const rows = readings
-    .map((reading) => {
+    .map((reading): Cell[] | null => {
       const clientProfileId = byProfile.get(reading.postproxyProfileId);
       if (!clientProfileId) return null;
-      return {
+      return [
         clientProfileId,
-        recordedAt: reading.recordedAt,
-        followers: reading.followers,
-        posts: reading.posts,
-        reach1d: reading.reach1d,
-        reach7d: reading.reach7d,
-        reach30d: reading.reach30d,
-        profileViews7d: reading.profileViews7d,
-        accountsEngaged7d: reading.accountsEngaged7d,
-        interactions7d: reading.interactions7d,
-        websiteClicks7d: reading.websiteClicks7d,
-      };
+        reading.recordedAt,
+        reading.followers,
+        reading.posts,
+        reading.reach1d,
+        reading.reach7d,
+        reading.reach30d,
+        reading.profileViews7d,
+        reading.accountsEngaged7d,
+        reading.interactions7d,
+        reading.websiteClicks7d,
+      ];
     })
-    .filter((row): row is NonNullable<typeof row> => row !== null);
+    .filter((row): row is Cell[] => row !== null);
 
   if (rows.length === 0) return 0;
-  const result = await prisma.socialAccountMetric.createMany({ data: rows, skipDuplicates: true });
-  console.log(`[sync-social] ${result.count} lecturas de cuenta nuevas`);
-  return result.count;
+  const count = await upsertReadings(
+    'social_account_metrics',
+    ['client_profile_id', 'recorded_at'],
+    [
+      'followers',
+      'posts',
+      'reach_1d',
+      'reach_7d',
+      'reach_30d',
+      'profile_views_7d',
+      'accounts_engaged_7d',
+      'interactions_7d',
+      'website_clicks_7d',
+    ],
+    rows
+  );
+  console.log(`[sync-social] ${count} lecturas de cuenta guardadas`);
+  return count;
 }
 
 /** Corrida completa. La usan el cron y el botón de sincronizar del panel. */

@@ -11,6 +11,7 @@ import {
   type OrganicMetrics,
   type PieceRow,
   type PiecesSummary,
+  type TrendPoint,
 } from '@/lib/types/agency';
 
 /**
@@ -69,6 +70,58 @@ export function summarize(rows: PieceRow[]): PiecesSummary {
   };
 }
 
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/**
+ * Acumulado de impresiones día por día. Arrastra la última lectura conocida de
+ * cada pieza: una pieza que no se midió hoy sigue valiendo lo que valía ayer,
+ * porque sus vistas no se borraron.
+ */
+async function trendOfImpressions(
+  socialPostIds: number[],
+  from: Date,
+  to: Date
+): Promise<TrendPoint[]> {
+  if (socialPostIds.length === 0) return [];
+
+  const readings = await prisma.socialPostMetric.findMany({
+    where: { socialPostId: { in: socialPostIds }, impressions: { not: null } },
+    select: { socialPostId: true, recordedAt: true, impressions: true },
+    orderBy: { recordedAt: 'asc' },
+  });
+  if (readings.length === 0) return [];
+
+  const days: string[] = [];
+  for (let time = from.getTime(); time <= to.getTime(); time += MS_PER_DAY) {
+    const key = dayKey(new Date(time));
+    if (days.at(-1) !== key) days.push(key);
+  }
+  const today = dayKey(to);
+  if (days.at(-1) !== today) days.push(today);
+
+  const lastByPost = new Map<number, number>();
+  const points: TrendPoint[] = [];
+  let cursor = 0;
+
+  for (const day of days) {
+    while (cursor < readings.length && dayKey(readings[cursor].recordedAt) <= day) {
+      const reading = readings[cursor];
+      if (reading.impressions !== null) lastByPost.set(reading.socialPostId, reading.impressions);
+      cursor += 1;
+    }
+    // Los días anteriores a la primera lectura no valen 0: no se midieron. La
+    // curva arranca cuando hay algo medido, en vez de dibujar una recta al piso
+    // que diría que en esas semanas no vio la pieza nadie.
+    if (lastByPost.size === 0) continue;
+
+    let total = 0;
+    for (const value of lastByPost.values()) total += value;
+    points.push({ date: day, value: total });
+  }
+
+  return points;
+}
+
 export interface MetricsQuery {
   /** `undefined` = todas las cuentas a las que llega quien pregunta. */
   clientId?: number;
@@ -99,6 +152,7 @@ export async function organicMetrics(query: MetricsQuery): Promise<OrganicMetric
     syncedAt: null,
     accounts: [],
     series: [],
+    impressionsTrend: [],
     top: [],
     worst: [],
     totals: summarize([]),
@@ -142,20 +196,34 @@ export async function organicMetrics(query: MetricsQuery): Promise<OrganicMetric
     };
   });
 
-  // Serie de seguidores: una lectura por día y red, la última del día. Cuando no
-  // hubo lectura ese día el valor queda ausente y el gráfico corta, en vez de
-  // inventar una línea recta entre dos puntos que nadie midió.
-  const perDay = new Map<string, Partial<Record<SocialNetwork, number | null>>>();
+  /*
+   * Serie de seguidores. Dos cosas que parecen detalles y no lo son:
+   *
+   * 1. El cron corre varias veces por día, así que de cada cuenta se toma la
+   *    ÚLTIMA lectura del día. Sumar todas las del día multiplicaba el total por
+   *    la cantidad de corridas y dibujaba una cuenta tres veces más grande.
+   * 2. Una lectura sin seguidores (`null`) se saltea. Contarla como 0 hunde la
+   *    línea al piso y afirma que la cuenta no tiene seguidores, cuando lo que
+   *    pasa es que esa lectura no los trajo.
+   */
+  const networkOfProfile = new Map(profiles.map((profile) => [profile.id, profile.network]));
+  const lastPerDay = new Map<string, number>();
   for (const row of accountRows) {
     if (row.recordedAt < from) continue;
-    const network = profiles.find((profile) => profile.id === row.clientProfileId)?.network;
+    if (row.followers === null) continue;
+    // Vienen ordenadas por fecha: la última que pisa la clave es la del día.
+    lastPerDay.set(`${dayKey(row.recordedAt)}|${row.clientProfileId}`, row.followers);
+  }
+
+  const perDay = new Map<string, Partial<Record<SocialNetwork, number | null>>>();
+  for (const [key, followers] of lastPerDay) {
+    const [date, profileId] = key.split('|');
+    const network = networkOfProfile.get(Number(profileId));
     if (!network) continue;
-    const key = dayKey(row.recordedAt);
-    const bucket = perDay.get(key) ?? {};
-    const previous = bucket[network];
+    const bucket = perDay.get(date) ?? {};
     // Varias cuentas de la misma red suman: es el total de la agencia o del cliente.
-    bucket[network] = (previous ?? 0) + (row.followers ?? 0);
-    perDay.set(key, bucket);
+    bucket[network] = (bucket[network] ?? 0) + followers;
+    perDay.set(date, bucket);
   }
 
   const series: FollowersPoint[] = Array.from(perDay.entries())
@@ -195,6 +263,19 @@ export async function organicMetrics(query: MetricsQuery): Promise<OrganicMetric
     };
   });
 
+  /*
+   * Tendencia de impresiones. Los contadores son acumulados, así que el total de
+   * un día es la suma de la última lectura de cada pieza HASTA ese día: la curva
+   * sube a medida que las piezas juntan vistas y su punto final coincide, por
+   * construcción, con la tarjeta de impresiones. Sumar las lecturas de cada día
+   * daría un número inventado — la misma vista contada una vez por corrida.
+   */
+  const impressionsTrend = await trendOfImpressions(
+    posts.map((post) => post.id),
+    from,
+    now
+  );
+
   const ranked = [...pieces].sort((a, b) => b.interactions - a.interactions);
   // Las peores se cuentan sólo entre las que tienen alguna lectura: una pieza que
   // el agregador todavía no midió no es "la peor", es una pieza sin datos.
@@ -213,6 +294,7 @@ export async function organicMetrics(query: MetricsQuery): Promise<OrganicMetric
     syncedAt: syncedAt?.toISOString() ?? null,
     accounts,
     series,
+    impressionsTrend,
     top: ranked.slice(0, PIECES_LIMIT),
     worst: measured.slice(-PIECES_LIMIT).reverse(),
     totals: summarize(pieces),

@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import type { CSSProperties, ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import type { IconType } from 'react-icons';
@@ -218,6 +219,68 @@ export function UrgencyBadge({ urgency, label }: { urgency: Urgency; label: stri
   );
 }
 
+const SPARK_WIDTH = 120;
+const SPARK_HEIGHT = 34;
+const SPARK_PADDING = 3;
+
+/**
+ * Tendencia mínima al pie de una tarjeta: sin ejes, sin grilla y sin tooltip. No
+ * está para leer valores —el número ya está arriba, en grande— sino para ver de
+ * un vistazo si la curva sube, se aplana o cae. Con menos de dos puntos no se
+ * dibuja nada: una línea de un solo punto no es una tendencia.
+ *
+ * Se estira a lo ancho de la tarjeta con `preserveAspectRatio="none"`, así que el
+ * trazo lleva `vector-effect` para no engordar al deformarse.
+ */
+export function Sparkline({ values, label }: { values: number[]; label: string }) {
+  if (values.length < 2) return null;
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  // Una serie plana se dibuja en el medio en vez de dividir por cero.
+  const span = max - min || 1;
+  const inner = SPARK_HEIGHT - SPARK_PADDING * 2;
+
+  const xOf = (index: number) => (index / (values.length - 1)) * SPARK_WIDTH;
+  const yOf = (value: number) => SPARK_PADDING + inner - ((value - min) / span) * inner;
+
+  const line = values.map((value, index) => `${index === 0 ? 'M' : 'L'}${xOf(index)},${yOf(value)}`);
+  const area = `${line.join(' ')} L${SPARK_WIDTH},${SPARK_HEIGHT} L0,${SPARK_HEIGHT} Z`;
+
+  return (
+    <svg
+      viewBox={`0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}`}
+      preserveAspectRatio="none"
+      className="mt-3 h-9 w-full"
+      role="img"
+      aria-label={label}
+    >
+      {/*
+        * Entra con un fundido y no dibujándose punto a punto: el trazado por
+        * `pathLength` usa un dash sobre la longitud del path en coordenadas del
+        * viewBox, y como acá el SVG se estira sólo a lo ancho, ese dash se
+        * deforma y la línea queda cortada en pedazos.
+        */}
+      <motion.g
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <path d={area} fill="hsl(var(--admin-accent) / 0.12)" stroke="none" />
+        <path
+          d={line.join(' ')}
+          fill="none"
+          stroke="hsl(var(--admin-accent))"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+        />
+      </motion.g>
+    </svg>
+  );
+}
+
 interface StatCardProps {
   label: string;
   value: string;
@@ -226,9 +289,11 @@ interface StatCardProps {
   network?: SocialNetwork;
   /** `null` = la red no reporta el dato; se pinta apagado en vez de verde/rojo. */
   delta?: number | null;
+  /** Serie para la tendencia al pie. Con menos de dos puntos no se dibuja. */
+  trend?: number[];
 }
 
-export function StatCard({ label, value, hint, network, delta }: StatCardProps) {
+export function StatCard({ label, value, hint, network, delta, trend }: StatCardProps) {
   const deltaColor =
     delta === undefined || delta === null || delta === 0
       ? 'hsl(var(--admin-muted-foreground))'
@@ -258,6 +323,7 @@ export function StatCard({ label, value, hint, network, delta }: StatCardProps) 
           {hint}
         </p>
       )}
+      {trend && <Sparkline values={trend} label={`Tendencia de ${label.toLowerCase()}`} />}
     </div>
   );
 }
