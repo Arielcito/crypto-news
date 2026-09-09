@@ -5,6 +5,7 @@ import type {
   AgencyClient,
   AgencyClientDetail,
   AgencyClientProfile,
+  AgencyExpense,
   AgencyPackage,
   AgencyReport,
   AgencyReportSummary,
@@ -13,10 +14,12 @@ import type {
   AgencyUserOption,
   CreateClientInput,
   CreateClientProfileInput,
+  CreateExpenseInput,
   CreatePackageInput,
   CreateTaskInput,
   CreateUserInput,
   CreatedUser,
+  ExpensesOverview,
   OrganicMetrics,
   UpdateClientInput,
   UpdateClientProfileInput,
@@ -236,4 +239,20 @@ export function generateAgencyReport(
 
 export function deleteAgencyReport(id: number): Promise<ApiResponse<null>> {
   return adminFetch(`${BASE}/reports/${id}`, { method: 'DELETE' });
+}
+
+// ── Gastos ──────────────────────────────────────────────────────────────────
+
+export function fetchAgencyExpenses(month: string): Promise<ApiResponse<ExpensesOverview>> {
+  return adminFetch(`${BASE}/expenses?month=${encodeURIComponent(month)}`);
+}
+
+export function createAgencyExpense(
+  input: CreateExpenseInput
+): Promise<ApiResponse<AgencyExpense>> {
+  return adminFetch(`${BASE}/expenses`, { method: 'POST', body: JSON.stringify(input) });
+}
+
+export function deleteAgencyExpense(id: number): Promise<ApiResponse<null>> {
+  return adminFetch(`${BASE}/expenses/${id}`, { method: 'DELETE' });
 }

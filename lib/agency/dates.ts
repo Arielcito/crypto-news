@@ -17,6 +17,26 @@ export function parseDueDate(isoDate: string): Date {
   return new Date(`${isoDate}T23:59:59.999${AR_OFFSET}`);
 }
 
+/**
+ * `YYYY-MM-DD` → medianoche UTC. Es lo que va en una columna `DATE`: Prisma
+ * guarda la parte UTC del Date, así que cualquier offset corre la fecha un día.
+ * Un deadline sí lleva hora — para eso está `parseDueDate`.
+ */
+export function parseCalendarDate(isoDate: string): Date {
+  return new Date(`${isoDate}T00:00:00.000Z`);
+}
+
+/** Una fecha de calendario se muestra tal cual, sin corrimiento por zona. */
+export function formatCalendarDate(date: Date | string): string {
+  const value = typeof date === 'string' ? new Date(date) : date;
+  return new Intl.DateTimeFormat('es-AR', {
+    timeZone: 'UTC',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(value);
+}
+
 /** `YYYY-MM-DD` en hora argentina, para prellenar inputs de fecha. */
 export function toDateInput(date: Date): string {
   return new Intl.DateTimeFormat('en-CA', {
@@ -109,4 +129,12 @@ export function countdownLabel(dueDate: Date | string, now = new Date()): string
 
 export function daysAgo(days: number, now = new Date()): Date {
   return new Date(now.getTime() - days * MS_PER_DAY);
+}
+
+/**
+ * El mes en curso en hora argentina. `formatMonthKey(new Date())` no sirve: a
+ * las 21:00 del 31 en Buenos Aires, en UTC ya es el mes siguiente.
+ */
+export function currentMonthAr(now = new Date()): string {
+  return toDateInput(now).slice(0, 7);
 }

@@ -333,3 +333,22 @@ model SocialAccountMetric {
   @@index([clientProfileId, recordedAt(sort: Desc)])
   @@map("social_account_metrics")
 }
+
+/// Un gasto de la agencia. Sin moneda ni cliente imputado: hoy lo único que se
+/// mira es cuánto se va en el mes, y agregar columnas que nadie lee cuesta más
+/// que sumarlas el día que hagan falta. El monto va en unidades enteras de
+/// moneda, igual que `Client.monthlyAmount`.
+model Expense {
+  id          Int      @id @default(autoincrement())
+  /// El mes se DERIVA de acá. Guardarlo aparte sería un segundo estado que
+  /// mantener sincronizado con la fecha.
+  date        DateTime @db.Date
+  category    String
+  description String
+  amount      Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([date])
+  @@map("expenses")
+}

@@ -10,7 +10,8 @@
     "analyze": "ANALYZE=true npm run build",
     "bootstrap:admin": "ts-node -r ./prisma/load-env.js prisma/bootstrap-admin.ts",
     "qa:agency": "TS_NODE_PROJECT=tsconfig.qa.json ts-node -r tsconfig-paths/register scripts/qa-agency.ts",
-    "qa:cover": "TS_NODE_PROJECT=tsconfig.qa.json ts-node -r tsconfig-paths/register scripts/qa-cover-image.ts"
+    "qa:cover": "TS_NODE_PROJECT=tsconfig.qa.json ts-node -r tsconfig-paths/register scripts/qa-cover-image.ts",
+    "qa:gastos": "TS_NODE_PROJECT=tsconfig.qa.json ts-node -r tsconfig-paths/register scripts/qa-expenses.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

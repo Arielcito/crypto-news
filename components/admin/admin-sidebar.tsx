@@ -17,6 +17,7 @@ import {
   LogOut,
   Tags,
   Users,
+  Wallet,
   type LucideIcon,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -49,6 +50,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/admin/agencia/clientes', label: 'Clientes', icon: Building2 },
       { href: '/admin/agencia/organico', label: 'Orgánico', icon: BarChart3 },
       { href: '/admin/agencia/reportes', label: 'Reportes', icon: FileBarChart },
+      { href: '/admin/agencia/gastos', label: 'Gastos', icon: Wallet, adminOnly: true },
       { href: '/admin/agencia/equipo', label: 'Equipo', icon: Users, adminOnly: true },
     ],
   },

@@ -151,3 +151,15 @@ export const metricsRangeSchema = z.object({
   clientId: z.number().int().positive().optional(),
   days: z.union([z.literal(7), z.literal(28), z.literal(90)]).default(28),
 });
+
+/** Un gasto suelto. El mes sale de la fecha, no se carga aparte. */
+export const createExpenseSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Usá el formato YYYY-MM-DD'),
+  category: z.string().min(1, 'Elegí o escribí una categoría').max(60),
+  description: z.string().min(1, 'Describí el gasto').max(200),
+  amount: z.number().int().min(1, 'El monto tiene que ser mayor a cero').max(1_000_000_000),
+});
+
+export const expensesQuerySchema = z.object({
+  month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Usá el formato YYYY-MM'),
+});

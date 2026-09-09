@@ -34,7 +34,13 @@ function isAllowedOrigin(origin: string): boolean {
 }
 
 /** Rutas del panel a las que un empleado no tiene por qué entrar. */
-const adminOnlyPrefixes = ['/admin/posts', '/admin/categories', '/admin/tags', '/admin/agencia/equipo'];
+const adminOnlyPrefixes = [
+  '/admin/posts',
+  '/admin/categories',
+  '/admin/tags',
+  '/admin/agencia/equipo',
+  '/admin/agencia/gastos',
+];
 
 const publicAdminPaths = ['/admin/login', '/admin/cambiar-password'];
 

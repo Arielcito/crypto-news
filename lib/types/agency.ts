@@ -2,6 +2,7 @@ import type {
   Brief,
   Client,
   ClientProfile,
+  Expense,
   Package,
   Report,
   SocialNetwork,
@@ -14,6 +15,7 @@ import type {
   completeTaskSchema,
   createClientProfileSchema,
   createClientSchema,
+  createExpenseSchema,
   createPackageSchema,
   createTaskSchema,
   createUserSchema,
@@ -26,6 +28,7 @@ import type {
 
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type CreateExpenseInput = z.infer<typeof createExpenseSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type CreateClientInput = z.infer<typeof createClientSchema>;
 export type UpdateClientInput = z.infer<typeof updateClientSchema>;
@@ -278,4 +281,62 @@ export interface AgencyReport extends Omit<Report, 'snapshot'> {
   snapshot: ReportSnapshot;
   package: Pick<Package, 'id' | 'month'> & { client: Pick<Client, 'id' | 'name'> };
   generatedBy: Pick<User, 'id' | 'name'> | null;
+}
+
+// ── Gastos ──────────────────────────────────────────────────────────────────
+
+export type AgencyExpense = Expense;
+
+export interface ExpenseMonthTotal {
+  /** `YYYY-MM`. */
+  month: string;
+  total: number;
+}
+
+export interface ExpenseCategoryTotal {
+  category: string;
+  total: number;
+}
+
+export interface ExpensesOverview {
+  /** El mes consultado, `YYYY-MM`. */
+  month: string;
+  monthTotal: number;
+  /** Acumulado dividido por los meses transcurridos desde el primer gasto. */
+  monthlyAverage: number;
+  allTimeTotal: number;
+  monthsTracked: number;
+  /** Todos los meses con gastos, del más viejo al más nuevo. */
+  series: ExpenseMonthTotal[];
+  /** Sólo del mes consultado, de mayor a menor. */
+  byCategory: ExpenseCategoryTotal[];
+  /** Sólo los del mes consultado. */
+  expenses: AgencyExpense[];
+}
+
+/**
+ * Categorías sugeridas en el alta. Es un `datalist`, no un enum: el día que
+ * aparezca un gasto que no entra en ninguna, se escribe y listo — sin migración.
+ */
+export const EXPENSE_CATEGORIES = [
+  'Sueldos',
+  'Freelancers',
+  'Publicidad',
+  'Herramientas',
+  'Infraestructura',
+  'Impuestos',
+  'Oficina',
+  'Otros',
+] as const;
+
+/**
+ * Pesos, sin centavos: los montos se guardan en unidades enteras y un gasto de
+ * agencia nunca se mira con la precisión del centavo.
+ */
+export function formatMoney(amount: number): string {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    maximumFractionDigits: 0,
+  }).format(amount);
 }
