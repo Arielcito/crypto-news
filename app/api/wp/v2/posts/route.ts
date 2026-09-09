@@ -196,13 +196,11 @@ export async function POST(request: NextRequest) {
      * URL. Si el espejado falla (imagen caída, formato raro, host lento) se
      * guarda la original: una portada prestada es mejor que no publicar.
      */
-    let featuredMedia: string | null = body.featured_media || null;
-    if (
-      typeof featuredMedia === 'string' &&
-      /^https?:\/\//i.test(featuredMedia) &&
-      !isMirroredUrl(featuredMedia) &&
-      body.mirror_media !== false
-    ) {
+    const rawMedia: unknown = body.featured_media;
+    let featuredMedia: string | null =
+      typeof rawMedia === 'string' && /^https?:\/\//i.test(rawMedia.trim()) ? rawMedia.trim() : null;
+
+    if (featuredMedia && !isMirroredUrl(featuredMedia) && body.mirror_media !== false) {
       try {
         featuredMedia = await mirrorRemoteImage(featuredMedia, slug);
         console.log('[POST] /api/wp/v2/posts - Imagen espejada en Blob:', featuredMedia);
