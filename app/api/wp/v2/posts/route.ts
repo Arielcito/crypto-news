@@ -218,15 +218,23 @@ export async function POST(request: NextRequest) {
      * peor que publicarla sin imagen, y la fila del sheet ya quedó marcada como
      * procesada, o sea que no se vuelve a leer nunca.
      */
-    if (!featuredMedia && canGenerateCover()) {
-      try {
-        featuredMedia = await generateCoverImage(body.title, body.excerpt || '', slug);
-        console.log('[POST] /api/wp/v2/posts - Portada generada:', featuredMedia);
-      } catch (error) {
-        console.warn(
-          '[POST] /api/wp/v2/posts - No se pudo generar la portada:',
-          error instanceof Error ? error.message : error
-        );
+    // Se devuelve en la respuesta porque la ingesta corre en Make y los logs de
+    // Vercel no están a mano: sin esto, "salió sin portada" no dice por qué.
+    let cover = 'no hacía falta';
+
+    if (!featuredMedia) {
+      if (!canGenerateCover()) {
+        cover = 'falta GEMINI_API_KEY';
+        console.warn('[POST] /api/wp/v2/posts - Sin GEMINI_API_KEY, se publica sin portada');
+      } else {
+        try {
+          featuredMedia = await generateCoverImage(body.title, body.excerpt || '', slug);
+          cover = 'generada';
+          console.log('[POST] /api/wp/v2/posts - Portada generada:', featuredMedia);
+        } catch (error) {
+          cover = error instanceof Error ? error.message : String(error);
+          console.warn('[POST] /api/wp/v2/posts - No se pudo generar la portada:', cover);
+        }
       }
     }
 
@@ -276,7 +284,7 @@ export async function POST(request: NextRequest) {
     // y por status, y nunca lanza.
     await notifyPostPublished(newPost);
 
-    return Response.json({ data: newPostWithRelations }, { status: 201 });
+    return Response.json({ data: newPostWithRelations, cover }, { status: 201 });
   } catch (error: any) {
     console.error('[POST] /api/wp/v2/posts - Error creating post:', error);
 
