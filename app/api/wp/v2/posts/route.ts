@@ -13,6 +13,10 @@ import {
 } from '@/lib/services/posts-service';
 import { notifyPostPublished } from '@/lib/services/discord';
 import { isMirroredUrl, mirrorRemoteImage } from '@/lib/services/media-mirror';
+import { canGenerateCover, generateCoverImage } from '@/lib/services/cover-image';
+
+// Generar la portada con Gemini tarda entre 10 y 30 segundos.
+export const maxDuration = 60;
 
 export async function GET(request: NextRequest) {
     try {
@@ -205,6 +209,24 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         console.warn(
           '[POST] /api/wp/v2/posts - No se pudo espejar la imagen, se usa la original:',
+          error instanceof Error ? error.message : error
+        );
+      }
+    }
+
+    /*
+     * Sin portada la nota queda con el placeholder gris en la grilla, así que
+     * se genera una. Si Gemini falla se publica igual: perder la noticia es
+     * peor que publicarla sin imagen, y la fila del sheet ya quedó marcada como
+     * procesada, o sea que no se vuelve a leer nunca.
+     */
+    if (!featuredMedia && canGenerateCover()) {
+      try {
+        featuredMedia = await generateCoverImage(body.title, body.excerpt || '', slug);
+        console.log('[POST] /api/wp/v2/posts - Portada generada:', featuredMedia);
+      } catch (error) {
+        console.warn(
+          '[POST] /api/wp/v2/posts - No se pudo generar la portada:',
           error instanceof Error ? error.message : error
         );
       }
