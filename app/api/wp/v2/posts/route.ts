@@ -155,17 +155,30 @@ export async function POST(request: NextRequest) {
     // Ensure domain is provided or default
     const domain = body.domain || 'default';
 
+    /*
+     * La ingesta manda a veces un id suelto ("categories": 173) en vez de un
+     * array. Se normaliza acá, antes de validar y de conectar relaciones, para
+     * que ningún cliente pueda reventar el .map de más abajo.
+     */
+    const toIdArray = (value: unknown): number[] =>
+      (Array.isArray(value) ? value : value === undefined || value === null || value === '' ? [] : [value])
+        .map(Number)
+        .filter(id => Number.isInteger(id));
+
+    const categoryIds = toIdArray(body.categories);
+    const tagIds = toIdArray(body.tags);
+
     // Validate that categories exist for the given domain
-    if (body.categories?.length) {
-      const categoryValidation = await validateCategoriesForDomain(body.categories, domain);
+    if (categoryIds.length) {
+      const categoryValidation = await validateCategoriesForDomain(categoryIds, domain);
       if (!categoryValidation.valid) {
         return Response.json({ error: 'Bad request', message: `Categories not found for domain ${domain}: ${categoryValidation.missingIds.join(', ')}` }, { status: 400 });
       }
     }
 
     // Validate that tags exist (assuming tags are not domain-specific for now)
-    if (body.tags?.length) {
-      const tagValidation = await validateTagsExist(body.tags);
+    if (tagIds.length) {
+      const tagValidation = await validateTagsExist(tagIds);
       if (!tagValidation.valid) {
         return Response.json({ error: 'Bad request', message: `Tags not found: ${tagValidation.missingIds.join(', ')}` }, { status: 400 });
       }
@@ -206,8 +219,8 @@ export async function POST(request: NextRequest) {
       author: body.author || 1,
       featuredMedia,
       domain: domain,
-      categories: body.categories?.length || 0,
-      tags: body.tags?.length || 0
+      categories: categoryIds.length,
+      tags: tagIds.length
     });
 
     const newPostData: Prisma.PostCreateInput = {
@@ -220,10 +233,10 @@ export async function POST(request: NextRequest) {
         featuredMedia,
         domain: domain,
         categories: {
-          connect: body.categories?.map((id: number) => ({ id })) || []
+          connect: categoryIds.map(id => ({ id }))
         },
         tags: {
-          connect: body.tags?.map((id: number) => ({ id })) || []
+          connect: tagIds.map(id => ({ id }))
         }
     };
 
