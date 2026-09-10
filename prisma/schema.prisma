@@ -334,10 +334,10 @@ model SocialAccountMetric {
   @@map("social_account_metrics")
 }
 
-/// Un gasto de la agencia. Sin moneda ni cliente imputado: hoy lo único que se
-/// mira es cuánto se va en el mes, y agregar columnas que nadie lee cuesta más
-/// que sumarlas el día que hagan falta. El monto va en unidades enteras de
-/// moneda, igual que `Client.monthlyAmount`.
+/// Un gasto de IA de la agencia: Anthropic, OpenAI, Gemini, Make. `category` es
+/// la herramienta. Sin columna de moneda porque todos facturan en USD, y sin
+/// cliente imputado porque hoy lo único que se mira es cuánto se va por mes; el
+/// monto va en dólares enteros.
 model Expense {
   id          Int      @id @default(autoincrement())
   /// El mes se DERIVA de acá. Guardarlo aparte sería un segundo estado que

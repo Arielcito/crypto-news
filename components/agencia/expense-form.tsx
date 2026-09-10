@@ -78,19 +78,19 @@ export function ExpenseForm({ month, onSubmit, isPending = false }: ExpenseFormP
           />
           {errors.amount && <p className="text-sm text-destructive">{errors.amount.message}</p>}
           <p className="text-xs" style={MUTED_STYLE}>
-            En pesos, sin centavos.
+            En dólares, sin centavos.
           </p>
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="expense-category">Categoría</Label>
+        <Label htmlFor="expense-category">Herramienta</Label>
         {/* Lista nativa: sugiere las de siempre y deja escribir una nueva. */}
         <Input
           id="expense-category"
           list="expense-categories"
           autoComplete="off"
-          placeholder="Herramientas"
+          placeholder="Anthropic"
           className={ADMIN_INPUT_CLASS}
           {...register('category', { required: 'Elegí o escribí una categoría' })}
         />
@@ -106,7 +106,7 @@ export function ExpenseForm({ month, onSubmit, isPending = false }: ExpenseFormP
         <Label htmlFor="expense-description">Detalle</Label>
         <Input
           id="expense-description"
-          placeholder="Suscripción a Canva"
+          placeholder="Plan Max de Claude"
           className={ADMIN_INPUT_CLASS}
           {...register('description', { required: 'Describí el gasto' })}
         />

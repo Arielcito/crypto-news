@@ -315,28 +315,29 @@ export interface ExpensesOverview {
 }
 
 /**
- * Categorías sugeridas en el alta. Es un `datalist`, no un enum: el día que
- * aparezca un gasto que no entra en ninguna, se escribe y listo — sin migración.
+ * Herramientas sugeridas en el alta. Es un `datalist`, no un enum: el día que
+ * aparezca un proveedor nuevo — y en IA aparece uno por mes — se escribe y
+ * listo, sin migración.
  */
 export const EXPENSE_CATEGORIES = [
-  'Sueldos',
-  'Freelancers',
-  'Publicidad',
-  'Herramientas',
-  'Infraestructura',
-  'Impuestos',
-  'Oficina',
+  'Anthropic',
+  'OpenAI',
+  'Google Gemini',
+  'Make',
+  'Perplexity',
+  'ElevenLabs',
   'Otros',
 ] as const;
 
 /**
- * Pesos, sin centavos: los montos se guardan en unidades enteras y un gasto de
- * agencia nunca se mira con la precisión del centavo.
+ * Dólares, sin centavos: los proveedores de IA facturan en USD y el gasto se
+ * mira por mes, no al centavo. Una sola moneda, así que no hay columna de
+ * moneda ni conversión que mantener.
  */
 export function formatMoney(amount: number): string {
   return new Intl.NumberFormat('es-AR', {
     style: 'currency',
-    currency: 'ARS',
+    currency: 'USD',
     maximumFractionDigits: 0,
   }).format(amount);
 }

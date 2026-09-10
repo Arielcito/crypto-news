@@ -10,7 +10,7 @@ export default async function AgenciaGastosPage() {
 
   return (
     <div>
-      <AdminPageHeader eyebrow="Agencia" title="Gastos" />
+      <AdminPageHeader eyebrow="Agencia" title="Gastos de IA" />
       <ExpensesDashboard />
     </div>
   );

@@ -118,8 +118,8 @@ export function ExpensesDashboard() {
           </div>
 
           <AgencyCard
-            title="Por categoría"
-            description={`En qué se fue la plata de ${monthLabel(month)}.`}
+            title="Por herramienta"
+            description={`En qué herramienta se fue la plata de ${monthLabel(month)}.`}
           >
             {data.byCategory.length === 0 ? (
               <EmptyState
