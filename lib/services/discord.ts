@@ -13,7 +13,16 @@ const SEND_TIMEOUT_MS = 5000;
 
 export type NotifiablePost = Pick<
   Post,
-  'id' | 'title' | 'slug' | 'excerpt' | 'content' | 'featuredMedia' | 'status' | 'domain' | 'discordPostedAt'
+  | 'id'
+  | 'title'
+  | 'slug'
+  | 'excerpt'
+  | 'content'
+  | 'featuredMedia'
+  | 'status'
+  | 'domain'
+  | 'discordPostedAt'
+  | 'telegramPostedAt'
 > & {
   categories: Pick<DomainCategories, 'name' | 'slug'>[];
 };
@@ -29,7 +38,7 @@ type DiscordEmbed = {
   footer: { text: string };
 };
 
-function stripMarkdown(text: string, max = DESCRIPTION_MAX): string {
+export function stripMarkdown(text: string, max = DESCRIPTION_MAX): string {
   const stripped = text
     .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
@@ -40,7 +49,7 @@ function stripMarkdown(text: string, max = DESCRIPTION_MAX): string {
   return `${stripped.slice(0, max - 1)}…`;
 }
 
-function buildPostUrl(post: NotifiablePost): string {
+export function buildPostUrl(post: NotifiablePost): string {
   // En dev el post queda con domain "localhost"; el link tiene que apuntar al sitio público igual.
   const host = post.domain === ADMIN_DOMAIN ? post.domain : ADMIN_DOMAIN;
   const categorySlug = post.categories[0]?.slug;
@@ -107,22 +116,10 @@ async function send(embed: DiscordEmbed, attempt = 1): Promise<boolean> {
  *
  * Fire-and-forget por diseño: nunca lanza. Si Discord falla, el post ya quedó
  * creado y `discordPostedAt` sigue en null, así que un reintento posterior
- * (volver a guardar el post) lo vuelve a intentar.
+ * (volver a guardar el post) lo vuelve a intentar. Los cortes por dominio y
+ * status los hace `notifyPostPublished`.
  */
-export async function notifyPostPublished(post: NotifiablePost): Promise<boolean> {
-  // /api/wp/v2/posts acepta cualquier `domain` (incluso "default"), y el link del
-  // embed siempre apunta a ADMIN_DOMAIN. Sin este corte publicaríamos en #noticias
-  // notas de otro sitio con una URL que no existe.
-  if (post.domain !== ADMIN_DOMAIN) {
-    console.log(`[discord] post ${post.id} del dominio "${post.domain}" — no se notifica`);
-    return false;
-  }
-
-  if (post.status !== 'publish') {
-    console.log(`[discord] post ${post.id} en estado "${post.status}" — no se notifica`);
-    return false;
-  }
-
+export async function notifyDiscord(post: NotifiablePost): Promise<boolean> {
   if (post.discordPostedAt) {
     console.log(`[discord] post ${post.id} ya notificado el ${post.discordPostedAt.toISOString()}`);
     return false;

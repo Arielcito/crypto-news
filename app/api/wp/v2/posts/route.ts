@@ -11,7 +11,7 @@ import {
   validateCategoriesForDomain,
   validateTagsExist,
 } from '@/lib/services/posts-service';
-import { notifyPostPublished } from '@/lib/services/discord';
+import { notifyPostPublished } from '@/lib/services/notify';
 import { isMirroredUrl, mirrorRemoteImage } from '@/lib/services/media-mirror';
 import { canGenerateCover, generateCoverImage } from '@/lib/services/cover-image';
 
@@ -280,7 +280,7 @@ export async function POST(request: NextRequest) {
     const newPostWithRelations = newPost as PostWithRelations;
 
     // Esta es la ruta que usa la ingesta automática, así que es la que dispara
-    // la mayoría de los avisos a Discord. notifyPostPublished filtra por dominio
+    // la mayoría de los avisos a Discord y Telegram. notifyPostPublished filtra por dominio
     // y por status, y nunca lanza.
     await notifyPostPublished(newPost);
 

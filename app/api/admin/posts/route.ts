@@ -9,7 +9,7 @@ import {
   validateCategoriesForDomain,
   validateTagsExist,
 } from '@/lib/services/posts-service';
-import { notifyPostPublished } from '@/lib/services/discord';
+import { notifyPostPublished } from '@/lib/services/notify';
 import { ADMIN_DOMAIN } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {

@@ -32,6 +32,7 @@ model Post {
   isActive        Boolean            @default(true) @map("is_active")
   featured        Boolean            @default(false)
   discordPostedAt DateTime?          @map("discord_posted_at")
+  telegramPostedAt DateTime?         @map("telegram_posted_at")
   categories      DomainCategories[]
   tags            Tag[]
 
