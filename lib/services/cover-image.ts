@@ -36,11 +36,14 @@ export const canGenerateCover = (): boolean => Boolean(process.env.GEMINI_API_KE
 
 export function buildCoverPrompt(title: string, excerpt: string): string {
   return [
-    'Ilustración editorial digital para la portada de una nota de un medio de criptomonedas.',
+    // Fotográfica, no ilustración: el render 3D se veía genérico y "hecho con IA".
+    'Fotografía periodística realista para la portada de una nota de un medio de criptomonedas.',
     `Titular: «${title}»`,
     excerpt ? `Contexto: ${excerpt.slice(0, 400)}` : '',
-    'Estilo: render 3D moderno y limpio, iluminación cinematográfica, paleta oscura con acentos naranjas.',
-    'Representá la idea de forma simbólica: gráficos, monedas, arquitectura, mapas, dispositivos.',
+    'Mostrá una escena concreta y creíble que podría haber tomado un fotógrafo de agencia:',
+    'edificios de gobierno o bancos, calles y comercios, oficinas, pantallas de trading, hardware de minería, manos usando un celular.',
+    'Estilo: foto documental con cámara réflex, lente 35 mm, luz natural, profundidad de campo baja, grano sutil, colores naturales.',
+    'Evitá lo que delata una imagen generada: nada de monedas doradas flotando, hologramas, neón, brillos, render 3D ni estética de ciencia ficción.',
     'Sin texto, letras, números ni logos. Sin personas reales identificables. Sin marcas de agua.',
   ]
     .filter(Boolean)
