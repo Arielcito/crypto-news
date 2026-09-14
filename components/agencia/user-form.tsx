@@ -53,7 +53,7 @@ export function UserForm({ onSubmit, isPending = false }: UserFormProps) {
           ))}
         </select>
         <p className="text-xs" style={MUTED_STYLE}>
-          Los empleados sólo ven los clientes donde tienen tareas asignadas.
+          El rol Equipo sólo ve los clientes donde tiene tareas asignadas.
         </p>
       </div>
 

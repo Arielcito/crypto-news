@@ -97,7 +97,9 @@ export const NETWORK_LABELS: Record<SocialNetwork, string> = {
 
 export const ROLE_LABELS: Record<'ADMIN' | 'EMPLOYEE', string> = {
   ADMIN: 'Admin',
-  EMPLOYEE: 'Empleado',
+  // Sólo cambia el nombre visible: "empleado" sonaba a relación laboral. El
+  // valor del enum queda EMPLOYEE para no migrar la base por una etiqueta.
+  EMPLOYEE: 'Equipo',
 };
 
 export const CLIENT_STATUS_LABELS: Record<'ACTIVE' | 'PAUSED' | 'CHURNED', string> = {
@@ -324,13 +326,14 @@ export const EXPENSE_CATEGORIES = [
   'OpenAI',
   'Google Gemini',
   'Make',
+  'PostProxy',
   'Perplexity',
   'ElevenLabs',
   'Otros',
 ] as const;
 
 /**
- * Dólares, sin centavos: los proveedores de IA facturan en USD y el gasto se
+ * Dólares, sin centavos: los proveedores facturan en USD y el gasto se
  * mira por mes, no al centavo. Una sola moneda, así que no hay columna de
  * moneda ni conversión que mantener.
  */
