@@ -25,6 +25,13 @@ console.log('\nPrompt');
 const prompt = buildCoverPrompt(title, excerpt);
 check('incluye el titular', prompt.includes(title));
 check('prohíbe el texto en la imagen', /Sin texto/.test(prompt));
+check('la escena es estable para el mismo titular', buildCoverPrompt(title, excerpt) === prompt);
+const scenes = new Set(
+  ['Banco Checo compra Bitcoin', 'Crypto.com saca USDT', 'Utah invierte en cripto', 'Hackeo a HashKey', 'ETF de Solana'].map(
+    (t) => buildCoverPrompt(t, '').match(/Escena: (.*)/)?.[1]
+  )
+);
+check('titulares distintos reciben escenas variadas', scenes.size >= 3, scenes);
 
 console.log('\nParseo de la respuesta');
 check(

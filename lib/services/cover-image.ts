@@ -34,14 +34,36 @@ interface InteractionResponse {
 
 export const canGenerateCover = (): boolean => Boolean(process.env.GEMINI_API_KEY);
 
+// Con una lista abierta de opciones el modelo siempre elegía la más típica
+// (una persona mirando el celular en la calle) y todas las portadas salían
+// iguales. Cada nota recibe una sola escena, fija por titular.
+const SCENES = [
+  'la fachada o el interior de un edificio institucional (parlamento, banco central, tribunal, ministerio), sin personas en primer plano',
+  'un primer plano de hardware: servidores, racks o máquinas de minería con cables y luces de estado',
+  'un monitor de trading con gráficos de velas en una oficina en penumbra, visto de costado y desenfocado',
+  'una sala de reuniones o conferencia de prensa vista desde el fondo, con micrófonos y sillas',
+  'un plano detalle de documentos, carpetas y una lapicera sobre un escritorio de madera',
+  'una vista aérea o panorámica de una ciudad o distrito financiero',
+  'un comercio o mercado callejero con un cartel de pago en efectivo o terminal de cobro',
+  'una planta industrial o de energía (represa, parque solar, galpón) en exteriores',
+  'un plano detalle de una laptop con código o una terminal en un escritorio',
+  'un pasillo de oficina corporativa vacío con paredes de vidrio',
+];
+
+function pickScene(title: string): string {
+  let hash = 0;
+  for (const char of title) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return SCENES[hash % SCENES.length];
+}
+
 export function buildCoverPrompt(title: string, excerpt: string): string {
   return [
     // Fotográfica, no ilustración: el render 3D se veía genérico y "hecho con IA".
     'Fotografía periodística realista para la portada de una nota de un medio de criptomonedas.',
     `Titular: «${title}»`,
     excerpt ? `Contexto: ${excerpt.slice(0, 400)}` : '',
-    'Mostrá una escena concreta y creíble que podría haber tomado un fotógrafo de agencia:',
-    'edificios de gobierno o bancos, calles y comercios, oficinas, pantallas de trading, hardware de minería, manos usando un celular.',
+    `Escena: ${pickScene(title)}. Adaptala al tema del titular (país, sector, tipo de institución).`,
+    'No muestres personas mirando o sosteniendo un celular.',
     'Estilo: foto documental con cámara réflex, lente 35 mm, luz natural, profundidad de campo baja, grano sutil, colores naturales.',
     'Evitá lo que delata una imagen generada: nada de monedas doradas flotando, hologramas, neón, brillos, render 3D ni estética de ciencia ficción.',
     'Sin texto, letras, números ni logos. Sin personas reales identificables. Sin marcas de agua.',
