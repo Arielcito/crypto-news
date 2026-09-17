@@ -50,10 +50,26 @@ const SCENES = [
   'un pasillo de oficina corporativa vacío con paredes de vidrio',
 ];
 
+// Segundo eje: con 10 escenas para decenas de notas la escena se repite, y dos
+// notas con la misma escena salían casi idénticas. El encuadre las despega.
+const FRAMINGS = [
+  'plano general, cámara a la altura de los ojos, luz de mediodía',
+  'plano detalle bien cerca del sujeto, luz cálida de tarde',
+  'contrapicado desde abajo, cielo nublado',
+  'picado desde arriba, luz difusa',
+  'plano lateral con el sujeto descentrado a la izquierda, hora dorada',
+  'plano a contraluz con la silueta recortada, interior en penumbra',
+];
+
+function hashOf(text: string, seed: number): number {
+  let hash = seed;
+  for (const char of text) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return hash;
+}
+
 function pickScene(title: string): string {
-  let hash = 0;
-  for (const char of title) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return SCENES[hash % SCENES.length];
+  const scene = SCENES[hashOf(title, 0) % SCENES.length];
+  return `${scene}. Encuadre: ${FRAMINGS[hashOf(title, 7) % FRAMINGS.length]}`;
 }
 
 export function buildCoverPrompt(title: string, excerpt: string): string {
