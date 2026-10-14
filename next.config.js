@@ -52,6 +52,15 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/:category/qu-es-bitcoin-por-qu-es-escaso-y-c-mo-empezar-la-charla-con-armel-de-amorrortu-en-sin-vueltas-by-grabrfi',
+        destination: '/adopcion-de-cripto/grabrfi-bitcoin-argentina-sin-vueltas-entender-bitcoin-desde-cero',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [];
   },
