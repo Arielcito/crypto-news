@@ -84,6 +84,8 @@ export async function GET(request: NextRequest) {
     const where: Prisma.PostWhereInput = {
       AND: [
         { isActive: true },
+        // Endpoint público: los borradores sólo se ven desde /api/admin.
+        { status: 'publish' },
         domain ? { domain } : {},
         search ? {
           OR: [

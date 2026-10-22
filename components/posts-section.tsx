@@ -49,7 +49,7 @@ function PostCard({ post, category }: { post: Post, category: string }) {
         <div className="p-2">
           <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
             <span className="bg-primary/10 text-primary py-0.5 rounded-full text-[10px]">
-              {post.categories[0].name}
+              {post.categories[0]?.name ?? 'general'}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-2.5 h-2.5" />
