@@ -241,7 +241,7 @@ export function PostForm({
                     <SelectTrigger className={ADMIN_INPUT_CLASS}>
                       <SelectValue placeholder="Estado" />
                     </SelectTrigger>
-                    <SelectContent style={ADMIN_SURFACE_STYLE}>
+                    <SelectContent className="admin-portal" style={ADMIN_SURFACE_STYLE}>
                       <SelectItem value="draft">Borrador</SelectItem>
                       <SelectItem value="publish">Publicado</SelectItem>
                     </SelectContent>
@@ -263,7 +263,15 @@ export function PostForm({
                     <SelectTrigger className={ADMIN_INPUT_CLASS}>
                       <SelectValue placeholder="Seleccionar autor" />
                     </SelectTrigger>
-                    <SelectContent style={ADMIN_SURFACE_STYLE}>
+                    <SelectContent className="admin-portal" style={ADMIN_SURFACE_STYLE}>
+                      {authors.length === 0 && (
+                        <p
+                          className="px-2 py-1.5 text-sm"
+                          style={{ color: 'hsl(var(--admin-muted-foreground))' }}
+                        >
+                          No hay autores cargados
+                        </p>
+                      )}
                       {authors.map((author) => (
                         <SelectItem key={author.id} value={String(author.id)}>
                           {author.name}

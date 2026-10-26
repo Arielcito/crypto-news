@@ -106,7 +106,7 @@ export function PostsList() {
             <SelectTrigger className={`sm:w-40 ${ADMIN_INPUT_CLASS}`}>
               <SelectValue placeholder="Estado" />
             </SelectTrigger>
-            <SelectContent style={ADMIN_SURFACE_STYLE}>
+            <SelectContent className="admin-portal" style={ADMIN_SURFACE_STYLE}>
               <SelectItem value="all">Todos</SelectItem>
               <SelectItem value="publish">Publicado</SelectItem>
               <SelectItem value="draft">Borrador</SelectItem>
