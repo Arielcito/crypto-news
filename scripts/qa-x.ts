@@ -5,6 +5,7 @@
  *   npm run qa:x
  */
 import { buildTweet } from '@/lib/services/x';
+import { shouldNotifyOnUpdate } from '@/lib/services/notify';
 import type { NotifiablePost } from '@/lib/services/discord';
 
 const base: NotifiablePost = {
@@ -22,6 +23,9 @@ const base: NotifiablePost = {
   categories: [{ name: 'Mercados', slug: 'mercados' }],
 };
 
+const now = Date.now();
+const daysAgo = (days: number) => new Date(now - days * 24 * 60 * 60 * 1000);
+
 const url = 'https://bitcoinarg.news/mercados/bitcoin-supera-100k';
 const tweet = buildTweet(base);
 const long = buildTweet({ ...base, title: 'a'.repeat(400), featuredMedia: null });
@@ -32,6 +36,9 @@ const checks: [string, boolean][] = [
   ['sube la portada', tweet.media?.[0] === base.featuredMedia],
   ['sin portada no manda media', !('media' in long)],
   ['recorta el título a 280 con …', long.post.body.length === 280 && long.post.body.endsWith('…')],
+  ['editar un draft viejo y publicarlo avisa', shouldNotifyOnUpdate({ status: 'draft', date: daysAgo(30) }, now)],
+  ['re-guardar una nota publicada hoy avisa (reintento)', shouldNotifyOnUpdate({ status: 'publish', date: daysAgo(0.5) }, now)],
+  ['re-guardar una nota publicada vieja NO avisa', !shouldNotifyOnUpdate({ status: 'publish', date: daysAgo(3) }, now)],
 ];
 
 const failed = checks.filter(([, ok]) => !ok);

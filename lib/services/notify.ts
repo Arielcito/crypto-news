@@ -1,7 +1,22 @@
+import type { Post } from '@prisma/client';
 import { ADMIN_DOMAIN } from '@/lib/constants';
 import { notifyDiscord, type NotifiablePost } from '@/lib/services/discord';
 import { notifyTelegram } from '@/lib/services/telegram';
 import { notifyX } from '@/lib/services/x';
+
+const RETRY_WINDOW_MS = 48 * 60 * 60 * 1000;
+
+/**
+ * Al editar un post: avisa si pasa draft → publish, o si ya estaba publicado y
+ * es reciente (reintento de un canal que falló). Sin el corte, re-guardar
+ * cualquier nota vieja la anunciaba, porque su stamp de X/Telegram nunca se llenó.
+ */
+export function shouldNotifyOnUpdate(
+  before: Pick<Post, 'status' | 'date'>,
+  now: number = Date.now()
+): boolean {
+  return before.status !== 'publish' || now - before.date.getTime() < RETRY_WINDOW_MS;
+}
 
 /**
  * Avisa un post publicado en todos los canales (Discord, Telegram y X). Nunca
