@@ -64,7 +64,7 @@ const SITE_IDENTITIES: Record<KnownDomain, SiteIdentity> = {
     shortName: "BITCOINARG",
     description:
       "Noticias y análisis sobre Bitcoin, criptomonedas y blockchain en Argentina y Latinoamérica.",
-    twitterHandle: "@bitcoinargnews",
+    twitterHandle: "@BitcoinArgOK",
     logo: "/bitcoinarg/logo.png",
     socialLinks: [
       "https://t.me/bitcoinargentinacomunidad",

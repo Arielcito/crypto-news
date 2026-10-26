@@ -16,6 +16,7 @@ const message = buildTelegramMessage({
   domain: 'bitcoinarg.news',
   discordPostedAt: null,
   telegramPostedAt: null,
+  xPostedAt: null,
   categories: [{ name: 'Mercados', slug: 'mercados' }],
 });
 

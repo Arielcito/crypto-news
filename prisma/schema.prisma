@@ -14,27 +14,28 @@ datasource db {
 }
 
 model Post {
-  id              Int                @id @default(autoincrement())
-  date            DateTime           @default(now())
-  dateGmt         DateTime           @default(now()) @map("date_gmt")
-  modified        DateTime           @default(now())
-  modifiedGmt     DateTime           @default(now()) @map("modified_gmt")
-  slug            String             @unique
-  status          String             @default("publish")
-  title           String
-  content         String             @db.Text
-  excerpt         String?            @db.Text
-  author          Int
-  authorRef       Author?            @relation(fields: [authorRefId], references: [id])
-  authorRefId     Int?               @map("author_ref_id")
-  featuredMedia   String?            @map("featured_media")
-  domain          String
-  isActive        Boolean            @default(true) @map("is_active")
-  featured        Boolean            @default(false)
-  discordPostedAt DateTime?          @map("discord_posted_at")
-  telegramPostedAt DateTime?         @map("telegram_posted_at")
-  categories      DomainCategories[]
-  tags            Tag[]
+  id               Int                @id @default(autoincrement())
+  date             DateTime           @default(now())
+  dateGmt          DateTime           @default(now()) @map("date_gmt")
+  modified         DateTime           @default(now())
+  modifiedGmt      DateTime           @default(now()) @map("modified_gmt")
+  slug             String             @unique
+  status           String             @default("publish")
+  title            String
+  content          String             @db.Text
+  excerpt          String?            @db.Text
+  author           Int
+  authorRef        Author?            @relation(fields: [authorRefId], references: [id])
+  authorRefId      Int?               @map("author_ref_id")
+  featuredMedia    String?            @map("featured_media")
+  domain           String
+  isActive         Boolean            @default(true) @map("is_active")
+  featured         Boolean            @default(false)
+  discordPostedAt  DateTime?          @map("discord_posted_at")
+  telegramPostedAt DateTime?          @map("telegram_posted_at")
+  xPostedAt        DateTime?          @map("x_posted_at")
+  categories       DomainCategories[]
+  tags             Tag[]
 
   @@index([authorRefId])
   @@map("posts")

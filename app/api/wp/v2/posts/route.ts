@@ -282,7 +282,7 @@ export async function POST(request: NextRequest) {
     const newPostWithRelations = newPost as PostWithRelations;
 
     // Esta es la ruta que usa la ingesta automática, así que es la que dispara
-    // la mayoría de los avisos a Discord y Telegram. notifyPostPublished filtra por dominio
+    // la mayoría de los avisos a Discord, Telegram y X. notifyPostPublished filtra por dominio
     // y por status, y nunca lanza.
     await notifyPostPublished(newPost);
 

@@ -23,6 +23,7 @@ export type NotifiablePost = Pick<
   | 'domain'
   | 'discordPostedAt'
   | 'telegramPostedAt'
+  | 'xPostedAt'
 > & {
   categories: Pick<DomainCategories, 'name' | 'slug'>[];
 };
@@ -81,7 +82,10 @@ async function send(embed: DiscordEmbed, attempt = 1): Promise<boolean> {
   }
 
   try {
-    const response = await fetch(`${WEBHOOK_URL}?wait=true`, {
+    // Sin ?wait=true: con wait Discord responde recién después de procesar el
+    // embed (1–3 s, más en frío), el timeout cortaba con el mensaje ya publicado
+    // y el post quedaba sin stamp, listo para duplicarse al volver a guardarlo.
+    const response = await fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'User-Agent': USER_AGENT },
       // allowed_mentions vacío: garantiza que ningún @everyone o @rol dentro del

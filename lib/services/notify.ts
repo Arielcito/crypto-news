@@ -1,9 +1,10 @@
 import { ADMIN_DOMAIN } from '@/lib/constants';
 import { notifyDiscord, type NotifiablePost } from '@/lib/services/discord';
 import { notifyTelegram } from '@/lib/services/telegram';
+import { notifyX } from '@/lib/services/x';
 
 /**
- * Avisa un post publicado en todos los canales (Discord y Telegram). Nunca
+ * Avisa un post publicado en todos los canales (Discord, Telegram y X). Nunca
  * lanza: cada canal tiene su propio stamp, así que si uno falla el otro no se
  * duplica al reintentar.
  */
@@ -21,5 +22,5 @@ export async function notifyPostPublished(post: NotifiablePost): Promise<void> {
     return;
   }
 
-  await Promise.all([notifyDiscord(post), notifyTelegram(post)]);
+  await Promise.all([notifyDiscord(post), notifyTelegram(post), notifyX(post)]);
 }

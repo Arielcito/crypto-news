@@ -47,7 +47,7 @@ const bitcoinArgConfig: Omit<DomainConfig, 'domain' | 'colors'> = {
     description: 'Las últimas noticias sobre Bitcoin, criptomonedas y blockchain en Argentina y Latinoamérica.',
     title: 'BITCOIN ARGENTINA | Noticias de Bitcoin y Criptomonedas en Argentina',
     ogImage: '/bitcoinarg/og-image.jpg',
-    twitterHandle: '@bitcoinargnews',
+    twitterHandle: '@BitcoinArgOK',
     logo: '/bitcoinarg/logo.png',
     logoDark: '/bitcoinarg/logo.png',
     socialLinks: {
