@@ -58,13 +58,22 @@ function ApprovalNote() {
   );
 }
 
-function TaskButtons({ task, actions }: { task: AgencyTask; actions: TaskActions }) {
+function TaskButtons({
+  task,
+  actions,
+  compact = false,
+}: {
+  task: AgencyTask;
+  actions: TaskActions;
+  /** En la tabla todo va en una línea: "Completar" queda sólo con el ícono. */
+  compact?: boolean;
+}) {
   const pending = task.status === 'PENDING';
   const cancelled = task.status === 'CANCELLED';
   // Reabrir una cancelada es del admin, igual que cancelarla.
   const canReopen = cancelled ? !!actions.onCancel : task.status === 'DONE';
   return (
-    <div className="flex flex-wrap items-center justify-end gap-1">
+    <div className={`flex items-center justify-end gap-1 ${compact ? 'flex-nowrap' : 'flex-wrap'}`}>
       {task.permalink && (
         <Button variant="ghost" size="icon" asChild>
           <a href={task.permalink} target="_blank" rel="noreferrer" aria-label="Ver la pieza publicada">
@@ -79,12 +88,22 @@ function TaskButtons({ task, actions }: { task: AgencyTask; actions: TaskActions
           </a>
         </Button>
       )}
-      {pending && actions.onComplete && (
+      {pending && actions.onComplete && (compact ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => actions.onComplete?.(task)}
+          aria-label="Completar tarea"
+          title="Completar"
+        >
+          <CheckCircle2 className="h-4 w-4" />
+        </Button>
+      ) : (
         <Button variant="ghost" size="sm" onClick={() => actions.onComplete?.(task)}>
           <CheckCircle2 className="mr-2 h-4 w-4" />
           Completar
         </Button>
-      )}
+      ))}
       {pending && actions.onCancel && (
         <Button
           variant="ghost"
@@ -196,7 +215,7 @@ export function TaskRow({ task, actions }: { task: AgencyTask; actions: TaskActi
   const people = peopleOf(task);
   return (
     <TableRow>
-      <TableCell className="max-w-[240px]">
+      <TableCell className="max-w-[200px]">
         <p className="truncate font-medium">{task.title}</p>
         {awaitingApproval(task) && (
           <p className="text-xs">
@@ -223,9 +242,9 @@ export function TaskRow({ task, actions }: { task: AgencyTask; actions: TaskActi
         </Link>
       </TableCell>
       <TableCell>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col items-start gap-1">
           <NetworkBadge network={task.network} />
-          <span className="text-sm" style={MUTED_STYLE}>
+          <span className="text-xs" style={MUTED_STYLE}>
             {task.format}
             {task.outlet && ` · ${OUTLET_LABELS[task.outlet]}`}
           </span>
@@ -236,7 +255,7 @@ export function TaskRow({ task, actions }: { task: AgencyTask; actions: TaskActi
         <UrgencyBadge urgency={status.urgency} label={status.label} />
       </TableCell>
       <TableCell className="text-right">
-        <TaskButtons task={task} actions={actions} />
+        <TaskButtons task={task} actions={actions} compact />
       </TableCell>
     </TableRow>
   );
