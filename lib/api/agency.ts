@@ -27,6 +27,7 @@ import type {
   UpdateTaskInput,
   UpdateUserInput,
 } from '@/lib/types/agency';
+import type { TaskStatus } from '@prisma/client';
 
 const BASE = '/api/admin/agencia';
 
@@ -133,7 +134,7 @@ export interface TaskListFilters {
   clientId?: number;
   assigneeId?: number;
   packageId?: number;
-  status?: 'PENDING' | 'DONE';
+  status?: TaskStatus;
   network?: string;
   page?: number;
   perPage?: number;
@@ -170,7 +171,7 @@ export function updateAgencyTask(
 
 export function setTaskStatus(
   id: number,
-  status: 'PENDING' | 'DONE',
+  status: TaskStatus,
   permalink?: string | null
 ): Promise<ApiResponse<AgencyTask>> {
   return adminFetch(`${BASE}/tasks/${id}`, {
@@ -181,6 +182,16 @@ export function setTaskStatus(
 
 export function deleteAgencyTask(id: number): Promise<ApiResponse<null>> {
   return adminFetch(`${BASE}/tasks/${id}`, { method: 'DELETE' });
+}
+
+export function uploadTaskEvidence(id: number, file: File): Promise<ApiResponse<AgencyTask>> {
+  const formData = new FormData();
+  formData.append('file', file);
+  return adminUpload(`${BASE}/tasks/${id}/evidence`, formData);
+}
+
+export function deleteTaskEvidence(id: number): Promise<ApiResponse<AgencyTask>> {
+  return adminFetch(`${BASE}/tasks/${id}/evidence`, { method: 'DELETE' });
 }
 
 // ── Briefs ──────────────────────────────────────────────────────────────────

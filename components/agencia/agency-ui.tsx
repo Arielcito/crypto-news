@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import type { CSSProperties, ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import type { IconType } from 'react-icons';
-import { SiFacebook, SiInstagram, SiTiktok, SiX, SiYoutube } from 'react-icons/si';
+import { FiGlobe, FiMoreHorizontal } from 'react-icons/fi';
+import { SiDiscord, SiFacebook, SiInstagram, SiTiktok, SiX, SiYoutube } from 'react-icons/si';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { NETWORK_LABELS } from '@/lib/types/agency';
@@ -109,6 +110,9 @@ const NETWORK_STYLES: Record<SocialNetwork, { color: string; Icon: IconType }> =
   X: { color: '0 0% 35%', Icon: SiX },
   TIKTOK: { color: '183 70% 42%', Icon: SiTiktok },
   YOUTUBE: { color: '0 72% 48%', Icon: SiYoutube },
+  WEB: { color: '30 90% 45%', Icon: FiGlobe },
+  DISCORD: { color: '235 70% 60%', Icon: SiDiscord },
+  OTHER: { color: '220 10% 45%', Icon: FiMoreHorizontal },
 };
 
 /** El logo solo, para cuando el nombre de la red ya está escrito al lado. */

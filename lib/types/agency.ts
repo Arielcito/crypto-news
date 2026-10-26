@@ -5,6 +5,7 @@ import type {
   Expense,
   Package,
   Report,
+  Outlet,
   SocialNetwork,
   Task,
   User,
@@ -75,8 +76,9 @@ export interface AgencyClientDetail extends Client {
 
 export interface AgencyTask extends Task {
   assignee: Pick<User, 'id' | 'name'> | null;
+  coAssignee: Pick<User, 'id' | 'name'> | null;
   package: Pick<Package, 'id' | 'month' | 'clientId'> & {
-    client: Pick<Client, 'id' | 'name' | 'slug'>;
+    client: Pick<Client, 'id' | 'name' | 'slug' | 'requiresApproval'>;
   };
 }
 
@@ -93,6 +95,15 @@ export const NETWORK_LABELS: Record<SocialNetwork, string> = {
   X: 'X',
   TIKTOK: 'TikTok',
   YOUTUBE: 'YouTube',
+  WEB: 'Web',
+  DISCORD: 'Discord',
+  OTHER: 'Otro',
+};
+
+export const OUTLET_LABELS: Record<Outlet, string> = {
+  BTCARG: 'Bitcoin Argentina',
+  TEV: 'TEV',
+  CLIENT: 'Cuenta del cliente',
 };
 
 export const ROLE_LABELS: Record<'ADMIN' | 'EMPLOYEE', string> = {

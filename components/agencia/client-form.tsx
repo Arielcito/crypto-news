@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -57,10 +58,12 @@ export function ClientForm({
       status: initialValues?.status ?? 'ACTIVE',
       monthlyAmount: initialValues?.monthlyAmount ?? null,
       notes: initialValues?.notes ?? '',
+      requiresApproval: initialValues?.requiresApproval ?? false,
     },
   });
 
   const name = watch('name');
+  const requiresApproval = watch('requiresApproval');
   // El slug de un cliente que ya existe no se autogenera: cambiarlo sin querer
   // rompería cualquier link guardado a su ficha.
   const autoSlug = !initialValues && !dirtyFields.slug;
@@ -140,6 +143,23 @@ export function ClientForm({
         <Label htmlFor="client-notes">Notas</Label>
         <Textarea id="client-notes" rows={3} className={ADMIN_INPUT_CLASS} {...register('notes')} />
         {errors.notes && <p className="text-sm text-destructive">{errors.notes.message}</p>}
+      </div>
+
+      <div className="flex items-start gap-3">
+        <Checkbox
+          id="client-approval"
+          className="mt-0.5"
+          checked={requiresApproval}
+          onCheckedChange={(checked) => setValue('requiresApproval', checked === true)}
+        />
+        <div className="space-y-1">
+          <Label htmlFor="client-approval" className="cursor-pointer">
+            Aprueba cada pieza antes de publicarla
+          </Label>
+          <p className="text-xs" style={MUTED_STYLE}>
+            Las tareas de este cliente muestran &quot;Falta aprobación&quot; hasta que se marque el OK.
+          </p>
+        </div>
       </div>
 
       <Button type="submit" className="w-full" disabled={isPending}>

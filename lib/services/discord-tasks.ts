@@ -43,6 +43,7 @@ export async function sendTaskAlerts(now = new Date()): Promise<TaskAlertResult>
     where: { status: 'PENDING', dueDate: { lte: horizon } },
     include: {
       assignee: { select: { name: true } },
+      coAssignee: { select: { name: true } },
       package: { select: { client: { select: { name: true } } } },
     },
     orderBy: { dueDate: 'asc' },
@@ -57,7 +58,8 @@ export async function sendTaskAlerts(now = new Date()): Promise<TaskAlertResult>
   }
 
   const line = (task: (typeof tasks)[number]): string => {
-    const who = task.assignee?.name ?? 'sin responsable';
+    const who =
+      [task.assignee?.name, task.coAssignee?.name].filter(Boolean).join(' y ') || 'sin responsable';
     const client = task.package.client.name;
     const network = NETWORK_LABELS[task.network];
     return `• **${client}** — ${task.title} (${network}) · ${who} · ${formatDateAr(

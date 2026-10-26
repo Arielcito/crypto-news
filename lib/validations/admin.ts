@@ -57,8 +57,12 @@ export const changePasswordSchema = z
 export const roleEnum = z.enum(['ADMIN', 'EMPLOYEE']);
 export const clientStatusEnum = z.enum(['ACTIVE', 'PAUSED', 'CHURNED']);
 export const packageStatusEnum = z.enum(['OPEN', 'COMPLETED']);
-export const taskStatusEnum = z.enum(['PENDING', 'DONE']);
+export const taskStatusEnum = z.enum(['PENDING', 'DONE', 'CANCELLED']);
+/** Redes con cuenta conectable en PostProxy: las únicas válidas para un perfil. */
 export const socialNetworkEnum = z.enum(['INSTAGRAM', 'FACEBOOK', 'X', 'TIKTOK', 'YOUTUBE']);
+/** Una tarea además puede salir en la web, en Discord o en otro canal sin cuenta. */
+export const taskNetworkEnum = z.enum([...socialNetworkEnum.options, 'WEB', 'DISCORD', 'OTHER']);
+export const outletEnum = z.enum(['BTCARG', 'TEV', 'CLIENT']);
 
 export const createUserSchema = z.object({
   name: z.string().min(1, 'El nombre es obligatorio').max(120),
@@ -82,6 +86,7 @@ export const createClientSchema = z.object({
   status: clientStatusEnum.default('ACTIVE'),
   monthlyAmount: z.number().int().min(0).nullable().optional(),
   notes: z.string().max(2000).nullable().optional(),
+  requiresApproval: z.boolean().optional(),
 });
 
 export const updateClientSchema = createClientSchema.partial();
@@ -116,19 +121,26 @@ export const updatePackageSchema = z.object({
 export const createTaskSchema = z.object({
   packageId: z.number().int().positive(),
   title: z.string().min(1, 'El título es obligatorio').max(200),
-  network: socialNetworkEnum,
+  network: taskNetworkEnum,
+  outlet: outletEnum.nullable().optional(),
   format: z.string().min(1, 'El formato es obligatorio').max(60),
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Usá el formato YYYY-MM-DD'),
   assigneeId: z.number().int().positive().nullable().optional(),
+  coAssigneeId: z.number().int().positive().nullable().optional(),
+  /** Se guarda como `approvedAt`: el booleano es sólo lo que tilda el admin. */
+  approved: z.boolean().optional(),
   notes: z.string().max(2000).nullable().optional(),
 });
 
 export const updateTaskSchema = z.object({
   title: z.string().min(1).max(200).optional(),
-  network: socialNetworkEnum.optional(),
+  network: taskNetworkEnum.optional(),
+  outlet: outletEnum.nullable().optional(),
   format: z.string().min(1).max(60).optional(),
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   assigneeId: z.number().int().positive().nullable().optional(),
+  coAssigneeId: z.number().int().positive().nullable().optional(),
+  approved: z.boolean().optional(),
   notes: z.string().max(2000).nullable().optional(),
 });
 
@@ -141,7 +153,7 @@ export const taskFiltersSchema = z.object({
   clientId: z.number().int().positive().optional(),
   assigneeId: z.number().int().positive().optional(),
   status: taskStatusEnum.optional(),
-  network: socialNetworkEnum.optional(),
+  network: taskNetworkEnum.optional(),
   packageId: z.number().int().positive().optional(),
   page: z.number().int().min(1).default(1),
   perPage: z.number().int().min(1).max(100).default(20),

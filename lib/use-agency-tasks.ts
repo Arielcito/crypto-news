@@ -4,12 +4,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createAgencyTask,
   deleteAgencyTask,
+  deleteTaskEvidence,
   fetchAgencyTasks,
   setTaskStatus,
   updateAgencyTask,
+  uploadTaskEvidence,
   type TaskListFilters,
 } from '@/lib/api/agency';
 import type { CreateTaskInput, UpdateTaskInput } from '@/lib/types/agency';
+import type { TaskStatus } from '@prisma/client';
 
 const KEY = ['admin', 'agency', 'tasks'] as const;
 
@@ -47,11 +50,19 @@ export function useUpdateTask() {
 
 export function useSetTaskStatus() {
   return useTaskMutation(
-    ({ id, status, permalink }: { id: number; status: 'PENDING' | 'DONE'; permalink?: string | null }) =>
+    ({ id, status, permalink }: { id: number; status: TaskStatus; permalink?: string | null }) =>
       setTaskStatus(id, status, permalink)
   );
 }
 
 export function useDeleteTask() {
   return useTaskMutation((id: number) => deleteAgencyTask(id));
+}
+
+export function useUploadTaskEvidence() {
+  return useTaskMutation(({ id, file }: { id: number; file: File }) => uploadTaskEvidence(id, file));
+}
+
+export function useDeleteTaskEvidence() {
+  return useTaskMutation((id: number) => deleteTaskEvidence(id));
 }

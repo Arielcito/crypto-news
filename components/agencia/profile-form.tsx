@@ -7,13 +7,13 @@ import { Label } from '@/components/ui/label';
 import { ADMIN_INPUT_CLASS } from '@/lib/constants';
 import { AGENCY_SELECT_CLASS, MUTED_STYLE } from '@/components/agencia/agency-ui';
 import { NETWORK_LABELS } from '@/lib/types/agency';
+import { socialNetworkEnum } from '@/lib/validations/admin';
 import { parseDueDate, toDateInput } from '@/lib/agency/dates';
 import type { AgencyClientProfile, CreateClientProfileInput } from '@/lib/types/agency';
-import type { SocialNetwork } from '@prisma/client';
 
 interface ProfileFormFields {
   postproxyProfileId: string;
-  network: SocialNetwork;
+  network: CreateClientProfileInput['network'];
   handle: string;
   expiresAt: string;
 }
@@ -38,7 +38,8 @@ export function ProfileForm({
   } = useForm<ProfileFormFields>({
     defaultValues: {
       postproxyProfileId: initialValues?.postproxyProfileId ?? '',
-      network: initialValues?.network ?? 'INSTAGRAM',
+      // Un perfil nunca es WEB/DISCORD/OTHER; el enum de la base es compartido con tareas.
+      network: socialNetworkEnum.catch('INSTAGRAM').parse(initialValues?.network),
       handle: initialValues?.handle ?? '',
       expiresAt: initialValues?.expiresAt ? toDateInput(new Date(initialValues.expiresAt)) : '',
     },
@@ -60,9 +61,9 @@ export function ProfileForm({
       <div className="space-y-2">
         <Label htmlFor="profile-network">Red</Label>
         <select id="profile-network" className={AGENCY_SELECT_CLASS} {...register('network')}>
-          {Object.entries(NETWORK_LABELS).map(([value, label]) => (
+          {socialNetworkEnum.options.map((value) => (
             <option key={value} value={value}>
-              {label}
+              {NETWORK_LABELS[value]}
             </option>
           ))}
         </select>

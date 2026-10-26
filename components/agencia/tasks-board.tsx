@@ -28,7 +28,9 @@ import {
 import { useAgencyClients } from '@/lib/use-agency-clients';
 import { useAgencyUsers } from '@/lib/use-agency-users';
 import { NETWORK_LABELS } from '@/lib/types/agency';
+import { taskStatusEnum } from '@/lib/validations/admin';
 import type { AgencyTask, CreateTaskInput } from '@/lib/types/agency';
+import type { TaskStatus } from '@prisma/client';
 import type { TaskListFilters } from '@/lib/api/agency';
 
 const PER_PAGE = 20;
@@ -107,19 +109,20 @@ export function TasksBoard({
     );
   };
 
-  const handleReopen = (task: AgencyTask) => {
+  // El mensaje de éxito lo arma el server según el estado nuevo.
+  const changeStatus = (task: AgencyTask, status: TaskStatus) => {
     statusMutation.mutate(
-      { id: task.id, status: 'PENDING' },
+      { id: task.id, status },
       {
         onSuccess: (response) => {
           if (response.error) {
             toast.error(response.message || response.error);
             return;
           }
-          toast.success('Tarea reabierta');
+          toast.success(response.message || 'Tarea actualizada');
         },
         onError: (mutationError) =>
-          toast.error(mutationError instanceof Error ? mutationError.message : 'Error al reabrir'),
+          toast.error(mutationError instanceof Error ? mutationError.message : 'Error al actualizar'),
       }
     );
   };
@@ -142,7 +145,8 @@ export function TasksBoard({
 
   const actions = {
     onComplete: setCompleting,
-    onReopen: handleReopen,
+    onReopen: (task: AgencyTask) => changeStatus(task, 'PENDING'),
+    onCancel: canManage ? (task: AgencyTask) => changeStatus(task, 'CANCELLED') : undefined,
     onEdit: canManage ? setEditing : undefined,
     onDelete: canManage ? setDeleting : undefined,
   };
@@ -155,13 +159,14 @@ export function TasksBoard({
             className={AGENCY_SELECT_CLASS}
             value={filters.status ?? ''}
             onChange={(event) =>
-              patchFilters({ status: (event.target.value || undefined) as 'PENDING' | 'DONE' | undefined })
+              patchFilters({ status: taskStatusEnum.optional().catch(undefined).parse(event.target.value || undefined) })
             }
             aria-label="Filtrar por estado"
           >
             <option value="">Todos los estados</option>
             <option value="PENDING">Pendientes</option>
             <option value="DONE">Hechas</option>
+            <option value="CANCELLED">Canceladas</option>
           </select>
 
           <select

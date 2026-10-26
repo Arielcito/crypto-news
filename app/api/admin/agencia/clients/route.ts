@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
         status: parsed.data.status,
         monthlyAmount: parsed.data.monthlyAmount ?? null,
         notes: parsed.data.notes ?? null,
+        requiresApproval: parsed.data.requiresApproval ?? false,
       },
       include: {
         profiles: true,

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CheckCircle2, ExternalLink, Pencil, RotateCcw, Trash2 } from 'lucide-react';
+import { Ban, CheckCircle2, ExternalLink, ImageIcon, Pencil, RotateCcw, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableCell, TableRow } from '@/components/ui/table';
 import {
@@ -11,11 +11,14 @@ import {
   UrgencyBadge,
 } from '@/components/agencia/agency-ui';
 import { countdownLabel, formatDateAr, urgencyOf } from '@/lib/agency/dates';
+import { OUTLET_LABELS } from '@/lib/types/agency';
 import type { AgencyTask } from '@/lib/types/agency';
 
 export interface TaskActions {
   onComplete?: (task: AgencyTask) => void;
   onReopen?: (task: AgencyTask) => void;
+  /** Sólo el admin: cancelar cambia lo que se le debe al cliente. */
+  onCancel?: (task: AgencyTask) => void;
   onEdit?: (task: AgencyTask) => void;
   onDelete?: (task: AgencyTask) => void;
 }
@@ -25,6 +28,7 @@ export interface TaskActions {
  * en estado obligaría a un timer que sólo sirve para que un cartel envejezca.
  */
 function statusLabel(task: AgencyTask): { urgency: ReturnType<typeof urgencyOf>; label: string } {
+  if (task.status === 'CANCELLED') return { urgency: 'later', label: 'Cancelada' };
   const done = task.status === 'DONE';
   const urgency = urgencyOf(task.dueDate, done);
   if (done) {
@@ -36,8 +40,29 @@ function statusLabel(task: AgencyTask): { urgency: ReturnType<typeof urgencyOf>;
   return { urgency, label: countdownLabel(task.dueDate) };
 }
 
+/** Quién la hace: los dos responsables, o nada si no hay ninguno. */
+function peopleOf(task: AgencyTask): string | null {
+  return [task.assignee?.name, task.coAssignee?.name].filter(Boolean).join(' y ') || null;
+}
+
+/** Cliente que aprueba por escrito y esta pieza todavía no tiene el OK. */
+function awaitingApproval(task: AgencyTask): boolean {
+  return task.package.client.requiresApproval && !task.approvedAt && task.status !== 'CANCELLED';
+}
+
+function ApprovalNote() {
+  return (
+    <span className="font-medium" style={{ color: 'hsl(var(--admin-warning))' }}>
+      Falta aprobación
+    </span>
+  );
+}
+
 function TaskButtons({ task, actions }: { task: AgencyTask; actions: TaskActions }) {
-  const done = task.status === 'DONE';
+  const pending = task.status === 'PENDING';
+  const cancelled = task.status === 'CANCELLED';
+  // Reabrir una cancelada es del admin, igual que cancelarla.
+  const canReopen = cancelled ? !!actions.onCancel : task.status === 'DONE';
   return (
     <div className="flex flex-wrap items-center justify-end gap-1">
       {task.permalink && (
@@ -47,13 +72,30 @@ function TaskButtons({ task, actions }: { task: AgencyTask; actions: TaskActions
           </a>
         </Button>
       )}
-      {!done && actions.onComplete && (
+      {task.evidenceUrl && (
+        <Button variant="ghost" size="icon" asChild>
+          <a href={task.evidenceUrl} target="_blank" rel="noreferrer" aria-label="Ver la captura">
+            <ImageIcon className="h-4 w-4" />
+          </a>
+        </Button>
+      )}
+      {pending && actions.onComplete && (
         <Button variant="ghost" size="sm" onClick={() => actions.onComplete?.(task)}>
           <CheckCircle2 className="mr-2 h-4 w-4" />
           Completar
         </Button>
       )}
-      {done && actions.onReopen && (
+      {pending && actions.onCancel && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => actions.onCancel?.(task)}
+          aria-label="Cancelar tarea"
+        >
+          <Ban className="h-4 w-4" />
+        </Button>
+      )}
+      {canReopen && actions.onReopen && (
         <Button
           variant="ghost"
           size="icon"
@@ -84,6 +126,7 @@ function TaskButtons({ task, actions }: { task: AgencyTask; actions: TaskActions
 
 export function TaskCard({ task, actions }: { task: AgencyTask; actions: TaskActions }) {
   const status = statusLabel(task);
+  const people = peopleOf(task);
   return (
     <li
       className="rounded-lg border p-3"
@@ -113,12 +156,24 @@ export function TaskCard({ task, actions }: { task: AgencyTask; actions: TaskAct
       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs" style={MUTED_STYLE}>
         <NetworkBadge network={task.network} />
         <span>{task.format}</span>
-        <span>·</span>
-        <span>{formatDateAr(task.dueDate)}</span>
-        {task.assignee && (
+        {task.outlet && (
           <>
             <span>·</span>
-            <span>{task.assignee.name}</span>
+            <span>{OUTLET_LABELS[task.outlet]}</span>
+          </>
+        )}
+        <span>·</span>
+        <span>{formatDateAr(task.dueDate)}</span>
+        {people && (
+          <>
+            <span>·</span>
+            <span>{people}</span>
+          </>
+        )}
+        {awaitingApproval(task) && (
+          <>
+            <span>·</span>
+            <ApprovalNote />
           </>
         )}
       </div>
@@ -138,10 +193,16 @@ export function TaskCard({ task, actions }: { task: AgencyTask; actions: TaskAct
 
 export function TaskRow({ task, actions }: { task: AgencyTask; actions: TaskActions }) {
   const status = statusLabel(task);
+  const people = peopleOf(task);
   return (
     <TableRow>
       <TableCell className="max-w-[240px]">
         <p className="truncate font-medium">{task.title}</p>
+        {awaitingApproval(task) && (
+          <p className="text-xs">
+            <ApprovalNote />
+          </p>
+        )}
         {task.notes && (
           <p className="truncate text-xs" style={MUTED_STYLE}>
             {task.notes}
@@ -166,10 +227,11 @@ export function TaskRow({ task, actions }: { task: AgencyTask; actions: TaskActi
           <NetworkBadge network={task.network} />
           <span className="text-sm" style={MUTED_STYLE}>
             {task.format}
+            {task.outlet && ` · ${OUTLET_LABELS[task.outlet]}`}
           </span>
         </div>
       </TableCell>
-      <TableCell style={MUTED_STYLE}>{task.assignee?.name ?? 'Sin asignar'}</TableCell>
+      <TableCell style={MUTED_STYLE}>{people ?? 'Sin asignar'}</TableCell>
       <TableCell>
         <UrgencyBadge urgency={status.urgency} label={status.label} />
       </TableCell>

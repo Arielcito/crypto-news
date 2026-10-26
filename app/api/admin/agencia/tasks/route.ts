@@ -3,19 +3,8 @@ import { Prisma, Role } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { badRequest, notFound, requireAdmin, requireUser, serverError } from '@/lib/admin-auth';
 import { parseDueDate } from '@/lib/agency/dates';
+import { TASK_INCLUDE } from '@/lib/agency/tasks';
 import { createTaskSchema, taskFiltersSchema } from '@/lib/validations/admin';
-
-const TASK_INCLUDE = {
-  assignee: { select: { id: true, name: true } },
-  package: {
-    select: {
-      id: true,
-      month: true,
-      clientId: true,
-      client: { select: { id: true, name: true, slug: true } },
-    },
-  },
-} satisfies Prisma.TaskInclude;
 
 /** Los query params llegan como texto; el schema pide números. */
 function numberParam(params: URLSearchParams, key: string): number | undefined {
@@ -48,10 +37,13 @@ export async function GET(request: NextRequest) {
 
     // El empleado ve SÓLO lo suyo. No es un default que el cliente pueda pisar
     // mandando otro assigneeId: el filtro se impone después de leer el suyo.
+    // "Lo suyo" incluye las tareas donde es segundo responsable.
     const scopedAssignee = user.role === Role.ADMIN ? assigneeId : user.id;
 
     const where: Prisma.TaskWhereInput = {
-      ...(scopedAssignee ? { assigneeId: scopedAssignee } : {}),
+      ...(scopedAssignee
+        ? { OR: [{ assigneeId: scopedAssignee }, { coAssigneeId: scopedAssignee }] }
+        : {}),
       ...(status ? { status } : {}),
       ...(network ? { network } : {}),
       ...(packageId ? { packageId } : {}),
@@ -98,9 +90,12 @@ export async function POST(request: NextRequest) {
         packageId: parsed.data.packageId,
         title: parsed.data.title.trim(),
         network: parsed.data.network,
+        outlet: parsed.data.outlet ?? null,
         format: parsed.data.format.trim(),
         dueDate: parseDueDate(parsed.data.dueDate),
         assigneeId: parsed.data.assigneeId ?? null,
+        coAssigneeId: parsed.data.coAssigneeId ?? null,
+        approvedAt: parsed.data.approved ? new Date() : null,
         notes: parsed.data.notes ?? null,
       },
       include: TASK_INCLUDE,

@@ -23,6 +23,8 @@ export async function buildSnapshot(packageId: number): Promise<ReportSnapshot |
     include: {
       client: { select: { id: true, name: true } },
       tasks: {
+        // Las canceladas no van al reporte: el cliente vería piezas que nunca existieron.
+        where: { status: { not: 'CANCELLED' } },
         include: { assignee: { select: { id: true, name: true } } },
         orderBy: { dueDate: 'asc' },
       },

@@ -106,19 +106,34 @@ enum PackageStatus {
   COMPLETED
 }
 
-/// Sólo dos estados. "Vencida" se DERIVA de dueDate contra el ahora: un estado
-/// guardado se desactualiza solo y obliga a un job que lo repare.
+/// "Vencida" se DERIVA de dueDate contra el ahora: un estado guardado se
+/// desactualiza solo y obliga a un job que lo repare. CANCELLED saca la tarea
+/// del avance del paquete sin borrarla: queda el registro de que se acordó.
 enum TaskStatus {
   PENDING
   DONE
+  CANCELLED
 }
 
+/// WEB, DISCORD y OTHER sólo aplican a tareas: no hay cuenta de PostProxy que
+/// conectar para una nota web o una difusión en comunidad.
 enum SocialNetwork {
   INSTAGRAM
   FACEBOOK
   X
   TIKTOK
   YOUTUBE
+  WEB
+  DISCORD
+  OTHER
+}
+
+/// Dónde sale la pieza. El cliente paga, pero se publica en un medio propio
+/// (BTCARG, TEV) o en la cuenta del cliente: son cosas distintas.
+enum Outlet {
+  BTCARG
+  TEV
+  CLIENT
 }
 
 /// De dónde salió la pieza: publicada por el agregador o nativa e importada.
@@ -142,6 +157,7 @@ model User {
   updatedAt          DateTime @updatedAt @map("updated_at")
 
   assignedTasks    Task[]   @relation("TaskAssignee")
+  coAssignedTasks  Task[]   @relation("TaskCoAssignee")
   uploadedBriefs   Brief[]
   generatedReports Report[]
 
@@ -149,16 +165,18 @@ model User {
 }
 
 model Client {
-  id            Int          @id @default(autoincrement())
-  name          String
-  slug          String       @unique
-  status        ClientStatus @default(ACTIVE)
+  id               Int          @id @default(autoincrement())
+  name             String
+  slug             String       @unique
+  status           ClientStatus @default(ACTIVE)
   /// Ancla barata para la contabilidad futura. Unidades enteras de moneda.
-  monthlyAmount Int?         @map("monthly_amount")
-  notes         String?      @db.Text
-  isActive      Boolean      @default(true) @map("is_active")
-  createdAt     DateTime     @default(now()) @map("created_at")
-  updatedAt     DateTime     @updatedAt @map("updated_at")
+  monthlyAmount    Int?         @map("monthly_amount")
+  notes            String?      @db.Text
+  /// El cliente aprueba cada pieza por escrito antes de publicarse.
+  requiresApproval Boolean      @default(false) @map("requires_approval")
+  isActive         Boolean      @default(true) @map("is_active")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
 
   profiles ClientProfile[]
   packages Package[]
@@ -213,26 +231,37 @@ model Package {
 }
 
 model Task {
-  id          Int           @id @default(autoincrement())
-  packageId   Int           @map("package_id")
-  package     Package       @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  assigneeId  Int?          @map("assignee_id")
-  assignee    User?         @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
-  title       String
-  network     SocialNetwork
-  format      String
-  dueDate     DateTime      @map("due_date")
-  status      TaskStatus    @default(PENDING)
+  id           Int           @id @default(autoincrement())
+  packageId    Int           @map("package_id")
+  package      Package       @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  assigneeId   Int?          @map("assignee_id")
+  assignee     User?         @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  /// Segundo responsable: ve y completa la tarea igual que el primero.
+  coAssigneeId Int?          @map("co_assignee_id")
+  coAssignee   User?         @relation("TaskCoAssignee", fields: [coAssigneeId], references: [id], onDelete: SetNull)
+  title        String
+  network      SocialNetwork
+  outlet       Outlet?
+  format       String
+  dueDate      DateTime      @map("due_date")
+  status       TaskStatus    @default(PENDING)
   /// Link de la pieza publicada. Cruza con SocialPost.permalink en tiempo de
   /// lectura, no por FK: la pieza puede tardar horas en aparecer en el catálogo.
-  permalink   String?
-  completedAt DateTime?     @map("completed_at")
-  notes       String?       @db.Text
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
+  permalink    String?
+  completedAt  DateTime?     @map("completed_at")
+  /// Sólo importa si el cliente tiene `requiresApproval`.
+  approvedAt   DateTime?     @map("approved_at")
+  /// Captura de la pieza: las historias desaparecen a las 24 h y el link deja
+  /// de probar nada. Es una URL pública a propósito: muestra algo que ya se
+  /// publicó, a diferencia de un brief.
+  evidenceUrl  String?       @map("evidence_url")
+  notes        String?       @db.Text
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
 
   @@index([packageId])
   @@index([assigneeId, status])
+  @@index([coAssigneeId])
   @@index([dueDate])
   @@map("tasks")
 }

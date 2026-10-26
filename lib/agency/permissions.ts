@@ -12,7 +12,7 @@ export async function clientIdsForUser(user: SessionUser): Promise<number[] | 'a
   if (user.role === Role.ADMIN) return 'all';
 
   const rows = await prisma.task.findMany({
-    where: { assigneeId: user.id },
+    where: { OR: [{ assigneeId: user.id }, { coAssigneeId: user.id }] },
     select: { package: { select: { clientId: true } } },
     distinct: ['packageId'],
   });

@@ -12,9 +12,11 @@ export function progressOf(
   pkg: Pick<Package, 'committedPieces'>,
   tasks: Pick<Task, 'status'>[]
 ): { done: number; total: number; committed: number } {
+  // Una cancelada no se entrega ni se debe: contarla en `total` taparía la brecha.
+  const live = tasks.filter((task) => task.status !== 'CANCELLED');
   return {
-    done: tasks.filter((task) => task.status === 'DONE').length,
-    total: tasks.length,
+    done: live.filter((task) => task.status === 'DONE').length,
+    total: live.length,
     committed: pkg.committedPieces,
   };
 }

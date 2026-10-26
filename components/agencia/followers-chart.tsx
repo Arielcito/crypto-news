@@ -16,6 +16,10 @@ const LINE_COLORS: Record<SocialNetwork, string> = {
   X: '0 0% 45%',
   TIKTOK: '183 70% 42%',
   YOUTUBE: '0 72% 48%',
+  // Nunca tienen seguidores (no hay cuenta): están para que el Record cierre.
+  WEB: '30 90% 45%',
+  DISCORD: '235 70% 60%',
+  OTHER: '220 10% 45%',
 };
 
 interface Line {

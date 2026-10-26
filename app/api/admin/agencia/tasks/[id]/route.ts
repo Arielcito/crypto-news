@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Prisma, Role } from '@prisma/client';
+import { Prisma, Role, type TaskStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import {
   badRequest,
@@ -10,19 +10,14 @@ import {
   serverError,
 } from '@/lib/admin-auth';
 import { parseDueDate } from '@/lib/agency/dates';
+import { TASK_INCLUDE, canWorkOnTask } from '@/lib/agency/tasks';
 import { completeTaskSchema, updateTaskSchema } from '@/lib/validations/admin';
 
-const TASK_INCLUDE = {
-  assignee: { select: { id: true, name: true } },
-  package: {
-    select: {
-      id: true,
-      month: true,
-      clientId: true,
-      client: { select: { id: true, name: true, slug: true } },
-    },
-  },
-} satisfies Prisma.TaskInclude;
+const STATUS_MESSAGES: Record<TaskStatus, string> = {
+  PENDING: 'Tarea reabierta',
+  DONE: 'Tarea completada',
+  CANCELLED: 'Tarea cancelada',
+};
 
 function parseId(raw: string): number | null {
   const id = Number(raw);
@@ -45,10 +40,23 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return badRequest(parsed.error.issues.map((issue) => issue.message).join('; '));
     }
 
-    const { dueDate, ...rest } = parsed.data;
+    const { dueDate, approved, ...rest } = parsed.data;
+    // Volver a guardar el form con "aprobada" tildado no reescribe cuándo se aprobó.
+    let approvedAt: Date | null | undefined;
+    if (approved === false) approvedAt = null;
+    if (approved === true) {
+      const current = await prisma.task.findUnique({ where: { id }, select: { approvedAt: true } });
+      if (!current) return notFound('Tarea no encontrada');
+      approvedAt = current.approvedAt ?? new Date();
+    }
+
     const task = await prisma.task.update({
       where: { id },
-      data: { ...rest, ...(dueDate ? { dueDate: parseDueDate(dueDate) } : {}) },
+      data: {
+        ...rest,
+        ...(dueDate ? { dueDate: parseDueDate(dueDate) } : {}),
+        ...(approvedAt !== undefined ? { approvedAt } : {}),
+      },
       include: TASK_INCLUDE,
     });
 
@@ -63,8 +71,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 /**
- * Marcar hecha o volver a pendiente. Lo puede hacer el responsable —es el punto
- * del panel del empleado— o el admin. Nadie más, ni siquiera otro empleado.
+ * Marcar hecha o volver a pendiente. Lo puede hacer cualquiera de los dos
+ * responsables —es el punto del panel del empleado— o el admin. Cancelar (y
+ * reabrir una cancelada) es sólo del admin: cambia lo que se le debe al cliente.
  */
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   console.log(`[PATCH] /api/admin/agencia/tasks/${params.id} - Request received`);
@@ -83,10 +92,12 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
     const existing = await prisma.task.findUnique({
       where: { id },
-      select: { id: true, assigneeId: true, status: true, completedAt: true },
+      select: { id: true, assigneeId: true, coAssigneeId: true, status: true, completedAt: true },
     });
     if (!existing) return notFound('Tarea no encontrada');
-    if (user.role !== Role.ADMIN && existing.assigneeId !== user.id) return forbidden();
+    if (!canWorkOnTask(user, existing)) return forbidden();
+    const touchesCancelled = parsed.data.status === 'CANCELLED' || existing.status === 'CANCELLED';
+    if (user.role !== Role.ADMIN && touchesCancelled) return forbidden();
 
     const done = parsed.data.status === 'DONE';
     const task = await prisma.task.update({
@@ -105,7 +116,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     return NextResponse.json({
       data: task,
       error: null,
-      message: done ? 'Tarea completada' : 'Tarea reabierta',
+      message: STATUS_MESSAGES[task.status],
     });
   } catch (error) {
     return serverError(`[PATCH] /api/admin/agencia/tasks/${params.id}`, error);
