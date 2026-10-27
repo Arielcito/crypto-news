@@ -71,7 +71,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 /**
- * Marcar hecha o volver a pendiente. Lo puede hacer cualquiera de los dos
+ * Marcar hecha, editada o volver a pendiente. Lo puede hacer cualquiera de los dos
  * responsables —es el punto del panel del empleado— o el admin. Cancelar (y
  * reabrir una cancelada) es sólo del admin: cambia lo que se le debe al cliente.
  */
@@ -92,32 +92,44 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
     const existing = await prisma.task.findUnique({
       where: { id },
-      select: { id: true, assigneeId: true, coAssigneeId: true, status: true, completedAt: true },
+      select: {
+        id: true,
+        assigneeId: true,
+        coAssigneeId: true,
+        status: true,
+        completedAt: true,
+        editedAt: true,
+      },
     });
     if (!existing) return notFound('Tarea no encontrada');
     if (!canWorkOnTask(user, existing)) return forbidden();
-    const touchesCancelled = parsed.data.status === 'CANCELLED' || existing.status === 'CANCELLED';
+    const { status, edited, permalink } = parsed.data;
+    const touchesCancelled = status === 'CANCELLED' || existing.status === 'CANCELLED';
     if (user.role !== Role.ADMIN && touchesCancelled) return forbidden();
 
-    const done = parsed.data.status === 'DONE';
     const task = await prisma.task.update({
       where: { id },
       data: {
-        status: parsed.data.status,
         // Si ya estaba hecha se respeta la fecha original: reabrir y volver a
-        // cerrar no debería reescribir cuándo se entregó de verdad.
-        completedAt: done ? existing.completedAt ?? new Date() : null,
-        ...(parsed.data.permalink !== undefined ? { permalink: parsed.data.permalink } : {}),
+        // cerrar no debería reescribir cuándo se entregó de verdad. Lo mismo
+        // con la edición.
+        ...(status
+          ? { status, completedAt: status === 'DONE' ? existing.completedAt ?? new Date() : null }
+          : {}),
+        ...(edited !== undefined
+          ? { editedAt: edited ? existing.editedAt ?? new Date() : null }
+          : {}),
+        ...(permalink !== undefined ? { permalink } : {}),
       },
       include: TASK_INCLUDE,
     });
 
-    console.log(`[PATCH] /api/admin/agencia/tasks/${id} - status=${task.status}`);
-    return NextResponse.json({
-      data: task,
-      error: null,
-      message: STATUS_MESSAGES[task.status],
-    });
+    console.log(
+      `[PATCH] /api/admin/agencia/tasks/${id} - status=${task.status} edited=${!!task.editedAt}`
+    );
+    let message = STATUS_MESSAGES[task.status];
+    if (!status) message = edited ? 'Marcada como editada' : 'Edición desmarcada';
+    return NextResponse.json({ data: task, error: null, message });
   } catch (error) {
     return serverError(`[PATCH] /api/admin/agencia/tasks/${params.id}`, error);
   }

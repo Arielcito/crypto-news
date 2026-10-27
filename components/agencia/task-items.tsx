@@ -1,7 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { Ban, CheckCircle2, ExternalLink, ImageIcon, Pencil, RotateCcw, Trash2 } from 'lucide-react';
+import {
+  Ban,
+  CheckCircle2,
+  ExternalLink,
+  ImageIcon,
+  Pencil,
+  RotateCcw,
+  Scissors,
+  Trash2,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableCell, TableRow } from '@/components/ui/table';
 import {
@@ -11,12 +20,14 @@ import {
   UrgencyBadge,
 } from '@/components/agencia/agency-ui';
 import { countdownLabel, formatDateAr, urgencyOf } from '@/lib/agency/dates';
-import { OUTLET_LABELS } from '@/lib/types/agency';
+import { OUTLET_LABELS, SPONSORSHIP_LABELS } from '@/lib/types/agency';
 import type { AgencyTask } from '@/lib/types/agency';
 
 export interface TaskActions {
   onComplete?: (task: AgencyTask) => void;
   onReopen?: (task: AgencyTask) => void;
+  /** El editor avisa que terminó la pieza; sigue pendiente hasta publicarse. */
+  onToggleEdited?: (task: AgencyTask) => void;
   /** Sólo el admin: cancelar cambia lo que se le debe al cliente. */
   onCancel?: (task: AgencyTask) => void;
   onEdit?: (task: AgencyTask) => void;
@@ -50,6 +61,22 @@ function awaitingApproval(task: AgencyTask): boolean {
   return task.package.client.requiresApproval && !task.approvedAt && task.status !== 'CANCELLED';
 }
 
+/** Editada pero sin publicar: una vez hecha o cancelada deja de importar. */
+function editedPending(task: AgencyTask): boolean {
+  return task.status === 'PENDING' && !!task.editedAt;
+}
+
+/** "Reel · Bitcoin Argentina · Publicitario": lo que no está cargado no aparece. */
+function formatLine(task: AgencyTask): string {
+  return [
+    task.format,
+    task.outlet && OUTLET_LABELS[task.outlet],
+    task.sponsorship && SPONSORSHIP_LABELS[task.sponsorship],
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
+
 function ApprovalNote() {
   return (
     <span className="font-medium" style={{ color: 'hsl(var(--admin-warning))' }}>
@@ -72,17 +99,19 @@ function TaskButtons({
   const cancelled = task.status === 'CANCELLED';
   // Reabrir una cancelada es del admin, igual que cancelarla.
   const canReopen = cancelled ? !!actions.onCancel : task.status === 'DONE';
+  // En la tabla entran cinco íconos sin desbordar la fila.
+  const iconClass = compact ? 'h-8 w-8' : undefined;
   return (
     <div className={`flex items-center justify-end gap-1 ${compact ? 'flex-nowrap' : 'flex-wrap'}`}>
       {task.permalink && (
-        <Button variant="ghost" size="icon" asChild>
+        <Button variant="ghost" size="icon" className={iconClass} asChild>
           <a href={task.permalink} target="_blank" rel="noreferrer" aria-label="Ver la pieza publicada">
             <ExternalLink className="h-4 w-4" />
           </a>
         </Button>
       )}
       {task.evidenceUrl && (
-        <Button variant="ghost" size="icon" asChild>
+        <Button variant="ghost" size="icon" className={iconClass} asChild>
           <a href={task.evidenceUrl} target="_blank" rel="noreferrer" aria-label="Ver la captura">
             <ImageIcon className="h-4 w-4" />
           </a>
@@ -92,6 +121,7 @@ function TaskButtons({
         <Button
           variant="ghost"
           size="icon"
+          className={iconClass}
           onClick={() => actions.onComplete?.(task)}
           aria-label="Completar tarea"
           title="Completar"
@@ -104,10 +134,24 @@ function TaskButtons({
           Completar
         </Button>
       ))}
+      {pending && actions.onToggleEdited && (
+        <Button
+          variant={task.editedAt ? 'secondary' : 'ghost'}
+          size="icon"
+          className={iconClass}
+          onClick={() => actions.onToggleEdited?.(task)}
+          aria-label="Editada"
+          aria-pressed={!!task.editedAt}
+          title={task.editedAt ? 'Desmarcar edición' : 'Marcar como editada'}
+        >
+          <Scissors className="h-4 w-4" />
+        </Button>
+      )}
       {pending && actions.onCancel && (
         <Button
           variant="ghost"
           size="icon"
+          className={iconClass}
           onClick={() => actions.onCancel?.(task)}
           aria-label="Cancelar tarea"
         >
@@ -118,6 +162,7 @@ function TaskButtons({
         <Button
           variant="ghost"
           size="icon"
+          className={iconClass}
           onClick={() => actions.onReopen?.(task)}
           aria-label="Reabrir tarea"
         >
@@ -125,7 +170,13 @@ function TaskButtons({
         </Button>
       )}
       {actions.onEdit && (
-        <Button variant="ghost" size="icon" onClick={() => actions.onEdit?.(task)} aria-label="Editar tarea">
+        <Button
+          variant="ghost"
+          size="icon"
+          className={iconClass}
+          onClick={() => actions.onEdit?.(task)}
+          aria-label="Editar tarea"
+        >
           <Pencil className="h-4 w-4" />
         </Button>
       )}
@@ -133,6 +184,7 @@ function TaskButtons({
         <Button
           variant="ghost"
           size="icon"
+          className={iconClass}
           onClick={() => actions.onDelete?.(task)}
           aria-label="Eliminar tarea"
         >
@@ -174,13 +226,7 @@ export function TaskCard({ task, actions }: { task: AgencyTask; actions: TaskAct
 
       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs" style={MUTED_STYLE}>
         <NetworkBadge network={task.network} />
-        <span>{task.format}</span>
-        {task.outlet && (
-          <>
-            <span>·</span>
-            <span>{OUTLET_LABELS[task.outlet]}</span>
-          </>
-        )}
+        <span>{formatLine(task)}</span>
         <span>·</span>
         <span>{formatDateAr(task.dueDate)}</span>
         {people && (
@@ -193,6 +239,12 @@ export function TaskCard({ task, actions }: { task: AgencyTask; actions: TaskAct
           <>
             <span>·</span>
             <ApprovalNote />
+          </>
+        )}
+        {editedPending(task) && (
+          <>
+            <span>·</span>
+            <span className="font-medium">Editada</span>
           </>
         )}
       </div>
@@ -222,6 +274,11 @@ export function TaskRow({ task, actions }: { task: AgencyTask; actions: TaskActi
             <ApprovalNote />
           </p>
         )}
+        {editedPending(task) && (
+          <p className="text-xs font-medium" style={MUTED_STYLE}>
+            Editada, falta publicar
+          </p>
+        )}
         {task.notes && (
           <p className="truncate text-xs" style={MUTED_STYLE}>
             {task.notes}
@@ -245,8 +302,7 @@ export function TaskRow({ task, actions }: { task: AgencyTask; actions: TaskActi
         <div className="flex flex-col items-start gap-1">
           <NetworkBadge network={task.network} />
           <span className="text-xs" style={MUTED_STYLE}>
-            {task.format}
-            {task.outlet && ` · ${OUTLET_LABELS[task.outlet]}`}
+            {formatLine(task)}
           </span>
         </div>
       </TableCell>

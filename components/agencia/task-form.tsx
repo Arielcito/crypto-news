@@ -12,10 +12,10 @@ import { AGENCY_SELECT_CLASS, MUTED_STYLE } from '@/components/agencia/agency-ui
 import { useAgencyClients } from '@/lib/use-agency-clients';
 import { useAgencyPackages } from '@/lib/use-agency-packages';
 import { useAgencyUserOptions } from '@/lib/use-agency-users';
-import { NETWORK_LABELS, OUTLET_LABELS } from '@/lib/types/agency';
+import { NETWORK_LABELS, OUTLET_LABELS, SPONSORSHIP_LABELS } from '@/lib/types/agency';
 import { formatMonthLabel, toDateInput } from '@/lib/agency/dates';
 import type { AgencyTask, CreateTaskInput } from '@/lib/types/agency';
-import type { Outlet, SocialNetwork } from '@prisma/client';
+import type { Outlet, SocialNetwork, Sponsorship } from '@prisma/client';
 
 /** Sugerencias, no una lista cerrada: cada red inventa formatos nuevos seguido. */
 const FORMAT_SUGGESTIONS = [
@@ -39,6 +39,7 @@ interface TaskFormFields {
   title: string;
   network: SocialNetwork;
   outlet: Outlet | '';
+  sponsorship: Sponsorship | '';
   format: string;
   dueDate: string;
   assigneeId: string;
@@ -86,6 +87,7 @@ export function TaskForm({
       title: initialValues?.title ?? '',
       network: initialValues?.network ?? 'INSTAGRAM',
       outlet: initialValues?.outlet ?? '',
+      sponsorship: initialValues?.sponsorship ?? '',
       format: initialValues?.format ?? 'Reel',
       dueDate: initialValues ? toDateInput(new Date(initialValues.dueDate)) : toDateInput(new Date()),
       assigneeId: initialValues?.assigneeId ? String(initialValues.assigneeId) : '',
@@ -109,6 +111,7 @@ export function TaskForm({
       title: values.title.trim(),
       network: values.network,
       outlet: values.outlet || null,
+      sponsorship: values.sponsorship || null,
       format: values.format.trim(),
       dueDate: values.dueDate,
       assigneeId: values.assigneeId ? Number(values.assigneeId) : null,
@@ -222,18 +225,30 @@ export function TaskForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="task-due">Vence</Label>
-          <Input
-            id="task-due"
-            type="date"
-            className={ADMIN_INPUT_CLASS}
-            {...register('dueDate', { required: 'Poné una fecha de entrega' })}
-          />
-          {errors.dueDate && <p className="text-sm text-destructive">{errors.dueDate.message}</p>}
-          <p className="text-xs" style={MUTED_STYLE}>
-            Vence al final de ese día, hora argentina.
-          </p>
+          <Label htmlFor="task-sponsorship">Orgánico o publicitario</Label>
+          <select id="task-sponsorship" className={AGENCY_SELECT_CLASS} {...register('sponsorship')}>
+            <option value="">Sin definir</option>
+            {Object.entries(SPONSORSHIP_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="task-due">Vence</Label>
+        <Input
+          id="task-due"
+          type="date"
+          className={`${ADMIN_INPUT_CLASS} sm:max-w-[calc(50%-0.5rem)]`}
+          {...register('dueDate', { required: 'Poné una fecha de entrega' })}
+        />
+        {errors.dueDate && <p className="text-sm text-destructive">{errors.dueDate.message}</p>}
+        <p className="text-xs" style={MUTED_STYLE}>
+          Vence al final de ese día, hora argentina.
+        </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

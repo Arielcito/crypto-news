@@ -22,6 +22,7 @@ import {
   useAgencyTasks,
   useCreateTask,
   useDeleteTask,
+  useSetTaskEdited,
   useSetTaskStatus,
   useUpdateTask,
 } from '@/lib/use-agency-tasks';
@@ -57,6 +58,7 @@ export function TasksBoard({
   const updateMutation = useUpdateTask();
   const deleteMutation = useDeleteTask();
   const statusMutation = useSetTaskStatus();
+  const editedMutation = useSetTaskEdited();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<AgencyTask | null>(null);
@@ -127,6 +129,23 @@ export function TasksBoard({
     );
   };
 
+  const toggleEdited = (task: AgencyTask) => {
+    editedMutation.mutate(
+      { id: task.id, edited: !task.editedAt },
+      {
+        onSuccess: (response) => {
+          if (response.error) {
+            toast.error(response.message || response.error);
+            return;
+          }
+          toast.success(response.message || 'Tarea actualizada');
+        },
+        onError: (mutationError) =>
+          toast.error(mutationError instanceof Error ? mutationError.message : 'Error al actualizar'),
+      }
+    );
+  };
+
   const handleDelete = () => {
     if (!deleting) return;
     deleteMutation.mutate(deleting.id, {
@@ -146,6 +165,7 @@ export function TasksBoard({
   const actions = {
     onComplete: setCompleting,
     onReopen: (task: AgencyTask) => changeStatus(task, 'PENDING'),
+    onToggleEdited: toggleEdited,
     onCancel: canManage ? (task: AgencyTask) => changeStatus(task, 'CANCELLED') : undefined,
     onEdit: canManage ? setEditing : undefined,
     onDelete: canManage ? setDeleting : undefined,

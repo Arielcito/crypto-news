@@ -63,6 +63,7 @@ export const socialNetworkEnum = z.enum(['INSTAGRAM', 'FACEBOOK', 'X', 'TIKTOK',
 /** Una tarea además puede salir en la web, en Discord o en otro canal sin cuenta. */
 export const taskNetworkEnum = z.enum([...socialNetworkEnum.options, 'WEB', 'DISCORD', 'OTHER']);
 export const outletEnum = z.enum(['BTCARG', 'TEV', 'CLIENT']);
+export const sponsorshipEnum = z.enum(['ORGANIC', 'PAID']);
 
 export const createUserSchema = z.object({
   name: z.string().min(1, 'El nombre es obligatorio').max(120),
@@ -123,6 +124,7 @@ export const createTaskSchema = z.object({
   title: z.string().min(1, 'El título es obligatorio').max(200),
   network: taskNetworkEnum,
   outlet: outletEnum.nullable().optional(),
+  sponsorship: sponsorshipEnum.nullable().optional(),
   format: z.string().min(1, 'El formato es obligatorio').max(60),
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Usá el formato YYYY-MM-DD'),
   assigneeId: z.number().int().positive().nullable().optional(),
@@ -136,6 +138,7 @@ export const updateTaskSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   network: taskNetworkEnum.optional(),
   outlet: outletEnum.nullable().optional(),
+  sponsorship: sponsorshipEnum.nullable().optional(),
   format: z.string().min(1).max(60).optional(),
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   assigneeId: z.number().int().positive().nullable().optional(),
@@ -144,10 +147,16 @@ export const updateTaskSchema = z.object({
   notes: z.string().max(2000).nullable().optional(),
 });
 
-export const completeTaskSchema = z.object({
-  status: taskStatusEnum,
-  permalink: z.string().url('Pegá el link de la pieza publicada').nullable().optional(),
-});
+export const completeTaskSchema = z
+  .object({
+    status: taskStatusEnum.optional(),
+    permalink: z.string().url('Pegá el link de la pieza publicada').nullable().optional(),
+    /** El editor terminó la pieza: se guarda como `editedAt`, el estado no cambia. */
+    edited: z.boolean().optional(),
+  })
+  .refine((data) => data.status !== undefined || data.edited !== undefined, {
+    message: 'Mandá el estado o si está editada',
+  });
 
 export const taskFiltersSchema = z.object({
   clientId: z.number().int().positive().optional(),

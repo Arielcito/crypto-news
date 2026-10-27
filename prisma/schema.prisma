@@ -136,6 +136,13 @@ enum Outlet {
   CLIENT
 }
 
+/// Pieza que el cliente paga como publicidad o contenido orgánico. Se lleva
+/// para ver el balance entre una y otra en el calendario.
+enum Sponsorship {
+  ORGANIC
+  PAID
+}
+
 /// De dónde salió la pieza: publicada por el agregador o nativa e importada.
 enum PostOrigin {
   POSTPROXY
@@ -153,6 +160,8 @@ model User {
   mustChangePassword Boolean  @default(false) @map("must_change_password")
   /// Se incrementa al cambiar password o desactivar: invalida toda sesión abierta.
   sessionVersion     Int      @default(1) @map("session_version")
+  /// Chat privado con el bot de Telegram, para las alertas diarias de tareas.
+  telegramChatId     String?  @unique @map("telegram_chat_id")
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
 
@@ -242,6 +251,7 @@ model Task {
   title        String
   network      SocialNetwork
   outlet       Outlet?
+  sponsorship  Sponsorship?
   format       String
   dueDate      DateTime      @map("due_date")
   status       TaskStatus    @default(PENDING)
@@ -251,6 +261,8 @@ model Task {
   completedAt  DateTime?     @map("completed_at")
   /// Sólo importa si el cliente tiene `requiresApproval`.
   approvedAt   DateTime?     @map("approved_at")
+  /// El editor terminó la pieza. Sigue PENDING hasta que se publica.
+  editedAt     DateTime?     @map("edited_at")
   /// Captura de la pieza: las historias desaparecen a las 24 h y el link deja
   /// de probar nada. Es una URL pública a propósito: muestra algo que ya se
   /// publicó, a diferencia de un brief.

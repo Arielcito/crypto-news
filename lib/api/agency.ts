@@ -180,6 +180,10 @@ export function setTaskStatus(
   });
 }
 
+export function setTaskEdited(id: number, edited: boolean): Promise<ApiResponse<AgencyTask>> {
+  return adminFetch(`${BASE}/tasks/${id}`, { method: 'PATCH', body: JSON.stringify({ edited }) });
+}
+
 export function deleteAgencyTask(id: number): Promise<ApiResponse<null>> {
   return adminFetch(`${BASE}/tasks/${id}`, { method: 'DELETE' });
 }

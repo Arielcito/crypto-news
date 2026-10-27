@@ -91,6 +91,7 @@ export async function POST(request: NextRequest) {
         title: parsed.data.title.trim(),
         network: parsed.data.network,
         outlet: parsed.data.outlet ?? null,
+        sponsorship: parsed.data.sponsorship ?? null,
         format: parsed.data.format.trim(),
         dueDate: parseDueDate(parsed.data.dueDate),
         assigneeId: parsed.data.assigneeId ?? null,

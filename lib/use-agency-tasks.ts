@@ -6,6 +6,7 @@ import {
   deleteAgencyTask,
   deleteTaskEvidence,
   fetchAgencyTasks,
+  setTaskEdited,
   setTaskStatus,
   updateAgencyTask,
   uploadTaskEvidence,
@@ -52,6 +53,12 @@ export function useSetTaskStatus() {
   return useTaskMutation(
     ({ id, status, permalink }: { id: number; status: TaskStatus; permalink?: string | null }) =>
       setTaskStatus(id, status, permalink)
+  );
+}
+
+export function useSetTaskEdited() {
+  return useTaskMutation(
+    ({ id, edited }: { id: number; edited: boolean }) => setTaskEdited(id, edited)
   );
 }
 

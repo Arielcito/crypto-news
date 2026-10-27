@@ -7,6 +7,7 @@ import type {
   Report,
   Outlet,
   SocialNetwork,
+  Sponsorship,
   Task,
   User,
 } from '@prisma/client';
@@ -104,6 +105,11 @@ export const OUTLET_LABELS: Record<Outlet, string> = {
   BTCARG: 'Bitcoin Argentina',
   TEV: 'TEV',
   CLIENT: 'Cuenta del cliente',
+};
+
+export const SPONSORSHIP_LABELS: Record<Sponsorship, string> = {
+  ORGANIC: 'Orgánico',
+  PAID: 'Publicitario',
 };
 
 export const ROLE_LABELS: Record<'ADMIN' | 'EMPLOYEE', string> = {
@@ -287,7 +293,7 @@ export interface AgencyReportSummary {
   packageId: number;
   createdAt: Date;
   generatedBy: Pick<User, 'id' | 'name'> | null;
-  package: Pick<Package, 'id' | 'month'> & { client: Pick<Client, 'id' | 'name'> };
+  package: Pick<Package, 'id' | 'month'> & { client: Pick<Client, 'id' | 'name' | 'slug'> };
 }
 
 export interface AgencyReport extends Omit<Report, 'snapshot'> {

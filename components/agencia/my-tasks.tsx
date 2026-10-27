@@ -12,7 +12,7 @@ import {
   ListSkeleton,
   MUTED_STYLE,
 } from '@/components/agencia/agency-ui';
-import { useAgencyTasks, useSetTaskStatus } from '@/lib/use-agency-tasks';
+import { useAgencyTasks, useSetTaskEdited, useSetTaskStatus } from '@/lib/use-agency-tasks';
 import { urgencyOf } from '@/lib/agency/dates';
 import type { AgencyTask } from '@/lib/types/agency';
 
@@ -33,6 +33,7 @@ export function MyTasks({ userId }: { userId: number }) {
     perPage: 100,
   });
   const statusMutation = useSetTaskStatus();
+  const editedMutation = useSetTaskEdited();
   const [completing, setCompleting] = useState<AgencyTask | null>(null);
 
   const doneQuery = useAgencyTasks({ assigneeId: userId, status: 'DONE', perPage: 5 });
@@ -71,6 +72,23 @@ export function MyTasks({ userId }: { userId: number }) {
     );
   };
 
+  const handleToggleEdited = (task: AgencyTask) => {
+    editedMutation.mutate(
+      { id: task.id, edited: !task.editedAt },
+      {
+        onSuccess: (response) => {
+          if (response.error) {
+            toast.error(response.message || response.error);
+            return;
+          }
+          toast.success(response.message || 'Tarea actualizada');
+        },
+        onError: (mutationError) =>
+          toast.error(mutationError instanceof Error ? mutationError.message : 'Error al actualizar'),
+      }
+    );
+  };
+
   const recentlyDone = doneQuery.data?.tasks ?? [];
 
   return (
@@ -93,7 +111,11 @@ export function MyTasks({ userId }: { userId: number }) {
             >
               <ul className="space-y-2">
                 {groupTasks.map((task) => (
-                  <TaskCard key={task.id} task={task} actions={{ onComplete: setCompleting }} />
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    actions={{ onComplete: setCompleting, onToggleEdited: handleToggleEdited }}
+                  />
                 ))}
               </ul>
             </AgencyCard>
