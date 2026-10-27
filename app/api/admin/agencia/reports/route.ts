@@ -13,7 +13,7 @@ const REPORT_LIST_SELECT = {
   createdAt: true,
   generatedBy: { select: { id: true, name: true } },
   package: {
-    select: { id: true, month: true, client: { select: { id: true, name: true } } },
+    select: { id: true, month: true, client: { select: { id: true, name: true, slug: true } } },
   },
 } as const;
 

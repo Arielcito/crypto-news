@@ -78,7 +78,7 @@ export function ReportsList({ canManage }: { canManage: boolean }) {
               style={ADMIN_SURFACE_STYLE}
             >
               <div className="flex min-w-0 items-center gap-3">
-                <ClientAvatar name={report.package.client.name} />
+                <ClientAvatar name={report.package.client.name} seed={report.package.client.slug} />
                 <div className="min-w-0">
                   <Link
                     href={`/admin/agencia/reportes/${report.id}`}

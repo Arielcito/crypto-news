@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import type { CSSProperties, ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
@@ -150,10 +151,25 @@ export function NetworkBadge({ network }: { network: SocialNetwork }) {
 }
 
 /*
- * Los clientes no tienen logo cargado en la base, así que la marca se arma con
+ * Los logos viven en `public/agencia/clientes/<slug>.png` (128px), no en la
+ * base: son pocos clientes y cambian poco. El que no está en la lista cae a
  * las iniciales sobre un color derivado del nombre: siempre el mismo para el
  * mismo cliente, que es lo que hace que sirva para reconocerlo en una lista.
  */
+const CLIENT_LOGOS = new Set([
+  'bingx',
+  'bitcoin-argentina',
+  'bitget',
+  'capital-com',
+  'decibel',
+  'emcd',
+  'exness',
+  'grabfi',
+  'ondo',
+  'simplefx',
+  'tev',
+]);
+
 function hueOf(seed: string): number {
   let hash = 0;
   for (let i = 0; i < seed.length; i += 1) {
@@ -185,6 +201,19 @@ export function ClientAvatar({
   seed?: string;
   size?: keyof typeof AVATAR_SIZES;
 }) {
+  if (seed && CLIENT_LOGOS.has(seed)) {
+    // Fondo blanco: hay logos transparentes en negro (Ondo) que en oscuro desaparecen.
+    return (
+      <Image
+        src={`/agencia/clientes/${seed}.png`}
+        alt=""
+        width={56}
+        height={56}
+        className={cn('shrink-0 rounded-lg bg-white object-cover ring-1 ring-black/10', AVATAR_SIZES[size])}
+        aria-hidden
+      />
+    );
+  }
   // El tono va por variable y no inline: el texto necesita otra luminosidad en
   // oscuro, y un `style` no sabe en qué tema está.
   const hue = hueOf(seed ?? name);
