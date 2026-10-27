@@ -5,12 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import Post from "@/types/post";
+import { postPath } from "@/lib/utils";
 
 export function PostCard({ post }: { post: Post }) {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <Link href={`/${post.categories[0].slug}/${post.slug}`} className="group">
+    <Link href={postPath(post)} className="group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
         <div className="aspect-video relative overflow-hidden">
           {!imageError ? (
@@ -31,7 +32,7 @@ export function PostCard({ post }: { post: Post }) {
         <div className="p-2">
           <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
             <span className="bg-primary/10 text-primary py-0.5 rounded-full text-[10px]">
-              {post.categories[0].name}
+              {post.categories[0]?.name ?? "Noticias"}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-2.5 h-2.5" />

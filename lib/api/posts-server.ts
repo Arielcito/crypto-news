@@ -1,6 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/lib/prisma";
+import { checkAdminSession } from "@/lib/admin-auth";
 import type Post from "@/types/post";
 import type { Author } from "@/types/author";
 
@@ -29,6 +30,9 @@ export async function getPostBySlugServer(
   }
 
   if (!record) return null;
+
+  // Los borradores sólo los ve el admin (el preview de /admin/posts usa esta misma URL).
+  if (record.status !== "publish" && !(await checkAdminSession())) return null;
 
   return {
     id: record.id,

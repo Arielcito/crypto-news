@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Clock } from "lucide-react";
 import Post from "@/types/post";
+import { postPath } from "@/lib/utils";
 import Image from "next/image";
 
 interface RecommendedPostsProps {
@@ -22,7 +23,7 @@ export function RecommendedPosts({ currentPostId, posts }: RecommendedPostsProps
         {recommendedPosts.map(post => (
           <Link 
             key={post.id} 
-            href={`/${post.categories[0].slug}/${post.slug}`}
+            href={postPath(post)}
             className="group block"
           >
             <article className="flex gap-4 p-2 rounded-lg hover:bg-muted/50 transition-colors">

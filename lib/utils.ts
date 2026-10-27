@@ -15,3 +15,8 @@ export function slugVariants(slug: string): string[] {
   const stripped = removeAccents(slug);
   return stripped === slug ? [slug] : [slug, stripped];
 }
+
+/** URL pública de una nota. Sin categoría cae en /notas/, igual que el preview del admin. */
+export function postPath(post: { slug: string; categories: { slug: string }[] }): string {
+  return `/${post.categories[0]?.slug ?? 'notas'}/${post.slug}`;
+}

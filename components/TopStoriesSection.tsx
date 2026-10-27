@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Clock } from "lucide-react";
 import Image from "next/image";
 import Post from "@/types/post";
+import { postPath } from "@/lib/utils";
 
 interface TopStoriesSectionProps {
   posts: Post[];
@@ -10,7 +11,7 @@ interface TopStoriesSectionProps {
 function FeaturedStoryCard({ post }: { post: Post }) {
   console.log(post);
   return (
-    <Link href={`/${post.categories[0].slug}/${post.slug}`} className="block group">
+    <Link href={postPath(post)} className="block group">
       <article className="relative h-[300px] rounded-lg overflow-hidden">
         <Image
           src={post.featuredMedia || ""}
@@ -39,7 +40,7 @@ function FeaturedStoryCard({ post }: { post: Post }) {
 function SmallStoryCard({ post }: { post: Post }) {
   console.log(post);
   return (
-    <Link href={`/${post.categories[0].slug}/${post.slug}`} className="block group">
+    <Link href={postPath(post)} className="block group">
       <article className="flex gap-4 items-center">
         <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
           <Image

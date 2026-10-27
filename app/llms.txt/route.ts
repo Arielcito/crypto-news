@@ -23,7 +23,7 @@ export async function GET() {
       }),
     prisma.post
       .findMany({
-        where: { domain, status: "publish" },
+        where: { domain, status: "publish", isActive: true },
         select: {
           title: true,
           slug: true,

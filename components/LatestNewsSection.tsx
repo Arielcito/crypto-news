@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Clock } from "lucide-react";
 import Image from "next/image";
 import Post from "@/types/post";
+import { postPath } from "@/lib/utils";
 
 interface LatestNewsSectionProps {
   posts: Post[];
@@ -13,7 +14,7 @@ export function LatestNewsSection({ posts }: LatestNewsSectionProps) {
       <h2 className="text-2xl font-bold mb-4">Últimas Noticias</h2>
       <div className="space-y-4">
         {posts.map((post) => (
-          <Link key={post.slug} href={`/${post.categories[0].slug}/${post.slug}`} className="block group">
+          <Link key={post.slug} href={postPath(post)} className="block group">
             <article className="border-b pb-4">
               <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                 <span className="bg-red-100 text-red-600 px-2 py-1 rounded-full">

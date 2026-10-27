@@ -24,7 +24,8 @@ export async function GET(request: NextRequest) {
     const post = await prisma.post.findFirst({
       where: {
         slug,
-        isActive: true
+        isActive: true,
+        status: 'publish'
       },
       include: {
         categories: true,

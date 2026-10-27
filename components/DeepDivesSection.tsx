@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Clock } from "lucide-react";
 import Image from "next/image";
 import Post from "@/types/post";
+import { postPath } from "@/lib/utils";
 
 interface DeepDivesSectionProps {
   posts: Post[];
@@ -9,7 +10,7 @@ interface DeepDivesSectionProps {
 
 function DeepDiveCard({ post }: { post: Post }) {
   return (
-    <Link href={`/${post.categories[0].slug}/${post.slug}`} className="block group">
+    <Link href={postPath(post)} className="block group">
       <article className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
         <div className="aspect-[16/9] relative overflow-hidden">
           <Image

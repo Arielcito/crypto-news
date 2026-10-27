@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     console.log(`[GET] /api/wp/v2/posts/${id} - Fetching post`);
 
     const post = await prisma.post.findFirst({
-      where: { id, isActive: true },
+      where: { id, isActive: true, status: 'publish' },
       include: {
         categories: true,
         tags: true
