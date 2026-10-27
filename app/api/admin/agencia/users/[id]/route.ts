@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
-import { badRequest, notFound, requireAdmin, serverError } from '@/lib/admin-auth';
+import { badRequest, conflict, notFound, requireAdmin, serverError } from '@/lib/admin-auth';
 import { updateUserSchema } from '@/lib/validations/admin';
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
@@ -31,6 +31,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         ...parsed.data,
         // Desactivar tiene que cortar la sesión abierta, no esperar a que venza.
         ...(parsed.data.isActive === false ? { sessionVersion: { increment: 1 } } : {}),
+        // Otro @ es otra persona: el chat vinculado deja de valer hasta su /start.
+        ...(parsed.data.telegramUsername !== undefined ? { telegramChatId: null } : {}),
       },
       select: {
         id: true,
@@ -40,6 +42,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         isActive: true,
         mustChangePassword: true,
         createdAt: true,
+        telegramUsername: true,
+        telegramChatId: true,
       },
     });
 
@@ -48,6 +52,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
       return notFound('Usuario no encontrado');
+    }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return conflict('Ese usuario de Telegram ya está cargado en otra persona');
     }
     return serverError(`[PUT] /api/admin/agencia/users/${params.id}`, error);
   }

@@ -13,7 +13,7 @@ const OVERDUE_COLOR = 0xd32f2f;
 const SOON_COLOR = 0xf7931a;
 
 /** Cuántos días hacia adelante entran en el aviso. */
-const HORIZON_DAYS = 3;
+export const HORIZON_DAYS = 3;
 
 /** Tope de líneas por embed: Discord corta los mensajes largos. */
 const MAX_LINES = 15;

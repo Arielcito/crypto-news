@@ -45,7 +45,15 @@ export type CompleteTaskInput = z.infer<typeof completeTaskSchema>;
 /** Nunca sale el hash. Este es el shape que ve el cliente HTTP. */
 export type AgencyUser = Pick<
   User,
-  'id' | 'email' | 'name' | 'role' | 'isActive' | 'mustChangePassword' | 'createdAt'
+  | 'id'
+  | 'email'
+  | 'name'
+  | 'role'
+  | 'isActive'
+  | 'mustChangePassword'
+  | 'createdAt'
+  | 'telegramUsername'
+  | 'telegramChatId'
 >;
 
 /** Lo único que necesita el select de responsable. */

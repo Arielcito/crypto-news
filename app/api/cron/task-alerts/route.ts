@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendTaskAlerts } from '@/lib/services/discord-tasks';
+import { sendTelegramTaskAlerts } from '@/lib/services/telegram-tasks';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await sendTaskAlerts();
+    // Discord lleva el resumen del equipo; Telegram, el de cada uno por privado.
+    const [discord, telegram] = await Promise.all([sendTaskAlerts(), sendTelegramTaskAlerts()]);
+    const result = { discord, telegram };
     console.log('[GET] /api/cron/task-alerts - Done:', JSON.stringify(result));
     return NextResponse.json({ data: result, error: null, message: null });
   } catch (error) {

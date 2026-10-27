@@ -65,16 +65,29 @@ export const taskNetworkEnum = z.enum([...socialNetworkEnum.options, 'WEB', 'DIS
 export const outletEnum = z.enum(['BTCARG', 'TEV', 'CLIENT']);
 export const sponsorshipEnum = z.enum(['ORGANIC', 'PAID']);
 
+/** `@Paul_Roveda` → `paul_roveda`, que es como lo trae el /start. Vacío = sin Telegram. */
+const telegramUsernameSchema = z
+  .string()
+  .trim()
+  .transform((value) => value.replace(/^@/, '').toLowerCase())
+  .refine(
+    (value) => value === '' || /^[a-z0-9_]{5,32}$/.test(value),
+    'Usuario de Telegram inválido: de 5 a 32 letras, números o _'
+  )
+  .transform((value) => value || null);
+
 export const createUserSchema = z.object({
   name: z.string().min(1, 'El nombre es obligatorio').max(120),
   email: z.string().email('Email inválido').max(160),
   role: roleEnum.default('EMPLOYEE'),
+  telegramUsername: telegramUsernameSchema.optional(),
 });
 
 export const updateUserSchema = z.object({
   name: z.string().min(1).max(120).optional(),
   role: roleEnum.optional(),
   isActive: z.boolean().optional(),
+  telegramUsername: telegramUsernameSchema.optional(),
 });
 
 export const createClientSchema = z.object({

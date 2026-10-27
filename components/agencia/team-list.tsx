@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { KeyRound, Plus, UserX, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DeleteConfirmDialog } from '@/components/admin/delete-confirm-dialog';
@@ -17,6 +18,7 @@ import {
   ListSkeleton,
   MUTED_STYLE,
 } from '@/components/agencia/agency-ui';
+import { ADMIN_INPUT_CLASS } from '@/lib/constants';
 import {
   useAgencyUsers,
   useCreateAgencyUser,
@@ -65,6 +67,25 @@ export function TeamList({ currentUserId }: { currentUserId: number }) {
         },
         onError: (mutationError) =>
           toast.error(mutationError instanceof Error ? mutationError.message : 'Error al actualizar'),
+      }
+    );
+  };
+
+  const handleTelegram = (user: AgencyUser, raw: string) => {
+    // El server normaliza igual; acá sólo se evita un PUT (y desvincular el chat) si no cambió.
+    if (raw.trim().replace(/^@/, '').toLowerCase() === (user.telegramUsername ?? '')) return;
+    updateMutation.mutate(
+      { id: user.id, input: { telegramUsername: raw } },
+      {
+        onSuccess: (response) => {
+          if (response.error) {
+            toast.error(response.message || response.error);
+            return;
+          }
+          toast.success(`Telegram de ${user.name} guardado`);
+        },
+        onError: (mutationError) =>
+          toast.error(mutationError instanceof Error ? mutationError.message : 'Error al guardar'),
       }
     );
   };
@@ -125,6 +146,7 @@ export function TeamList({ currentUserId }: { currentUserId: number }) {
                 <TableHead>Nombre</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Rol</TableHead>
+                <TableHead>Telegram</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -161,6 +183,29 @@ export function TeamList({ currentUserId }: { currentUserId: number }) {
                           </option>
                         ))}
                       </select>
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        key={user.telegramUsername ?? ''}
+                        className={`${ADMIN_INPUT_CLASS} h-9 w-40`}
+                        defaultValue={user.telegramUsername ? `@${user.telegramUsername}` : ''}
+                        placeholder="@usuario"
+                        onBlur={(event) => handleTelegram(user, event.target.value)}
+                        onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.blur()}
+                        aria-label={`Telegram de ${user.name}`}
+                      />
+                      <p
+                        className="mt-1 text-xs"
+                        style={
+                          user.telegramChatId ? { color: 'hsl(var(--admin-positive))' } : MUTED_STYLE
+                        }
+                      >
+                        {user.telegramChatId
+                          ? 'Conectado'
+                          : user.telegramUsername
+                            ? 'Falta que toque Iniciar en el bot'
+                            : 'Sin Telegram'}
+                      </p>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">

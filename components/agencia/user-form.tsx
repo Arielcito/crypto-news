@@ -26,7 +26,7 @@ export function UserForm({ onSubmit, isPending = false }: UserFormProps) {
     formState: { errors },
   } = useForm<UserFormValues, unknown, CreateUserInput>({
     resolver: zodResolver(createUserSchema),
-    defaultValues: { name: '', email: '', role: 'EMPLOYEE' },
+    defaultValues: { name: '', email: '', role: 'EMPLOYEE', telegramUsername: '' },
   });
 
   return (
@@ -54,6 +54,22 @@ export function UserForm({ onSubmit, isPending = false }: UserFormProps) {
         </select>
         <p className="text-xs" style={MUTED_STYLE}>
           El rol Equipo sólo ve los clientes donde tiene tareas asignadas.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="user-telegram">Telegram (opcional)</Label>
+        <Input
+          id="user-telegram"
+          className={ADMIN_INPUT_CLASS}
+          placeholder="@usuario"
+          {...register('telegramUsername')}
+        />
+        {errors.telegramUsername && (
+          <p className="text-sm text-destructive">{errors.telegramUsername.message}</p>
+        )}
+        <p className="text-xs" style={MUTED_STYLE}>
+          Para recibir sus tareas cada mañana tiene que abrir el bot y tocar Iniciar.
         </p>
       </div>
 

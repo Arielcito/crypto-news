@@ -13,6 +13,8 @@ const PUBLIC_FIELDS = {
   isActive: true,
   mustChangePassword: true,
   createdAt: true,
+  telegramUsername: true,
+  telegramChatId: true,
 } as const;
 
 /**
@@ -61,6 +63,7 @@ export async function POST(request: NextRequest) {
         email: parsed.data.email.trim().toLowerCase(),
         name: parsed.data.name.trim(),
         role: parsed.data.role,
+        telegramUsername: parsed.data.telegramUsername,
         passwordHash: await hashPassword(temporaryPassword),
         mustChangePassword: true,
       },
@@ -78,7 +81,11 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      return conflict('Ya existe un usuario con ese email');
+      return conflict(
+        String(error.meta?.target).includes('telegram')
+          ? 'Ese usuario de Telegram ya está cargado en otra persona'
+          : 'Ya existe un usuario con ese email'
+      );
     }
     return serverError('[POST] /api/admin/agencia/users', error);
   }
