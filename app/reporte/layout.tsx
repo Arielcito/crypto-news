@@ -8,6 +8,7 @@ const bricolage = Bricolage_Grotesque({
 
 // Link privado para el cliente: que ningún buscador lo indexe aunque alguien lo publique.
 export const metadata = {
+  title: 'Reporte en vivo',
   robots: { index: false, follow: false },
 };
 

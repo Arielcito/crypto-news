@@ -71,7 +71,7 @@ export default async function ReportePublicoPage({
       <ReportSheet
         snapshot={shared}
         eyebrow="Reporte en vivo"
-        note={`Actualizado al ${formatDateTimeAr(snapshot.generatedAt)}. Los números siguen sumando mientras las piezas circulan.`}
+        note={`Actualizado al ${formatDateTimeAr(snapshot.generatedAt)} · Los números siguen sumando mientras las piezas circulan.`}
       />
     </main>
   );
