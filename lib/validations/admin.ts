@@ -177,8 +177,12 @@ export const taskFiltersSchema = z.object({
   status: taskStatusEnum.optional(),
   network: taskNetworkEnum.optional(),
   packageId: z.number().int().positive().optional(),
+  /** Rango de vencimiento `YYYY-MM-DD`, ambos inclusive: lo usa el calendario. */
+  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   page: z.number().int().min(1).default(1),
-  perPage: z.number().int().min(1).max(100).default(20),
+  // El calendario trae el mes entero de una: 100 no alcanza para 6 semanas.
+  perPage: z.number().int().min(1).max(500).default(20),
 });
 
 export const metricsRangeSchema = z.object({

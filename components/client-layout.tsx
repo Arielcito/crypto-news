@@ -14,7 +14,7 @@ const Footer = dynamic(() => import('@/components/footer').then(mod => ({ defaul
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  if (pathname?.startsWith('/admin')) {
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/reporte')) {
     return <div className="min-h-screen">{children}</div>;
   }
 

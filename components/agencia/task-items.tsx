@@ -45,7 +45,7 @@ function statusLabel(task: AgencyTask): { urgency: ReturnType<typeof urgencyOf>;
   if (done) {
     return {
       urgency,
-      label: task.completedAt ? `Hecha ${formatDateAr(task.completedAt)}` : 'Hecha',
+      label: task.completedAt ? `Publicada ${formatDateAr(task.completedAt)}` : 'Publicada',
     };
   }
   return { urgency, label: countdownLabel(task.dueDate) };
@@ -92,7 +92,7 @@ function TaskButtons({
 }: {
   task: AgencyTask;
   actions: TaskActions;
-  /** En la tabla todo va en una línea: "Completar" queda sólo con el ícono. */
+  /** En la tabla todo va en una línea: "Marcar publicada" queda sólo con el ícono. */
   compact?: boolean;
 }) {
   const pending = task.status === 'PENDING';
@@ -123,15 +123,15 @@ function TaskButtons({
           size="icon"
           className={iconClass}
           onClick={() => actions.onComplete?.(task)}
-          aria-label="Completar tarea"
-          title="Completar"
+          aria-label="Marcar como publicada"
+          title="Marcar como publicada"
         >
           <CheckCircle2 className="h-4 w-4" />
         </Button>
       ) : (
         <Button variant="ghost" size="sm" onClick={() => actions.onComplete?.(task)}>
           <CheckCircle2 className="mr-2 h-4 w-4" />
-          Completar
+          Marcar publicada
         </Button>
       ))}
       {pending && actions.onToggleEdited && (

@@ -138,3 +138,22 @@ export function daysAgo(days: number, now = new Date()): Date {
 export function currentMonthAr(now = new Date()): string {
   return toDateInput(now).slice(0, 7);
 }
+
+export const isoDay = (date: Date) => date.toISOString().slice(0, 10);
+
+/**
+ * Las semanas completas (lunes a domingo) que cubren el mes, como lo dibuja un
+ * calendario. `month` es el primer día del mes en UTC; cada día también es
+ * medianoche UTC, así que `isoDay` no se corre por zona horaria.
+ */
+export function calendarDays(month: Date): { days: Date[]; from: string; to: string } {
+  const year = month.getUTCFullYear();
+  const monthIndex = month.getUTCMonth();
+  const first = Date.UTC(year, monthIndex, 1);
+  const lead = (new Date(first).getUTCDay() + 6) % 7;
+  const inMonth = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
+  const cells = Math.ceil((lead + inMonth) / 7) * 7;
+  const days = Array.from({ length: cells }, (_, index) => new Date(first + (index - lead) * MS_PER_DAY));
+  return { days, from: isoDay(days[0]), to: isoDay(days[cells - 1]) };
+}
+

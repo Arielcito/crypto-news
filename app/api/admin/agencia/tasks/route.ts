@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Prisma, Role } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { badRequest, notFound, requireAdmin, requireUser, serverError } from '@/lib/admin-auth';
-import { parseDueDate } from '@/lib/agency/dates';
+import { AR_OFFSET, parseDueDate } from '@/lib/agency/dates';
 import { TASK_INCLUDE } from '@/lib/agency/tasks';
 import { createTaskSchema, taskFiltersSchema } from '@/lib/validations/admin';
 
@@ -26,6 +26,8 @@ export async function GET(request: NextRequest) {
       packageId: numberParam(search, 'packageId'),
       status: search.get('status') ?? undefined,
       network: search.get('network') ?? undefined,
+      from: search.get('from') ?? undefined,
+      to: search.get('to') ?? undefined,
       page: numberParam(search, 'page') ?? 1,
       perPage: numberParam(search, 'perPage') ?? 20,
     });
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest) {
       return badRequest(parsed.error.issues.map((issue) => issue.message).join('; '));
     }
 
-    const { page, perPage, clientId, assigneeId, status, network, packageId } = parsed.data;
+    const { page, perPage, clientId, assigneeId, status, network, packageId, from, to } = parsed.data;
 
     // El empleado ve SÓLO lo suyo. No es un default que el cliente pueda pisar
     // mandando otro assigneeId: el filtro se impone después de leer el suyo.
@@ -48,6 +50,15 @@ export async function GET(request: NextRequest) {
       ...(network ? { network } : {}),
       ...(packageId ? { packageId } : {}),
       ...(clientId ? { package: { clientId } } : {}),
+      // Días en hora argentina: desde las 00:00 de `from` hasta el cierre de `to`.
+      ...(from || to
+        ? {
+            dueDate: {
+              ...(from ? { gte: new Date(`${from}T00:00:00.000${AR_OFFSET}`) } : {}),
+              ...(to ? { lte: parseDueDate(to) } : {}),
+            },
+          }
+        : {}),
     };
 
     const [tasks, total] = await Promise.all([

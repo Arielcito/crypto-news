@@ -77,7 +77,7 @@ export function CompleteTaskDialog({ task, onOpenChange }: CompleteTaskDialogPro
             toast.error(response.message || response.error);
             return;
           }
-          toast.success('Tarea completada');
+          toast.success('Tarea marcada como publicada');
           close(false);
         },
         onError: (mutationError) =>
@@ -90,7 +90,7 @@ export function CompleteTaskDialog({ task, onOpenChange }: CompleteTaskDialogPro
     <Dialog open={!!task} onOpenChange={close}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Completar tarea</DialogTitle>
+          <DialogTitle>Marcar como publicada</DialogTitle>
           <DialogDescription>{task?.title}</DialogDescription>
         </DialogHeader>
 
@@ -164,7 +164,7 @@ export function CompleteTaskDialog({ task, onOpenChange }: CompleteTaskDialogPro
             Cancelar
           </Button>
           <Button onClick={confirm} disabled={busy}>
-            {upload.isPending ? 'Subiendo captura...' : busy ? 'Guardando...' : 'Marcar como hecha'}
+            {upload.isPending ? 'Subiendo captura...' : busy ? 'Guardando...' : 'Marcar como publicada'}
           </Button>
         </div>
       </DialogContent>

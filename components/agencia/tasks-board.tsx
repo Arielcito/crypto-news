@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ListChecks, Plus } from 'lucide-react';
+import { CalendarDays, List, ListChecks, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -10,6 +10,7 @@ import { DeleteConfirmDialog } from '@/components/admin/delete-confirm-dialog';
 import { TaskForm } from '@/components/agencia/task-form';
 import { CompleteTaskDialog } from '@/components/agencia/complete-task-dialog';
 import { TaskCard, TaskRow } from '@/components/agencia/task-items';
+import { TaskCalendar } from '@/components/agencia/task-calendar';
 import {
   ADMIN_SURFACE_STYLE,
   AGENCY_SELECT_CLASS,
@@ -29,12 +30,15 @@ import {
 import { useAgencyClients } from '@/lib/use-agency-clients';
 import { useAgencyUsers } from '@/lib/use-agency-users';
 import { NETWORK_LABELS } from '@/lib/types/agency';
+import { calendarDays, currentMonthAr, parseMonth } from '@/lib/agency/dates';
 import { taskStatusEnum } from '@/lib/validations/admin';
 import type { AgencyTask, CreateTaskInput } from '@/lib/types/agency';
 import type { TaskStatus } from '@prisma/client';
 import type { TaskListFilters } from '@/lib/api/agency';
 
 const PER_PAGE = 20;
+/** ponytail: tope del mes en calendario; hoy un mes lleno ronda las 150 tareas. Paginar si pasa 500. */
+const CALENDAR_LIMIT = 500;
 
 export function TasksBoard({
   canManage,
@@ -50,7 +54,17 @@ export function TasksBoard({
     perPage: PER_PAGE,
   });
 
-  const { data, isLoading, isError, error } = useAgencyTasks(filters);
+  const [view, setView] = useState<'list' | 'calendar'>('list');
+  const [month, setMonth] = useState(() => parseMonth(currentMonthAr()));
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const range = calendarDays(month);
+
+  // El calendario trae el mes visible entero (con los días de relleno) en una sola página.
+  const { data, isLoading, isError, error } = useAgencyTasks(
+    view === 'calendar'
+      ? { ...filters, page: 1, perPage: CALENDAR_LIMIT, from: range.from, to: range.to }
+      : filters
+  );
   const { data: clients = [] } = useAgencyClients();
   const { data: users = [] } = useAgencyUsers();
 
@@ -66,6 +80,7 @@ export function TasksBoard({
   const [completing, setCompleting] = useState<AgencyTask | null>(null);
 
   const tasks = data?.tasks ?? [];
+  const selected = tasks.find((task) => task.id === selectedId) ?? null;
   const total = data?.total ?? 0;
   const page = filters.page ?? 1;
   const pages = Math.max(1, Math.ceil(total / PER_PAGE));
@@ -171,6 +186,27 @@ export function TasksBoard({
     onDelete: canManage ? setDeleting : undefined,
   };
 
+  /** Desde el detalle del calendario: el diálogo de la acción reemplaza al del detalle. */
+  const closeThen = <T,>(fn?: (task: T) => void) =>
+    fn
+      ? (task: T) => {
+          setSelectedId(null);
+          fn(task);
+        }
+      : undefined;
+  const detailActions = {
+    ...actions,
+    onComplete: closeThen(actions.onComplete) ?? actions.onComplete,
+    onEdit: closeThen(actions.onEdit),
+    onDelete: closeThen(actions.onDelete),
+  };
+
+  const switchView = (next: 'list' | 'calendar') => {
+    setView(next);
+    // En calendario se ven todas: una publicada en el día 3 también cuenta para el mes.
+    if (next === 'calendar') patchFilters({ status: undefined });
+  };
+
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -185,7 +221,7 @@ export function TasksBoard({
           >
             <option value="">Todos los estados</option>
             <option value="PENDING">Pendientes</option>
-            <option value="DONE">Hechas</option>
+            <option value="DONE">Publicadas</option>
             <option value="CANCELLED">Canceladas</option>
           </select>
 
@@ -238,12 +274,31 @@ export function TasksBoard({
           </select>
         </div>
 
-        {canManage && (
-          <Button onClick={() => setCreateOpen(true)} className="shrink-0">
-            <Plus className="mr-2 h-4 w-4" />
-            Nueva tarea
-          </Button>
-        )}
+        <div className="flex shrink-0 gap-2">
+          <div className="flex rounded-md border p-0.5" role="group" aria-label="Vista">
+            {([
+              ['list', 'Lista', List],
+              ['calendar', 'Calendario', CalendarDays],
+            ] as const).map(([value, label, Icon]) => (
+              <Button
+                key={value}
+                variant={view === value ? 'secondary' : 'ghost'}
+                size="sm"
+                aria-pressed={view === value}
+                onClick={() => switchView(value)}
+              >
+                <Icon className="mr-1.5 h-4 w-4" />
+                {label}
+              </Button>
+            ))}
+          </div>
+          {canManage && (
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Nueva tarea
+            </Button>
+          )}
+        </div>
       </div>
 
       {filters.packageId && (
@@ -263,6 +318,13 @@ export function TasksBoard({
         <ListSkeleton rows={4} height="h-14" />
       ) : isError ? (
         <ErrorNote error={error} resource="las tareas" />
+      ) : view === 'calendar' ? (
+        <TaskCalendar
+          tasks={tasks}
+          month={month}
+          onMonthChange={setMonth}
+          onSelect={(task) => setSelectedId(task.id)}
+        />
       ) : tasks.length === 0 ? (
         <EmptyState
           icon={ListChecks}
@@ -352,6 +414,19 @@ export function TasksBoard({
               isPending={updateMutation.isPending}
               submitLabel="Guardar cambios"
             />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!selected} onOpenChange={(open) => !open && setSelectedId(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Tarea</DialogTitle>
+          </DialogHeader>
+          {selected && (
+            <ul>
+              <TaskCard task={selected} actions={detailActions} />
+            </ul>
           )}
         </DialogContent>
       </Dialog>

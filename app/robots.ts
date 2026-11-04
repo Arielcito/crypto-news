@@ -39,7 +39,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/_next/", "/admin/"],
+        disallow: ["/api/", "/_next/", "/admin/", "/reporte/"],
       },
       { userAgent: "Googlebot", allow: "/" },
       { userAgent: "Googlebot-News", allow: "/" },

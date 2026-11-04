@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Archive, ArrowLeft, BarChart3, Pencil } from 'lucide-react';
+import { Archive, ArrowLeft, BarChart3, Check, Link2, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -22,12 +22,34 @@ import { useAgencyClient, useArchiveClient, useUpdateClient } from '@/lib/use-ag
 import { CLIENT_STATUS_LABELS } from '@/lib/types/agency';
 import type { CreateClientInput } from '@/lib/types/agency';
 
-export function ClientDetail({ clientId, canManage }: { clientId: number; canManage: boolean }) {
+export function ClientDetail({
+  clientId,
+  canManage,
+  reportPath,
+}: {
+  clientId: number;
+  canManage: boolean;
+  /** Ruta del reporte en vivo firmado; sólo llega para admins. */
+  reportPath?: string;
+}) {
   const router = useRouter();
   const { data: client, isLoading, isError, error } = useAgencyClient(clientId);
   const updateMutation = useUpdateClient();
   const archiveMutation = useArchiveClient();
   const [editOpen, setEditOpen] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const copyReportLink = async () => {
+    if (!reportPath) return;
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}${reportPath}`);
+      setLinkCopied(true);
+      toast.success('Link copiado. El cliente lo abre sin login.');
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      toast.error('No se pudo copiar el link');
+    }
+  };
   const [archiving, setArchiving] = useState(false);
 
   if (isLoading) return <ListSkeleton rows={4} height="h-24" />;
@@ -87,6 +109,12 @@ export function ClientDetail({ clientId, canManage }: { clientId: number; canMan
               Ver orgánico
             </Link>
           </Button>
+          {reportPath && (
+            <Button variant="outline" size="sm" onClick={copyReportLink}>
+              {linkCopied ? <Check className="mr-2 h-4 w-4" /> : <Link2 className="mr-2 h-4 w-4" />}
+              Copiar link del reporte
+            </Button>
+          )}
           {canManage && (
             <>
               <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>

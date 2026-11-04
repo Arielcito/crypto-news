@@ -120,6 +120,32 @@ export const SPONSORSHIP_LABELS: Record<Sponsorship, string> = {
   PAID: 'Publicitario',
 };
 
+/**
+ * Tipo de contenido para el color del calendario. `format` es texto libre
+ * ("Clip podcast", "Video (YT)"), así que se clasifica por palabra clave y el
+ * orden importa: "Clip podcast" es clip, no podcast.
+ */
+export const CONTENT_KINDS = [
+  { kind: 'clip', label: 'Clip', color: '#0D9488', keywords: ['clip'] },
+  { kind: 'reel', label: 'Reel', color: '#E11D48', keywords: ['reel'] },
+  { kind: 'historia', label: 'Historia', color: '#D97706', keywords: ['historia'] },
+  { kind: 'podcast', label: 'Podcast / vivo', color: '#7C3AED', keywords: ['podcast', 'vivo'] },
+  { kind: 'video', label: 'Video largo', color: '#2563EB', keywords: ['video'] },
+  { kind: 'nota', label: 'Nota', color: '#A21CAF', keywords: ['nota', 'reseña'] },
+  { kind: 'post', label: 'Posteo', color: '#16A34A', keywords: ['post', 'carrusel', 'mención'] },
+  { kind: 'otro', label: 'Otro', color: '#64748B', keywords: [] },
+] as const;
+
+export type ContentKind = (typeof CONTENT_KINDS)[number];
+
+export function contentKindOf(format: string): ContentKind {
+  const text = format.toLowerCase();
+  return (
+    CONTENT_KINDS.find((entry) => entry.keywords.some((keyword) => text.includes(keyword))) ??
+    CONTENT_KINDS[CONTENT_KINDS.length - 1]
+  );
+}
+
 export const ROLE_LABELS: Record<'ADMIN' | 'EMPLOYEE', string> = {
   ADMIN: 'Admin',
   // Sólo cambia el nombre visible: "empleado" sonaba a relación laboral. El

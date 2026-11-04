@@ -136,6 +136,9 @@ export interface TaskListFilters {
   packageId?: number;
   status?: TaskStatus;
   network?: string;
+  /** `YYYY-MM-DD`, vencimiento inclusive. */
+  from?: string;
+  to?: string;
   page?: number;
   perPage?: number;
 }

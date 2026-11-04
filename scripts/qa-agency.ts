@@ -18,6 +18,8 @@ import { organicMetrics } from '@/lib/agency/metrics';
 import { progressOf } from '@/lib/agency/packages';
 import { canAccessClient, clientIdsForUser } from '@/lib/agency/permissions';
 import { parseDueDate, urgencyOf, countdownLabel } from '@/lib/agency/dates';
+import { contentKindOf } from '@/lib/types/agency';
+import { reportToken, verifyReportToken } from '@/lib/agency/report-link';
 import type { SessionUser } from '@/lib/admin-auth';
 
 let failures = 0;
@@ -204,6 +206,24 @@ async function main() {
   check("en 10 días → 'later'", urgencyOf(parseDueDate('2026-07-25'), false, ref) === 'later');
   check("hecha → 'done' aunque esté vencida", urgencyOf(parseDueDate('2026-07-01'), true, ref) === 'done');
   check('countdown legible', countdownLabel(parseDueDate('2026-07-17'), ref).startsWith('En 2 día'), countdownLabel(parseDueDate('2026-07-17'), ref));
+
+  console.log('\n== tipo de contenido (calendario) ==');
+  const kinds: [string, string][] = [
+    ['Clip podcast', 'clip'], ['Reel', 'reel'], ['Historia', 'historia'], ['Vivo (YT)', 'podcast'],
+    ['Video (YT)', 'video'], ['Nota de prensa', 'nota'], ['Carrusel', 'post'],
+    ['Mención orgánica semanal', 'post'], ['Contacto de ballenas', 'otro'],
+  ];
+  for (const [format, kind] of kinds) {
+    check(`${format} → ${kind}`, contentKindOf(format).kind === kind, contentKindOf(format).kind);
+  }
+
+  // Link público del reporte: la firma ata el token a un solo cliente.
+  process.env.SESSION_SECRET ??= 'qa-secret-de-al-menos-32-caracteres!!';
+  const token = reportToken(7);
+  check('el token firmado devuelve su cliente', verifyReportToken(token) === 7);
+  check('cambiar el id invalida la firma', verifyReportToken(token.replace(/^7\./, '8.')) === null);
+  check('firma adulterada no pasa', verifyReportToken(`${token.slice(0, -1)}${token.endsWith('A') ? 'B' : 'A'}`) === null);
+  check('basura no pasa', verifyReportToken('7.abc') === null && verifyReportToken('../etc') === null);
 
   console.log(failures === 0 ? '\nTODO OK\n' : `\n${failures} FALLAS\n`);
   await prisma.$disconnect();

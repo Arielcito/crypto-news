@@ -15,7 +15,7 @@ import { completeTaskSchema, updateTaskSchema } from '@/lib/validations/admin';
 
 const STATUS_MESSAGES: Record<TaskStatus, string> = {
   PENDING: 'Tarea reabierta',
-  DONE: 'Tarea completada',
+  DONE: 'Tarea marcada como publicada',
   CANCELLED: 'Tarea cancelada',
 };
 
