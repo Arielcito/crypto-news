@@ -14,6 +14,7 @@ import {
 import { notifyPostPublished } from '@/lib/services/notify';
 import { isMirroredUrl, mirrorRemoteImage } from '@/lib/services/media-mirror';
 import { canGenerateCover, generateCoverImage } from '@/lib/services/cover-image';
+import { humanizeText } from '@/lib/services/humanize-text';
 
 // Generar la portada con Gemini tarda entre 10 y 30 segundos.
 export const maxDuration = 60;
@@ -157,6 +158,14 @@ export async function POST(request: NextRequest) {
     if (!body.title || !body.content) {
       return Response.json({ error: 'Bad request', message: 'Title and content are required' }, { status: 400 });
     }
+
+    // La ingesta escribe con IA: se limpian los tics (raya, "Conclusión" genérica)
+    // antes de que el texto llegue al slug, a la portada y a la base.
+    const rawContent = String(body.content);
+    body.title = humanizeText(String(body.title));
+    body.content = humanizeText(rawContent);
+    if (typeof body.excerpt === 'string') body.excerpt = humanizeText(body.excerpt);
+    if (body.content !== rawContent) console.log('[POST] /api/wp/v2/posts - Texto limpiado de marcas de IA');
 
     // Ensure domain is provided or default
     const domain = body.domain || 'default';
