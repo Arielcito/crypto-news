@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Twitter, Linkedin, Globe, Mail } from "lucide-react";
+import { Twitter, Linkedin, Globe, Instagram, Mail } from "lucide-react";
 
 import type { Author } from "@/types/author";
 
@@ -11,6 +11,9 @@ type AuthorBioProps = {
 
 export function AuthorBio({ author, showCredentials = true }: AuthorBioProps) {
   const profileHref = `/autores/${author.slug}`;
+  // ponytail: Instagram va en `website` (sin columna propia); columna `instagram` si algún autor necesita los dos.
+  const websiteIsInstagram = /^https?:\/\/(www\.)?instagram\.com\//i.test(author.website ?? "");
+  const WebsiteIcon = websiteIsInstagram ? Instagram : Globe;
 
   return (
     <aside
@@ -93,10 +96,10 @@ export function AuthorBio({ author, showCredentials = true }: AuthorBioProps) {
                 href={author.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Sitio web de ${author.name}`}
+                aria-label={`${websiteIsInstagram ? "Instagram" : "Sitio web"} de ${author.name}`}
                 className="text-muted-foreground transition-colors hover:text-primary"
               >
-                <Globe className="h-4 w-4" />
+                <WebsiteIcon className="h-4 w-4" />
               </a>
             )}
             {author.email && (

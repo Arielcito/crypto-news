@@ -15,6 +15,7 @@ import { notifyPostPublished } from '@/lib/services/notify';
 import { isMirroredUrl, mirrorRemoteImage } from '@/lib/services/media-mirror';
 import { canGenerateCover, generateCoverImage } from '@/lib/services/cover-image';
 import { humanizeText } from '@/lib/services/humanize-text';
+import { getDefaultAuthorId } from '@/lib/api/authors';
 
 // Generar la portada con Gemini tarda entre 10 y 30 segundos.
 export const maxDuration = 60;
@@ -262,6 +263,8 @@ export async function POST(request: NextRequest) {
       tags: tagIds.length
     });
 
+    const authorRefId = await getDefaultAuthorId(domain);
+
     const newPostData: Prisma.PostCreateInput = {
         title: body.title,
         content: body.content,
@@ -271,6 +274,7 @@ export async function POST(request: NextRequest) {
         author: body.author || 1,
         featuredMedia,
         domain: domain,
+        ...(authorRefId && { authorRef: { connect: { id: authorRefId } } }),
         categories: {
           connect: categoryIds.map(id => ({ id }))
         },

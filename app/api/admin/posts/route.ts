@@ -11,6 +11,7 @@ import {
 } from '@/lib/services/posts-service';
 import { notifyPostPublished } from '@/lib/services/notify';
 import { ADMIN_DOMAIN } from '@/lib/constants';
+import { getDefaultAuthorId } from '@/lib/api/authors';
 
 export async function GET(request: NextRequest) {
   console.log('[GET] /api/admin/posts - Request received');
@@ -113,7 +114,7 @@ export async function POST(request: NextRequest) {
         slug: input.slug || generateSlug(input.title),
         status: input.status,
         author: input.authorRefId ?? 1,
-        authorRefId: input.authorRefId,
+        authorRefId: input.authorRefId ?? (await getDefaultAuthorId(ADMIN_DOMAIN)),
         featuredMedia: input.featuredMedia,
         featured: input.featured ?? false,
         domain: ADMIN_DOMAIN,

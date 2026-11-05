@@ -80,6 +80,28 @@ export async function getAuthorWithPosts(
   return { ...author, posts };
 }
 
+// Firma de las notas que entran sin autor (ingesta automática, admin sin elegir).
+const DEFAULT_AUTHOR_SLUG: Partial<Record<string, string>> = {
+  "bitcoinarg.news": "franco-villabona",
+};
+
+// Nunca lanza: sin autor la nota se publica igual, perderla es peor.
+export async function getDefaultAuthorId(domain: string): Promise<number | null> {
+  const slug = DEFAULT_AUTHOR_SLUG[domain];
+  if (!slug) return null;
+  try {
+    const author = await prisma.author.findFirst({
+      where: { domain, slug, isActive: true },
+      select: { id: true },
+    });
+    if (!author) console.warn(`[authors] autor por defecto "${slug}" no existe en ${domain}`);
+    return author?.id ?? null;
+  } catch (error) {
+    console.error("[authors] getDefaultAuthorId failed:", error);
+    return null;
+  }
+}
+
 export async function listActiveAuthors(domain: string): Promise<Author[]> {
   try {
     const records = await prisma.author.findMany({
