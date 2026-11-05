@@ -23,7 +23,8 @@ jobs:
       - name: Llamar a /api/cron/ingest-news
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        # Apex, no www: www responde 308 y curl sin -L lo daría por bueno sin correr nada.
         run: |
           curl --silent --show-error --fail-with-body --max-time 320 \
             -H "Authorization: Bearer ${CRON_SECRET}" \
-            https://www.bitcoinarg.news/api/cron/ingest-news
+            https://bitcoinarg.news/api/cron/ingest-news
