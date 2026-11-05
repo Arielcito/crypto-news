@@ -21,7 +21,9 @@ const nextConfig = {
   },
   output: 'standalone',
   experimental: {
-    serverComponentsExternalPackages: ['@vercel/blob', 'undici'],
+    // El SDK de Anthropic va afuera del bundle: el minificador SWC de Next 14.0
+    // le rompe una regex (`toolsets/sanitize`) y la ruta de ingesta no carga.
+    serverComponentsExternalPackages: ['@vercel/blob', 'undici', '@anthropic-ai/sdk'],
   },
   env: {
     NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN || process.env.VERCEL_URL || 'localhost',
