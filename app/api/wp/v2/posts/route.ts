@@ -3,19 +3,8 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { slugVariants } from '@/lib/utils';
-import {
-  PostWithRelations,
-  cleanPostData,
-  generateSlug,
-  generateExcerpt,
-  validateCategoriesForDomain,
-  validateTagsExist,
-} from '@/lib/services/posts-service';
-import { notifyPostPublished } from '@/lib/services/notify';
-import { isMirroredUrl, mirrorRemoteImage } from '@/lib/services/media-mirror';
-import { canGenerateCover, generateCoverImage } from '@/lib/services/cover-image';
-import { humanizeText } from '@/lib/services/humanize-text';
-import { getDefaultAuthorId } from '@/lib/api/authors';
+import { PostWithRelations, cleanPostData } from '@/lib/services/posts-service';
+import { PostInputError, createPost } from '@/lib/services/create-post';
 
 // Generar la portada con Gemini tarda entre 10 y 30 segundos.
 export const maxDuration = 60;
@@ -160,148 +149,26 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Bad request', message: 'Title and content are required' }, { status: 400 });
     }
 
-    // La ingesta escribe con IA: se limpian los tics (raya, "Conclusión" genérica)
-    // antes de que el texto llegue al slug, a la portada y a la base.
-    const rawContent = String(body.content);
-    body.title = humanizeText(String(body.title));
-    body.content = humanizeText(rawContent);
-    if (typeof body.excerpt === 'string') body.excerpt = humanizeText(body.excerpt);
-    if (body.content !== rawContent) console.log('[POST] /api/wp/v2/posts - Texto limpiado de marcas de IA');
-
-    // Ensure domain is provided or default
-    const domain = body.domain || 'default';
-
-    /*
-     * La ingesta manda a veces un id suelto ("categories": 173) en vez de un
-     * array. Se normaliza acá, antes de validar y de conectar relaciones, para
-     * que ningún cliente pueda reventar el .map de más abajo.
-     */
-    const toIdArray = (value: unknown): number[] =>
-      (Array.isArray(value) ? value : value === undefined || value === null || value === '' ? [] : [value])
-        .map(Number)
-        .filter(id => Number.isInteger(id));
-
-    const categoryIds = toIdArray(body.categories);
-    const tagIds = toIdArray(body.tags);
-
-    // Validate that categories exist for the given domain
-    if (categoryIds.length) {
-      const categoryValidation = await validateCategoriesForDomain(categoryIds, domain);
-      if (!categoryValidation.valid) {
-        return Response.json({ error: 'Bad request', message: `Categories not found for domain ${domain}: ${categoryValidation.missingIds.join(', ')}` }, { status: 400 });
-      }
-    }
-
-    // Validate that tags exist (assuming tags are not domain-specific for now)
-    if (tagIds.length) {
-      const tagValidation = await validateTagsExist(tagIds);
-      if (!tagValidation.valid) {
-        return Response.json({ error: 'Bad request', message: `Tags not found: ${tagValidation.missingIds.join(', ')}` }, { status: 400 });
-      }
-    }
-
-    const slug = generateSlug(body.title);
-
-    /*
-     * La imagen que manda la ingesta vive en el servidor de la fuente. Se copia
-     * a Blob para que el post no dependa de que un tercero no rote ni borre la
-     * URL. Si el espejado falla (imagen caída, formato raro, host lento) se
-     * guarda la original: una portada prestada es mejor que no publicar.
-     */
-    const rawMedia: unknown = body.featured_media;
-    let featuredMedia: string | null =
-      typeof rawMedia === 'string' && /^https?:\/\//i.test(rawMedia.trim()) ? rawMedia.trim() : null;
-
-    if (featuredMedia && !isMirroredUrl(featuredMedia) && body.mirror_media !== false) {
-      try {
-        featuredMedia = await mirrorRemoteImage(featuredMedia, slug);
-        console.log('[POST] /api/wp/v2/posts - Imagen espejada en Blob:', featuredMedia);
-      } catch (error) {
-        console.warn(
-          '[POST] /api/wp/v2/posts - No se pudo espejar la imagen, se usa la original:',
-          error instanceof Error ? error.message : error
-        );
-      }
-    }
-
-    /*
-     * Sin portada la nota queda con el placeholder gris en la grilla, así que
-     * se genera una. Si Gemini falla se publica igual: perder la noticia es
-     * peor que publicarla sin imagen, y la fila del sheet ya quedó marcada como
-     * procesada, o sea que no se vuelve a leer nunca.
-     */
-    // Se devuelve en la respuesta porque la ingesta corre en Make y los logs de
-    // Vercel no están a mano: sin esto, "salió sin portada" no dice por qué.
-    let cover = 'no hacía falta';
-
-    if (!featuredMedia) {
-      if (!canGenerateCover()) {
-        cover = 'falta GEMINI_API_KEY';
-        console.warn('[POST] /api/wp/v2/posts - Sin GEMINI_API_KEY, se publica sin portada');
-      } else {
-        try {
-          featuredMedia = await generateCoverImage(body.title, body.excerpt || '', slug);
-          cover = 'generada';
-          console.log('[POST] /api/wp/v2/posts - Portada generada:', featuredMedia);
-        } catch (error) {
-          cover = error instanceof Error ? error.message : String(error);
-          console.warn('[POST] /api/wp/v2/posts - No se pudo generar la portada:', cover);
-        }
-      }
-    }
-
-    console.log('[POST] /api/wp/v2/posts - Creating post with data:', {
-      title: body.title,
-      contentLength: body.content.length,
-      excerpt: body.excerpt ? body.excerpt.length : 'auto-generated',
-      slug,
-      status: body.status || 'publish',
-      author: body.author || 1,
-      featuredMedia,
-      domain: domain,
-      categories: categoryIds.length,
-      tags: tagIds.length
+    const { post, cover } = await createPost({
+      title: String(body.title),
+      content: String(body.content),
+      excerpt: typeof body.excerpt === 'string' ? body.excerpt : undefined,
+      domain: body.domain || 'default',
+      status: body.status,
+      author: body.author,
+      categories: body.categories,
+      tags: body.tags,
+      featuredMedia: body.featured_media,
+      mirrorMedia: body.mirror_media !== false,
     });
 
-    const authorRefId = await getDefaultAuthorId(domain);
-
-    const newPostData: Prisma.PostCreateInput = {
-        title: body.title,
-        content: body.content,
-        excerpt: body.excerpt || generateExcerpt(body.content),
-        slug,
-        status: body.status || 'publish',
-        author: body.author || 1,
-        featuredMedia,
-        domain: domain,
-        ...(authorRefId && { authorRef: { connect: { id: authorRefId } } }),
-        categories: {
-          connect: categoryIds.map(id => ({ id }))
-        },
-        tags: {
-          connect: tagIds.map(id => ({ id }))
-        }
-    };
-
-    const newPost = await prisma.post.create({
-      data: newPostData,
-      include: {
-        categories: true,
-        tags: true
-      }
-    });
-
-    // Cast to include relations for logging/response
-    const newPostWithRelations = newPost as PostWithRelations;
-
-    // Esta es la ruta que usa la ingesta automática, así que es la que dispara
-    // la mayoría de los avisos a Discord, Telegram y X. notifyPostPublished filtra por dominio
-    // y por status, y nunca lanza.
-    await notifyPostPublished(newPost);
-
-    return Response.json({ data: newPostWithRelations, cover }, { status: 201 });
+    return Response.json({ data: post, cover }, { status: 201 });
   } catch (error: any) {
     console.error('[POST] /api/wp/v2/posts - Error creating post:', error);
+
+    if (error instanceof PostInputError) {
+      return Response.json({ error: 'Bad request', message: error.message }, { status: 400 });
+    }
 
     // Handle potential Prisma unique constraint violation for slug
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {

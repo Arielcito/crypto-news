@@ -1,0 +1,29 @@
+# Ingesta de noticias de bitcoinarg.news (lib/services/news-ingest.ts).
+# Vive acá porque el plan Hobby de Vercel solo admite crons diarios.
+# Si la ingesta devuelve 500 (clave de Claude inválida, base caída) el job falla
+# y GitHub avisa por mail.
+# GitHub apaga los schedules de repos públicos tras 60 días sin commits (avisa
+# por mail antes): si eso pasa, reactivarlo desde la pestaña Actions.
+name: Ingesta de noticias
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ingest-news
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Llamar a /api/cron/ingest-news
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl --silent --show-error --fail-with-body --max-time 320 \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            https://www.bitcoinarg.news/api/cron/ingest-news

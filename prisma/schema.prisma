@@ -398,3 +398,23 @@ model Expense {
   @@index([date])
   @@map("expenses")
 }
+
+/// Una noticia de un feed RSS que ya pasó por la ingesta (`lib/services/news-ingest.ts`).
+/// Se reclama ANTES de llamar a Claude: dos corridas superpuestas chocan contra el
+/// unique de `link` y la segunda la saltea. Las descartadas también quedan, para no
+/// volver a pagar a Claude por la misma nota. Es, además, el único log de la
+/// ingesta que se puede consultar: los de Vercel no están a mano.
+model IngestedItem {
+  id         Int      @id @default(autoincrement())
+  link       String   @unique
+  title      String
+  /// claimed | published | skipped | error
+  status     String
+  relevancia Int?
+  postId     Int?     @map("post_id")
+  detail     String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("ingested_items")
+}
