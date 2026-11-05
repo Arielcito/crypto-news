@@ -15,8 +15,6 @@ import type { Domain } from "@/lib/domain-colors";
 
 const inter = Inter({ subsets: ["latin"], display: "swap", preload: true });
 
-const FAVICON_PATH = '/favicons/bitcoin.ico';
-
 const KNOWN_DOMAINS: Domain[] = ['bitcoinarg.news', 'localhost'];
 
 function detectInitialDomain(): Domain {
@@ -39,7 +37,6 @@ function detectInitialDomain(): Domain {
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = getDomainConfig();
-  const faviconPath = FAVICON_PATH;
   const baseDomain = config.site.domain === 'localhost' ? 'bitcoinarg.news' : config.site.domain;
 
   return {
@@ -52,10 +49,13 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: '/',
     },
+    // Google Search pide >= 48px: el .ico trae 16/32/48 y el PNG de 192 cubre el resto.
     icons: {
-      icon: faviconPath,
-      shortcut: faviconPath,
-      apple: faviconPath,
+      icon: [
+        { url: '/favicon.ico', sizes: 'any' },
+        { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      ],
+      apple: '/apple-touch-icon.png',
     },
     openGraph: {
       title: config.site.title,
