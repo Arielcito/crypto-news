@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { buildPostUrl, stripMarkdown, type NotifiablePost } from '@/lib/services/discord';
 
@@ -6,6 +7,13 @@ const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 // `@usuario` del canal/grupo público o su id numérico. El bot tiene que ser admin.
 const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 const SEND_TIMEOUT_MS = 5000;
+
+/**
+ * `secret_token` del setWebhook: sha256 del token. Sale del token para no
+ * tener una tercera variable que mover a mano entre Telegram y Vercel.
+ */
+export const webhookSecret = (): string | null =>
+  BOT_TOKEN ? createHash('sha256').update(BOT_TOKEN).digest('hex') : null;
 
 export const escapeHtml = (text: string): string =>
   text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

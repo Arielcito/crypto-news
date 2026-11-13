@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { escapeHtml, sendTelegramMessage } from '@/lib/services/telegram';
+import { escapeHtml, sendTelegramMessage, webhookSecret } from '@/lib/services/telegram';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,12 +22,13 @@ const ok = () => NextResponse.json({ ok: true });
 /**
  * Webhook del bot. Su único trabajo es el /start: cruza el @ de quien lo manda
  * con `User.telegramUsername` y guarda el chat privado para el digest diario.
- * Telegram firma cada pedido con el `secret_token` que se le pasó en setWebhook.
+ * Telegram firma cada pedido con el `secret_token` que se le pasó en setWebhook
+ * (`webhookSecret()`, derivado del token).
  */
 export async function POST(request: NextRequest) {
   console.log('[POST] /api/telegram/webhook - Request received');
 
-  const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
+  const secret = webhookSecret();
   if (!secret || request.headers.get('x-telegram-bot-api-secret-token') !== secret) {
     return NextResponse.json(
       { data: null, error: 'Unauthorized', message: 'Authentication required' },
