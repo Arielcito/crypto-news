@@ -8,6 +8,7 @@ import { ClientLayout } from "@/components/client-layout";
 import { getDomainConfig } from "@/lib/domain-config";
 import { Providers } from "./providers";
 import { Analytics } from "@/components/analytics";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { JsonLd } from "@/components/json-ld";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
 import Script from "next/script";
@@ -127,6 +128,7 @@ export default function RootLayout({
           </ThemeProvider>
         </Providers>
         <Analytics />
+        <VercelAnalytics />
       </body>
     </html>
   );
