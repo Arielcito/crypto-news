@@ -1,6 +1,6 @@
 /**
- * Arma el payload de PostProxy para X sin red: título solo en el post, link en
- * el hilo (PostProxy rechaza links en el cuerpo) y portada si hay.
+ * Arma el payload de PostProxy para X sin red: título y bajada en el post, link
+ * en el hilo (PostProxy rechaza links en el cuerpo) y portada si hay.
  *
  *   npm run qa:x
  */
@@ -29,9 +29,16 @@ const daysAgo = (days: number) => new Date(now - days * 24 * 60 * 60 * 1000);
 const url = 'https://bitcoinarg.news/mercados/bitcoin-supera-100k';
 const tweet = buildTweet(base);
 const long = buildTweet({ ...base, title: 'a'.repeat(400), featuredMedia: null });
+const excerpt = 'El precio tocó un máximo histórico tras la aprobación de nuevos ETF.';
+const withExcerpt = buildTweet({ ...base, excerpt });
+const longExcerpt = buildTweet({ ...base, excerpt: 'palabra '.repeat(60) });
+const withUrl = buildTweet({ ...base, excerpt: 'Según https://example.com/nota el precio subió' });
 
 const checks: [string, boolean][] = [
-  ['el post lleva solo el título', tweet.post.body === base.title],
+  ['sin bajada el post lleva solo el título', tweet.post.body === base.title],
+  ['con bajada va título + bajada', withExcerpt.post.body === `${base.title}\n\n${excerpt}`],
+  ['bajada larga recorta a 280 con …', longExcerpt.post.body.length === 280 && longExcerpt.post.body.endsWith('…')],
+  ['saca URLs sueltas de la bajada', !/https?:/.test(withUrl.post.body)],
   ['el link va en el hilo', tweet.thread[0].body === `Nota completa: ${url}`],
   ['sube la portada', tweet.media?.[0] === base.featuredMedia],
   ['sin portada no manda media', !('media' in long)],

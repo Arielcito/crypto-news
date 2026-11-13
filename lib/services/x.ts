@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { buildPostUrl, type NotifiablePost } from '@/lib/services/discord';
+import { buildPostUrl, stripMarkdown, type NotifiablePost } from '@/lib/services/discord';
 
 const POSTPROXY_API = 'https://api.postproxy.dev/api';
 const API_KEY = process.env.POSTPROXY_API_KEY;
@@ -11,16 +11,20 @@ const SEND_TIMEOUT_MS = 10000;
 const TWEET_MAX = 280;
 
 /**
- * PostProxy rechaza links en el cuerpo de un post de X (422): el link va en la
- * primera respuesta del hilo, y la portada se sube en el post principal porque
- * sin link X no arma tarjeta.
+ * Título y bajada hasta los 280. PostProxy rechaza links en el cuerpo de un post
+ * de X (422): se sacan las URLs sueltas de la bajada, el link va en la primera
+ * respuesta del hilo, y la portada se sube en el post principal porque sin link
+ * X no arma tarjeta.
  */
 export function buildTweet(post: NotifiablePost) {
   const title =
     post.title.length <= TWEET_MAX ? post.title : `${post.title.slice(0, TWEET_MAX - 1)}…`;
+  const room = TWEET_MAX - title.length - 2;
+  const excerpt =
+    room > 20 ? stripMarkdown((post.excerpt || post.content).replace(/https?:\/\/\S+/g, ''), room) : '';
 
   return {
-    post: { body: title },
+    post: { body: excerpt ? `${title}\n\n${excerpt}` : title },
     profiles: [X_PROFILE_ID],
     ...(post.featuredMedia ? { media: [post.featuredMedia] } : {}),
     thread: [{ body: `Nota completa: ${buildPostUrl(post)}` }],
