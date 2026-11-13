@@ -4,7 +4,7 @@
  *
  *   npm run qa:x
  */
-import { buildTweet } from '@/lib/services/x';
+import { buildTweet, tweetsInLastDay } from '@/lib/services/x';
 import { shouldNotifyOnUpdate } from '@/lib/services/notify';
 import type { NotifiablePost } from '@/lib/services/discord';
 
@@ -34,7 +34,18 @@ const withExcerpt = buildTweet({ ...base, excerpt });
 const longExcerpt = buildTweet({ ...base, excerpt: 'palabra '.repeat(60) });
 const withUrl = buildTweet({ ...base, excerpt: 'Según https://example.com/nota el precio subió' });
 
+const hoursAgo = (hours: number) => new Date(now - hours * 60 * 60 * 1000).toISOString();
+const reply = [{ body: 'Nota completa' }];
+const proxyPosts = [
+  { created_at: hoursAgo(1), thread: reply, platforms: [{ platform: 'twitter', status: 'pending' }] },
+  { created_at: hoursAgo(2), thread: reply, platforms: [{ platform: 'twitter', status: 'failed' }] },
+  { created_at: hoursAgo(23), thread: reply, platforms: [{ platform: 'twitter', status: 'published' }] },
+  { created_at: hoursAgo(25), thread: reply, platforms: [{ platform: 'twitter', status: 'published' }] },
+  { created_at: hoursAgo(1), platforms: [{ platform: 'youtube', status: 'published' }] },
+];
+
 const checks: [string, boolean][] = [
+  ['cuota: cuenta post + hilo de X en 24 h, sin fallidos ni otras redes', tweetsInLastDay(proxyPosts, now) === 4],
   ['sin bajada el post lleva solo el título', tweet.post.body === base.title],
   ['con bajada va título + bajada', withExcerpt.post.body === `${base.title}\n\n${excerpt}`],
   ['bajada larga recorta a 280 con …', longExcerpt.post.body.length === 280 && longExcerpt.post.body.endsWith('…')],
