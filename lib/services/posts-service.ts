@@ -20,7 +20,13 @@ export function cleanPostData(post: PostWithRelations): PostWithRelations {
 }
 
 export function generateSlug(title: string): string {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  // Translitera tildes y ñ ("conducción" → "conduccion") en vez de cortarlas.
+  return title
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 export function generateExcerpt(content: string): string {
