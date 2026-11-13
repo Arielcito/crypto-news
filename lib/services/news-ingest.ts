@@ -70,7 +70,7 @@ Reglas de redacción:
 - category: UN solo id de este listado. ${Object.entries(CATEGORIES)
   .map(([id, name]) => `${id} ${name}`)
   .join(', ')}. Si dudás, usá ${FALLBACK_CATEGORY}.
-- repetida: true si la noticia cuenta el mismo hecho que alguna de las "Notas ya publicadas en el sitio", aunque venga de otro medio o con otras palabras. false si es un hecho distinto o un desarrollo nuevo e importante de esa historia.
+- repetida: true si la noticia es la misma historia que alguna de las "Notas ya publicadas en el sitio" (misma empresa, persona o hecho), aunque venga de otro medio, con otro ángulo u otro dato del mismo anuncio. false si es un hecho distinto, o un hecho nuevo que cambia la historia (por ejemplo, se confirma lo que antes era un rumor).
 - relevancia: entero de 0 a 100 según esta escala. 80-100: impacta directo al lector argentino (regulación o impuestos en Argentina, pesos y stablecoins en el país, exchanges locales, adopción local). 60-79: noticia global de peso que mueve al mercado (ETF, Fed, halving, movimientos fuertes de BTC o ETH, hackeos grandes, regulación de EE.UU. o la UE). 40-59: industria cripto de interés medio, sin impacto local claro. 20-39: altcoins menores, precio de corto plazo, noticias de otros mercados. 0-19: publicidad, promociones, contenido patrocinado o irrelevante. Usá toda la escala: si la noticia es global y relevante, ponele 60 o más.
 
 No inventes datos, cifras ni declaraciones que no estén en el material recibido.`;
