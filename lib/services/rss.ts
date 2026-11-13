@@ -1,8 +1,8 @@
 /**
- * Lectura de feeds RSS 2.0 de WordPress y pasaje de HTML a texto plano, sin
- * dependencias: los feeds que se ingieren (`news-ingest.ts`) son todos WordPress
- * y tienen la misma forma. Puro a propósito, así lo prueba `npm run qa:rss` sin
- * red ni base.
+ * Lectura de feeds RSS 2.0 de WordPress y de sitemaps de Google News, y pasaje
+ * de HTML a texto plano, sin dependencias: las fuentes que se ingieren
+ * (`news-ingest.ts`) son todas WordPress y tienen la misma forma. Puro a
+ * propósito, así lo prueba `npm run qa:rss` sin red ni base.
  */
 export interface FeedItem {
   title: string;
@@ -59,6 +59,12 @@ function readTag(xml: string, tag: string): string | null {
   return cdata ? cdata[1] : match[1];
 }
 
+function readDate(xml: string, tag: string): Date | null {
+  const raw = readTag(xml, tag);
+  const date = raw ? new Date(raw.trim()) : null;
+  return date && !Number.isNaN(date.getTime()) ? date : null;
+}
+
 /** Ítems sin título o sin link se descartan: sin link no hay cómo deduplicar. */
 export function parseFeed(xml: string): FeedItem[] {
   const items: FeedItem[] = [];
@@ -67,17 +73,27 @@ export function parseFeed(xml: string): FeedItem[] {
     const link = decodeEntities(readTag(raw, 'link') ?? '').trim();
     if (!title || !/^https?:\/\//i.test(link)) continue;
 
-    const rawDate = readTag(raw, 'pubDate');
-    const date = rawDate ? new Date(rawDate.trim()) : null;
     const encoded = readTag(raw, 'content:encoded');
 
     items.push({
       title,
       link,
-      pubDate: date && !Number.isNaN(date.getTime()) ? date : null,
+      pubDate: readDate(raw, 'pubDate'),
       description: htmlToText(readTag(raw, 'description') ?? ''),
       content: encoded ? htmlToText(encoded) : null,
     });
+  }
+  return items;
+}
+
+/** Sitemap de Google News (`<url>` + `<news:news>`): trae título y fecha, no copete ni cuerpo. */
+export function parseNewsSitemap(xml: string): FeedItem[] {
+  const items: FeedItem[] = [];
+  for (const [, raw] of Array.from(xml.matchAll(/<url\b[^>]*>([\s\S]*?)<\/url>/gi))) {
+    const title = decodeEntities(readTag(raw, 'news:title') ?? '').trim();
+    const link = decodeEntities(readTag(raw, 'loc') ?? '').trim();
+    if (!title || !/^https?:\/\//i.test(link)) continue;
+    items.push({ title, link, pubDate: readDate(raw, 'news:publication_date'), description: '', content: null });
   }
   return items;
 }

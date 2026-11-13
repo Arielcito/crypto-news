@@ -5,7 +5,7 @@
  *   npm run qa:rss
  *   npm run qa:rss -- --live
  */
-import { articleText, decodeEntities, htmlToText, parseFeed } from '@/lib/services/rss';
+import { articleText, decodeEntities, htmlToText, parseFeed, parseNewsSitemap } from '@/lib/services/rss';
 
 const FEED = `<?xml version="1.0"?><rss><channel><title>Medio</title>
 <item>
@@ -24,7 +24,13 @@ const FEED = `<?xml version="1.0"?><rss><channel><title>Medio</title>
 </item>
 </channel></rss>`;
 
+const SITEMAP = `<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+<url><loc>https://medio.com/mercados/nota-3/</loc><news:news><news:publication><news:name>Medio</news:name></news:publication><news:publication_date>2026-11-13T09:14:03-05:00</news:publication_date><news:title>Ethereum cae &amp; Bitcoin resiste</news:title></news:news></url>
+<url><loc>https://medio.com/sin-titulo/</loc></url>
+</urlset>`;
+
 const items = parseFeed(FEED);
+const sitemap = parseNewsSitemap(SITEMAP);
 const cases: [string, unknown, unknown][] = [
   ['descarta el ítem sin link', items.length, 2],
   ['decodifica entidades del título', items[0]?.title, 'Bitcoin sube – el peso & la inflación'],
@@ -37,6 +43,11 @@ const cases: [string, unknown, unknown][] = [
   ['sin content:encoded → null', items[1]?.content, null],
   ['entidad desconocida queda', decodeEntities('a &foo; b &#x41;'), 'a &foo; b A'],
   ['html con comentario y br', htmlToText('<p>uno<br>dos</p><!-- x --><div>tres</div>'), 'uno\ndos\ntres'],
+  ['sitemap: descarta la url sin título', sitemap.length, 1],
+  ['sitemap: título decodificado', sitemap[0]?.title, 'Ethereum cae & Bitcoin resiste'],
+  ['sitemap: link', sitemap[0]?.link, 'https://medio.com/mercados/nota-3/'],
+  ['sitemap: fecha con zona', sitemap[0]?.pubDate?.toISOString(), '2026-11-13T14:14:03.000Z'],
+  ['sitemap: sin cuerpo', sitemap[0]?.content, null],
   ['prefiere <article>', articleText('<nav>Menú</nav><article><p>Nota</p></article><footer>Pie</footer>'), 'Nota'],
 ];
 
@@ -48,6 +59,10 @@ for (const [label, got, expected] of cases) {
 }
 
 async function live() {
+  const sitemapUrl = 'https://www.diariobitcoin.com/sitemap-news.xml';
+  const sitemapResponse = await fetch(sitemapUrl, { headers: { 'User-Agent': 'bitcoinarg.news-ingest/1.0 (+https://www.bitcoinarg.news)' } });
+  const urls = parseNewsSitemap(await sitemapResponse.text());
+  console.log(`live ${sitemapUrl}: HTTP ${sitemapResponse.status}, ${urls.length} urls, sin fecha: ${urls.filter(item => !item.pubDate).length}`);
   const feeds = ['https://www.criptonoticias.com/feed/', 'https://es.beincrypto.com/feed/'];
   for (const url of feeds) {
     const response = await fetch(url, { headers: { 'User-Agent': 'bitcoinarg.news-ingest/1.0 (+https://www.bitcoinarg.news)' } });

@@ -3,9 +3,10 @@
  * publicador): la dispara cada hora `.github/workflows/ingest-news.yml` contra
  * `/api/cron/ingest-news`.
  *
- * Por cada nota nueva de los feeds: se reclama en `ingested_items`, Claude la
- * reescribe y le pone relevancia, y si pasa el corte se publica con
- * `createPost` (portada de Gemini y avisos a Discord, Telegram y X).
+ * Por cada nota nueva de los feeds (y del sitemap de DiarioBitcoin): se reclama
+ * en `ingested_items`, Claude la reescribe, le pone relevancia y marca si ya está
+ * publicada, y si pasa el corte se publica con `createPost` (portada de Gemini y
+ * avisos a Discord, Telegram y X).
  */
 import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
@@ -13,12 +14,24 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { createPost } from '@/lib/services/create-post';
-import { FeedItem, articleText, parseFeed } from '@/lib/services/rss';
+import { FeedItem, articleText, parseFeed, parseNewsSitemap } from '@/lib/services/rss';
 
 const DOMAIN = 'bitcoinarg.news';
-const FEEDS = [
-  { name: 'CriptoNoticias', url: 'https://www.criptonoticias.com/feed/' },
-  { name: 'BeInCrypto', url: 'https://es.beincrypto.com/feed/' },
+/**
+ * Secciones cripto de DiarioBitcoin. El resto (análisis de precio automáticos, IA,
+ * política de EE.UU., ciencia) son ~300 notas por día que no van al sitio.
+ */
+const DIARIOBITCOIN_SECTIONS =
+  /^https:\/\/www\.diariobitcoin\.com\/(criptomonedas|exchanges|blockchain|mineria|stablecoin|mercados|regulacion)\//;
+const FEEDS: { name: string; url: string; parse: (xml: string) => FeedItem[] }[] = [
+  { name: 'CriptoNoticias', url: 'https://www.criptonoticias.com/feed/', parse: parseFeed },
+  { name: 'BeInCrypto', url: 'https://es.beincrypto.com/feed/', parse: parseFeed },
+  // Su robots.txt prohíbe /feed/ pero publica este sitemap, y las notas se pueden leer.
+  {
+    name: 'DiarioBitcoin',
+    url: 'https://www.diariobitcoin.com/sitemap-news.xml',
+    parse: xml => parseNewsSitemap(xml).filter(item => DIARIOBITCOIN_SECTIONS.test(item.link)),
+  },
 ];
 /** UA honesto: si un medio no nos deja leer, queda anotado y se respeta. */
 const USER_AGENT = 'bitcoinarg.news-ingest/1.0 (+https://www.bitcoinarg.news)';
@@ -57,6 +70,7 @@ Reglas de redacción:
 - category: UN solo id de este listado. ${Object.entries(CATEGORIES)
   .map(([id, name]) => `${id} ${name}`)
   .join(', ')}. Si dudás, usá ${FALLBACK_CATEGORY}.
+- repetida: true si la noticia cuenta el mismo hecho que alguna de las "Notas ya publicadas en el sitio", aunque venga de otro medio o con otras palabras. false si es un hecho distinto o un desarrollo nuevo e importante de esa historia.
 - relevancia: entero de 0 a 100 según esta escala. 80-100: impacta directo al lector argentino (regulación o impuestos en Argentina, pesos y stablecoins en el país, exchanges locales, adopción local). 60-79: noticia global de peso que mueve al mercado (ETF, Fed, halving, movimientos fuertes de BTC o ETH, hackeos grandes, regulación de EE.UU. o la UE). 40-59: industria cripto de interés medio, sin impacto local claro. 20-39: altcoins menores, precio de corto plazo, noticias de otros mercados. 0-19: publicidad, promociones, contenido patrocinado o irrelevante. Usá toda la escala: si la noticia es global y relevante, ponele 60 o más.
 
 No inventes datos, cifras ni declaraciones que no estén en el material recibido.`;
@@ -67,6 +81,7 @@ const RewriteSchema = z.object({
   excerpt: z.string(),
   category: z.number().int(),
   relevancia: z.number().int(),
+  repetida: z.boolean(),
 });
 
 type SourcedItem = FeedItem & { source: string; pubDate: Date };
@@ -103,7 +118,7 @@ async function readFeeds(feedErrors: string[]): Promise<SourcedItem[]> {
       try {
         const response = await fetchPage(feed.url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return parseFeed(await response.text()).flatMap(item =>
+        return feed.parse(await response.text()).flatMap(item =>
           item.pubDate ? [{ ...item, pubDate: item.pubDate, source: feed.name }] : []
         );
       } catch (error) {
@@ -117,8 +132,22 @@ async function readFeeds(feedErrors: string[]): Promise<SourcedItem[]> {
   return perFeed.flat();
 }
 
-function userMessage(item: SourcedItem, text: string): string {
+/** Lo publicado en la ventana de la ingesta, incluidas las notas de esta misma corrida. */
+async function recentTitles(): Promise<string[]> {
+  const posts = await prisma.post.findMany({
+    where: { domain: DOMAIN, date: { gte: new Date(Date.now() - MAX_AGE_MS) } },
+    orderBy: { date: 'desc' },
+    select: { title: true },
+    take: 100,
+  });
+  return posts.map(post => post.title);
+}
+
+function userMessage(item: SourcedItem, text: string, published: string[]): string {
   return [
+    'Notas ya publicadas en el sitio (últimas 48 h):',
+    ...(published.length ? published.map(title => `- ${title}`) : ['(ninguna)']),
+    '',
     `Título original: ${item.title}`,
     `Fecha: ${item.pubDate.toISOString()}`,
     `URL de la fuente: ${item.link}`,
@@ -182,7 +211,7 @@ async function ingestItem(client: Anthropic, item: SourcedItem): Promise<Outcome
       model: MODEL,
       max_tokens: 8000,
       system: SYSTEM,
-      messages: [{ role: 'user', content: userMessage(item, text) }],
+      messages: [{ role: 'user', content: userMessage(item, text, await recentTitles()) }],
       output_config: { effort: 'medium', format: zodOutputFormat(RewriteSchema) },
     });
     if (response.stop_reason === 'refusal') {
@@ -208,6 +237,13 @@ async function ingestItem(client: Anthropic, item: SourcedItem): Promise<Outcome
   }
 
   const { relevancia } = rewrite;
+  // ponytail: la repetida se detecta después de pagar la reescritura. Si pesa en la factura,
+  // un chequeo previo con Haiku solo contra los títulos.
+  if (rewrite.repetida) {
+    console.log('[ingest] Repetida, no se publica');
+    await finish('skipped', { relevancia, detail: 'repetida' });
+    return 'skipped';
+  }
   if (relevancia < MIN_RELEVANCIA) {
     console.log(`[ingest] Relevancia ${relevancia}, no se publica`);
     await finish('skipped', { relevancia, detail: 'relevancia baja' });
@@ -253,10 +289,11 @@ export async function runIngest(): Promise<IngestSummary> {
       })
     ).map(row => row.link)
   );
-  // De la más vieja a la más nueva: el sitio las publica en el orden en que salieron.
+  // De la más nueva a la más vieja: entran más notas de las que se procesan por corrida, y las
+  // que quedan afuera son las viejas, que a las 48 h salen de la ventana sin gastar Claude.
   const queue = fresh
     .filter(item => !seen.has(item.link))
-    .sort((a, b) => a.pubDate.getTime() - b.pubDate.getTime());
+    .sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
 
   console.log(`[ingest] ${items.length} notas en los feeds, ${queue.length} nuevas`);
 
