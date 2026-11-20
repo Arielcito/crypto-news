@@ -8,6 +8,10 @@ const isProd = process.env.NODE_ENV === 'production';
 const nextConfig = {
   reactStrictMode: true,
   images: {
+    // El optimizador de Vercel Hobby agotó la cuota y respondía 402 a cada
+    // imagen. Las portadas se comprimen al subirlas (lib/services/cover-image.ts)
+    // y se sirven directo desde Blob/GCS.
+    unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],

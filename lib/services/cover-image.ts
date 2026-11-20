@@ -1,4 +1,5 @@
 import { put } from '@vercel/blob';
+import sharp from 'sharp';
 
 /**
  * Genera la portada de un post con Gemini y la sube a Blob.
@@ -14,12 +15,6 @@ import { put } from '@vercel/blob';
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/interactions';
 const MODEL = process.env.GEMINI_IMAGE_MODEL || 'gemini-3.1-flash-image';
 const TIMEOUT_MS = 45_000;
-
-const EXTENSIONS: Record<string, string> = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-};
 
 interface InteractionContent {
   type?: string;
@@ -116,14 +111,21 @@ export async function generateCoverImage(title: string, excerpt: string, slug: s
   }
 
   const image = extractImage((await response.json()) as InteractionResponse);
-  const contentType = (image.mime_type || 'image/jpeg').toLowerCase();
-  const buffer = Buffer.from(image.data, 'base64');
-  if (buffer.byteLength === 0) throw new Error('La imagen generada vino vacía');
+  const raw = Buffer.from(image.data, 'base64');
+  if (raw.byteLength === 0) throw new Error('La imagen generada vino vacía');
+
+  // Gemini devuelve ~1MB y las imágenes se sirven sin optimizador
+  // (next.config.js); recomprimida queda en ~150KB sin pérdida visible.
+  // JPEG y no WebP para que Telegram, X y los og:image la tomen sin vueltas.
+  const buffer = await sharp(raw)
+    .resize({ width: 1200, withoutEnlargement: true })
+    .jpeg({ quality: 78, mozjpeg: true })
+    .toBuffer();
 
   const safeSlug = slug.slice(0, 60) || 'post';
-  const blob = await put(`posts/${Date.now()}-${safeSlug}.${EXTENSIONS[contentType] ?? 'jpg'}`, buffer, {
+  const blob = await put(`posts/${Date.now()}-${safeSlug}.jpg`, buffer, {
     access: 'public',
-    contentType,
+    contentType: 'image/jpeg',
   });
 
   return blob.url;
