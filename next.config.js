@@ -9,8 +9,8 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     // El optimizador de Vercel Hobby agotó la cuota y respondía 402 a cada
-    // imagen. Las portadas se comprimen al subirlas (lib/services/cover-image.ts)
-    // y se sirven directo desde Blob/GCS.
+    // imagen. Se sirven directo desde Blob/GCS. No sumar sharp para comprimir:
+    // con Next 14.0.4 rompe "Collecting build traces" (Maximum call stack).
     unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
