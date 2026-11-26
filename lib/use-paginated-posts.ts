@@ -6,9 +6,11 @@ import { fetchPaginatedPosts, PaginatedPostsResponse } from '@/lib/api/posts';
 
 interface UsePaginatedPostsOptions {
   perPage?: number;
+  /** Primera página renderizada en el servidor, para que los buscadores vean el listado. */
+  initialData?: PaginatedPostsResponse;
 }
 
-export function usePaginatedPosts({ perPage = 2 }: UsePaginatedPostsOptions = {}) {
+export function usePaginatedPosts({ perPage = 2, initialData }: UsePaginatedPostsOptions = {}) {
   const [page, setPage] = useState(1);
 
   const { data, isLoading, isFetching } = useQuery<PaginatedPostsResponse>({
@@ -16,6 +18,7 @@ export function usePaginatedPosts({ perPage = 2 }: UsePaginatedPostsOptions = {}
     queryFn: () => fetchPaginatedPosts({ page, perPage }),
     staleTime: 1000 * 60 * 5,
     placeholderData: (prev) => prev,
+    initialData: page === 1 ? initialData : undefined,
   });
 
   const posts = data?.posts ?? [];

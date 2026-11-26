@@ -63,7 +63,7 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "FacebookBot", allow: "/" },
       { userAgent: "Bytespider", allow: "/" },
     ],
-    sitemap: `${base}/sitemap.xml`,
+    sitemap: [`${base}/sitemap.xml`, `${base}/news-sitemap.xml`],
     host: base,
   };
 }

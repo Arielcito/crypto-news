@@ -62,6 +62,15 @@ async function getInitialPosts(domain: string): Promise<Post[]> {
   }
 }
 
+async function getPublishedCount(domain: string): Promise<number> {
+  try {
+    return await prisma.post.count({ where: { domain, status: "publish", isActive: true } });
+  } catch (error) {
+    console.error("[home] getPublishedCount failed:", error);
+    return 0;
+  }
+}
+
 const FEATURED_SLOTS = 4;
 
 async function getFeaturedPosts(domain: string): Promise<Post[]> {
@@ -96,9 +105,10 @@ async function getFeaturedPosts(domain: string): Promise<Post[]> {
 
 export default async function Home() {
   const domain = detectRequestDomain();
-  const [initialPosts, topStoryPosts] = await Promise.all([
+  const [initialPosts, topStoryPosts, publishedCount] = await Promise.all([
     getInitialPosts(domain),
     getFeaturedPosts(domain),
+    getPublishedCount(domain),
   ]);
   const identity = getSiteIdentity();
   const hasSsrPosts = initialPosts.length > 0;
@@ -123,7 +133,17 @@ export default async function Home() {
               </div>
             )}
 
-            <AllPostsPaginated />
+            <AllPostsPaginated
+              initialData={
+                hasSsrPosts
+                  ? {
+                      posts: initialPosts,
+                      total: publishedCount,
+                      totalPages: Math.ceil(publishedCount / 12),
+                    }
+                  : undefined
+              }
+            />
           </div>
 
           <TelegramChannel />

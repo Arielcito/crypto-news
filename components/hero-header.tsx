@@ -76,7 +76,7 @@ export function HeroHeader() {
               {site.categories.map((category) => (
                 <Link 
                   key={category.href} 
-                  href={'/categories/' + category.href}
+                  href={`/categories/${category.href.replace(/^\/+/, '')}`}
                   className="text-xs sm:text-sm font-bold hover:text-primary transition-colors whitespace-nowrap text-center"
                 >
                   {category.label}

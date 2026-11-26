@@ -4,12 +4,9 @@ import { usePathname } from 'next/navigation';
 import { CryptoPriceBanner } from '@/components/crypto-price-banner';
 import { HeroHeader } from '@/components/hero-header';
 import { MiniHeader } from '@/components/mini-header';
-import dynamic from 'next/dynamic';
-
-const Footer = dynamic(() => import('@/components/footer').then(mod => ({ default: mod.Footer })), {
-  ssr: false,
-  loading: () => <div className="h-40 animate-pulse bg-gray-50" />
-});
+// El footer se renderiza en el servidor para que los buscadores vean los links
+// institucionales (Sobre nosotros, Política editorial, Contacto).
+import { Footer } from '@/components/footer';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
