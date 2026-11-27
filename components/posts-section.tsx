@@ -10,7 +10,7 @@ import { TopStoriesSection } from "./TopStoriesSection";
 import { DeepDivesSection } from "./DeepDivesSection";
 import { PodcastSection } from "./PodcastSection";
 import { useQuery } from '@tanstack/react-query';
-import { fetchPaginatedPosts } from '@/lib/api/posts';
+import { fetchPaginatedPosts, type PaginatedPostsResponse } from '@/lib/api/posts';
 import { usePaginatedPosts } from '@/lib/use-paginated-posts';
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
@@ -140,7 +140,7 @@ function getVisiblePages(current: number, total: number): (number | 'ellipsis')[
   return pages;
 }
 
-export function AllPostsPaginated() {
+export function AllPostsPaginated({ initialData }: { initialData?: PaginatedPostsResponse } = {}) {
   const {
     posts,
     total,
@@ -153,7 +153,7 @@ export function AllPostsPaginated() {
     hasPrevPage,
     nextPage,
     prevPage,
-  } = usePaginatedPosts({ perPage: 12 });
+  } = usePaginatedPosts({ perPage: 12, initialData });
 
   const visiblePages = getVisiblePages(page, totalPages);
 
