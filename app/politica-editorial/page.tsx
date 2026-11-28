@@ -100,7 +100,7 @@ export default function PoliticaEditorialPage() {
           </ul>
 
           <h2>2. Verificación de la información</h2>
-          <p>Antes de publicar una noticia, nuestro proceso incluye:</p>
+          <p>Antes de publicar una noticia, y según el tipo de nota, nuestro proceso incluye:</p>
           <ul>
             <li>
               Confirmación en la fuente primaria (comunicado oficial, on-chain data,
@@ -132,17 +132,23 @@ export default function PoliticaEditorialPage() {
           <h2>4. Uso de inteligencia artificial</h2>
           <ul>
             <li>
-              Las herramientas de IA pueden ser utilizadas como apoyo para traducción,
-              resúmenes preliminares o búsqueda de antecedentes, pero todo el contenido
-              publicado es revisado, editado y firmado por humanos.
+              Parte de nuestras notas de actualidad parten de la cobertura de otros
+              medios especializados, que citamos al pie con enlace. Para esas notas
+              usamos inteligencia artificial para preparar un primer borrador en
+              español a partir de la fuente.
             </li>
             <li>
-              Cuando un texto incluye una sección generada con asistencia de IA, se
-              indica al pie.
+              Ese borrador no se publica solo: un editor lo revisa, verifica los datos,
+              agrega contexto local y lo aprueba antes de publicarlo.
             </li>
             <li>
-              No publicamos contenido íntegramente generado por IA sin revisión
-              editorial.
+              Esas notas se firman como <strong>Redacción</strong> y llevan al pie la
+              aclaración de que se elaboraron con asistencia de IA. Las notas con firma
+              personal las escribe esa persona.
+            </li>
+            <li>
+              También usamos IA como apoyo para traducción, resúmenes preliminares o
+              búsqueda de antecedentes.
             </li>
           </ul>
 

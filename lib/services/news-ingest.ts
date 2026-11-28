@@ -48,6 +48,16 @@ const START_BUDGET_MS = 100_000;
 const MIN_TEXT_CHARS = 600;
 const MAX_TEXT_CHARS = 9000;
 const MODEL = 'claude-sonnet-5-5';
+/**
+ * Por defecto la ingesta deja BORRADORES para que alguien los revise, edite y
+ * publique desde el admin (al publicar salen los avisos a redes). Publicar solo,
+ * cada hora y sin revisión es el patrón que Google trata como contenido a escala.
+ * `INGEST_AUTOPUBLISH=true` vuelve al comportamiento anterior.
+ */
+const AUTOPUBLISH = process.env.INGEST_AUTOPUBLISH === 'true';
+/** Aviso al pie: Google pide decir cómo se usó la automatización. */
+const AI_DISCLOSURE =
+  '\n\n*Esta nota fue elaborada por la Redacción de BITCOINARG.news con asistencia de inteligencia artificial, a partir de la fuente citada.*';
 const CATEGORIES: Record<number, string> = {
   176: 'Adopción',
   174: 'Regulación',
@@ -254,13 +264,15 @@ async function ingestItem(client: Anthropic, item: SourcedItem): Promise<Outcome
   try {
     const { post, cover } = await createPost({
       title: rewrite.title,
-      content: rewrite.content,
+      content: rewrite.content.trimEnd() + AI_DISCLOSURE,
       excerpt: rewrite.excerpt,
       domain: DOMAIN,
-      status: 'publish',
+      status: AUTOPUBLISH ? 'publish' : 'draft',
       categories: [category],
     });
-    console.log(`[ingest] Publicada (relevancia ${relevancia}): post ${post.id}`);
+    console.log(
+      `[ingest] ${AUTOPUBLISH ? 'Publicada' : 'Borrador para revisar'} (relevancia ${relevancia}): post ${post.id}`
+    );
     await finish('published', { relevancia, postId: post.id, detail: `portada: ${cover}`.slice(0, 500) });
     return 'published';
   } catch (error) {
