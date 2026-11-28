@@ -1,3 +1,4 @@
+import { removeAccents } from "@/lib/utils";
 import type { MetadataRoute } from "next";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
@@ -64,7 +65,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     prisma.domainCategories
       .findMany({
-        where: { domain, isActive: true },
+        // Solo categorías con notas publicadas: una vacía no aporta nada al índice.
+        where: {
+          domain,
+          isActive: true,
+          posts: { some: { status: "publish", isActive: true } },
+        },
         select: { slug: true },
       })
       .catch((error) => {
@@ -124,8 +130,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  const categoryUrls: MetadataRoute.Sitemap = categories.map((c) => ({
-    url: `${base}/categories/${c.slug}`,
+  // Una URL por categoría, sin tildes ni mayúsculas: es la canónica de la página.
+  const categorySlugs = Array.from(
+    new Set(categories.map((c) => removeAccents(c.slug).toLowerCase())),
+  );
+  const categoryUrls: MetadataRoute.Sitemap = categorySlugs.map((slug) => ({
+    url: `${base}/categories/${slug}`,
     lastModified: now,
     changeFrequency: "daily",
     priority: 0.7,

@@ -81,8 +81,10 @@ export async function getAuthorWithPosts(
 }
 
 // Firma de las notas que entran sin autor (ingesta automática, admin sin elegir).
+// Es la Redacción y no una persona: Google trata como engaño atribuir a alguien
+// notas que no escribió (guía de contenido útil, octubre de 2026).
 const DEFAULT_AUTHOR_SLUG: Partial<Record<string, string>> = {
-  "bitcoinarg.news": "franco-villabona",
+  "bitcoinarg.news": "redaccion-bitcoinarg",
 };
 
 // Nunca lanza: sin autor la nota se publica igual, perderla es peor.
